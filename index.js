@@ -1,11 +1,14 @@
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const { GoogleGenAI } = require('@google/genai'); 
+const { GoogleGenerativeAI } = require('@google/generative-ai'); // CORRIGIDO: Nome do pacote oficial
+
+// Carrega as variáveis de ambiente do arquivo .env
+require('dotenv').config(); 
 
 // --- Configuração da API Gemini ---
 // A chave é lida da variável de ambiente GEMINI_API_KEY
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }); 
-const model = "gemini-2.5-flash"; // Modelo mais rápido e leve
+const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Chave passada diretamente ao construtor
+const modelName = "gemini-1.5-flash"; // Modelo mais rápido e leve (ou o que você preferir)
 
 // Configurações de Resiliência (Retry Logic)
 const MAX_RETRIES = 5; 
@@ -55,12 +58,11 @@ async function getGeminiResponseWithRetry(chatInstance, prompt, retryCount = 0) 
     }
 
     try {
-        // Correção de formato
-        const response = await chatInstance.sendMessage({ message: prompt }); 
+        const result = await chatInstance.sendMessage(prompt); // CORRIGIDO: Envio de string direta
+        const response = await result.response;
+        return response.text(); // CORRIGIDO: .text() é uma função
 
-        return response.text;
     } catch (error) {
-        // Trata 503 (Serviço Indisponível/Sobrecarga) ou 400 (Erro de Autenticação/Bad Request)
         const status = error.status || (error.message.includes('400') || error.message.includes('503') ? 400 : 0);
         
         if (status === 503 || status === 400) {
@@ -70,55 +72,12 @@ async function getGeminiResponseWithRetry(chatInstance, prompt, retryCount = 0) 
             return getGeminiResponseWithRetry(chatInstance, prompt, retryCount + 1);
         } else {
             console.error('Erro não tratado na API do Gemini:', error);
-            // Mensagem de fallback genérica para erros não tratados.
             return "Ocorreu um erro desconhecido ao processar sua solicitação. Tente de outra forma."; 
         }
     }
 }
 
-// Ouvinte de mensagens
-client.on('message', async (msg) => {
-    if (msg.fromMe || msg.isGroup) {
-        return;
-    }
-
-    const userId = msg.from; 
-    const chat = await msg.getChat();
-    
-    // --- LÓGICA DE COMANDOS DEDICADOS ---
-    if (msg.body.toLowerCase().startsWith('/')) {
-        const command = msg.body.toLowerCase().trim();
-
-        if (command === '/limpar') {
-            if (activeChats.has(userId)) {
-                activeChats.delete(userId); // Limpa a sessão do Gemini
-                msg.reply("✅ Memória de conversa limpa! Podemos começar um novo assunto.");
-                console.log(`[COMANDO] Sessão de chat do usuário ${userId} limpa.`);
-            } else {
-                msg.reply("A memória já está limpa! Podemos começar um novo assunto.");
-            }
-            return; 
-        }
-        
-        // Se for um comando não reconhecido
-        msg.reply("Desculpe, esse comando não é reconhecido. Tente `/limpar` para resetar a conversa.");
-        return;
-    }
-    // --- FIM DA LÓGICA DE COMANDOS DEDICADOS ---
-
-    chat.sendStateTyping(); // Mostra "digitando..."
-    
-    let chatInstance = activeChats.get(userId);
-
-    // Lógica para criar ou obter a sessão de chat (memória)
-    if (!chatInstance) {
-        console.log(`Iniciando nova sessão de chat para o usuário: ${userId}`);
-        
-        chatInstance = ai.chats.create({
-            model: model,
-            config: {
-                // INSTRUÇÃO FINAL: Com as regras de resposta e toda a base de conhecimento
-                systemInstruction: `Você é Duda, o assistente virtual da UNINTER Caratinga. Sua principal missão é fornecer informações EXATAS, CONCISAS e ATUALIZADAS.
+const systemInstructionText = `Você é Duda, o assistente virtual da UNINTER Caratinga. Sua principal missão é fornecer informações EXATAS, CONCISAS e ATUALIZADAS.
 
 REGRAS DE RESPOSTA:
 1. Contatos do Polo: Fornecer o Telefone Fixo, Endereço Físico, Instagram e Linktree do Polo de Caratinga SOMENTE quando explicitamente solicitado ou estritamente relevante à resposta. NÃO APENDE estes contatos a toda resposta.
@@ -241,18 +200,53 @@ Pergunta: A inscrição é valida apenas para um curso?
 Resposta: Sim, os candidatos realizam o vestibular apenas para uma das opções de cursos disponíveis. Aqueles que desejam frequentar dois cursos devem enviar solicitação para o e-mail vestibular@uninter.com.
 
 Pergunta: A inscrição é paga?
-Resposta: Cursos presenciais e semipresenciais: Inscrição isenta (100% gratuita). Cursos a distância: Sim. Ao final da inscrição, é gerado um boleto que pode ser pago diretamente no Polo de Apoio selecionado ou na rede bancária credenciada.`,
-            },
+Resposta: Cursos presenciais e semipresenciais: Inscrição isenta (100% gratuita). Cursos a distância: Sim. Ao final da inscrição, é gerado um boleto que pode ser pago diretamente no Polo de Apoio selecionado ou na rede bancária credenciada.`;
+
+client.on('message', async (msg) => {
+    if (msg.fromMe || msg.isGroup) {
+        return;
+    }
+
+    const userId = msg.from; 
+    const chat = await msg.getChat();
+    
+    if (msg.body.toLowerCase().startsWith('/')) {
+        const command = msg.body.toLowerCase().trim();
+
+        if (command === '/limpar') {
+            if (activeChats.has(userId)) {
+                activeChats.delete(userId); // Limpa a sessão do Gemini
+                msg.reply("✅ Memória de conversa limpa! Podemos começar um novo assunto.");
+                console.log(`[COMANDO] Sessão de chat do usuário ${userId} limpa.`);
+            } else {
+                msg.reply("A memória já está limpa! Podemos começar um novo assunto.");
+            }
+            return; 
+        }
+        
+        msg.reply("Desculpe, esse comando não é reconhecido. Tente `/limpar` para resetar a conversa.");
+        return;
+    }
+
+    chat.sendStateTyping(); 
+    
+    let chatInstance = activeChats.get(userId);
+
+    if (!chatInstance) {
+        console.log(`Iniciando nova sessão de chat para o usuário: ${userId}`);
+        
+        const generativeModel = ai.getGenerativeModel({
+            model: modelName,
+            systemInstruction: systemInstructionText, // Passa a instrução do sistema aqui
         });
 
+        chatInstance = generativeModel.startChat({}); // Cria a instância do chat
         activeChats.set(userId, chatInstance); 
     }
 
-    // Chama a função de repetição com a instância de chat e o corpo da mensagem
     const geminiText = await getGeminiResponseWithRetry(chatInstance, msg.body);
     
-    // Responde ao usuário
     msg.reply(geminiText);
 
-    chat.clearState(); // Limpa o estado "digitando..."
+    chat.clearState(); 
 });

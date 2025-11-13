@@ -1,20 +1,16 @@
 {
-  "name": "duda-uninter-caratinga",
+  "name": "01-robo-duda",
   "version": "1.0.0",
-  "description": "Assistente virtual para o polo Uninter Caratinga, utilizando whatsapp-web.js e Gemini API.",
+  "description": "Your bot description",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js", // ESTA É A LINHA CRUCIAL QUE PRECISA SER ADICIONADA
+    "test": "echo "Error: no test specified" && exit 1"
   },
-  "keywords": [
-    "whatsapp",
-    "bot",
-    "gemini",
-    "uninter"
-  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@google/genai": "^0.1.0",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.23.0"
+    // suas dependências
   }
 }

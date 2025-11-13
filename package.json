@@ -1,16 +1,24 @@
 {
   "name": "01-robo-duda",
   "version": "1.0.0",
-  "description": "Your bot description",
+  "description": "Bot para integração com WhatsApp e Gemini, rodando na Render.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js", // ESTA É A LINHA CRUCIAL QUE PRECISA SER ADICIONADA
+    "start": "node index.js",
     "test": "echo "Error: no test specified" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "whatsapp",
+    "gemini",
+    "ai",
+    "bot"
+  ],
+  "author": "Bruno Costa Ribeiro",
+  "license": "MIT",
   "dependencies": {
-    // suas dependências
+    "whatsapp-web.js": "^1.23.0",
+    "qrious": "^4.1.2",
+    "@google/generative-ai": "^0.1.0",
+    "dotenv": "^16.4.5"
   }
 }

@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "whatsapp-web.js": "^1.23.0",
-    "qrious": "^4.1.2",
+    "qrcode-terminal": "^1.2.0",
     "@google/generative-ai": "^0.1.0",
     "dotenv": "^16.4.5"
   }

@@ -1,14 +1,14 @@
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const { GoogleGenerativeAI } = require('@google/generative-ai'); // CORRIGIDO: Nome do pacote oficial
+const { GoogleGenerativeAI } = require('@google/generative-ai'); 
 
 // Carrega as variáveis de ambiente do arquivo .env
 require('dotenv').config(); 
 
 // --- Configuração da API Gemini ---
 // A chave é lida da variável de ambiente GEMINI_API_KEY
-const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Chave passada diretamente ao construtor
-const modelName = "gemini-1.5-flash"; // Modelo mais rápido e leve (ou o que você preferir)
+const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); 
+const modelName = "gemini-1.5-flash"; // Modelo mais rápido e leve
 
 // Configurações de Resiliência (Retry Logic)
 const MAX_RETRIES = 5; 
@@ -17,72 +17,13 @@ const RETRY_DELAY_MS = 5000; // 5 segundos de espera
 // Armazenamento de chats por usuário (Memory)
 const activeChats = new Map(); 
 
-// Configuração de cliente
-const client = new Client({
-    authStrategy: new LocalAuth({ clientId: "bot-uninter-caratinga" }),
-    puppeteer: {
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-web-security'
-        ],
-    },
-});
-
-// Inicialização e QR Code
-client.on('qr', (qr) => {
-    qrcode.generate(qr, { small: true });
-    console.log('----------------------------------------------------');
-    console.log('🚨 Novo QR CODE gerado. Escaneie-o para continuar.');
-    console.log('----------------------------------------------------');
-});
-
-// Confirmação de que o cliente está pronto
-client.on('ready', () => {
-    console.log('Client is ready! Bot Uninter Caratinga está ONLINE, com MEMÓRIA e comandos.');
-});
-
-client.initialize();
-
-/**
- * Função para chamar a API do Gemini com lógica de repetição (retry) para erros 503/400.
- * @param {object} chatInstance - A instância do chat (com memória).
- * @param {string} prompt - A mensagem de entrada.
- * @param {number} retryCount - Contador de tentativas (interno).
- * @returns {Promise<string>} A resposta do Gemini.
- */
-async function getGeminiResponseWithRetry(chatInstance, prompt, retryCount = 0) {
-    if (retryCount >= MAX_RETRIES) {
-        console.error(`Falha após ${MAX_RETRIES} tentativas. O modelo Gemini continua indisponível.`);
-        return "Desculpe, a inteligência artificial está sobrecarregada no momento. Tente novamente em alguns minutos.";
-    }
-
-    try {
-        const result = await chatInstance.sendMessage(prompt); // CORRIGIDO: Envio de string direta
-        const response = await result.response;
-        return response.text(); // CORRIGIDO: .text() é uma função
-
-    } catch (error) {
-        const status = error.status || (error.message.includes('400') || error.message.includes('503') ? 400 : 0);
-        
-        if (status === 503 || status === 400) {
-            console.warn(`[GEMINI - Tentativa ${retryCount + 1}] Erro ${status}. Tentando novamente em ${RETRY_DELAY_MS / 1000}s...`);
-            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-            
-            return getGeminiResponseWithRetry(chatInstance, prompt, retryCount + 1);
-        } else {
-            console.error('Erro não tratado na API do Gemini:', error);
-            return "Ocorreu um erro desconhecido ao processar sua solicitação. Tente de outra forma."; 
-        }
-    }
-}
-
+// --- Configuração do Modelo e System Instruction (Melhorado) ---
 const systemInstructionText = `Você é Duda, o assistente virtual da UNINTER Caratinga. Sua principal missão é fornecer informações EXATAS, CONCISAS e ATUALIZADAS.
 
 REGRAS DE RESPOSTA:
-1. Contatos do Polo: Fornecer o Telefone Fixo, Endereço Físico, Instagram e Linktree do Polo de Caratinga SOMENTE quando explicitamente solicitado ou estritamente relevante à resposta. NÃO APENDE estes contatos a toda resposta.
-2. Links: Sempre que um link for a melhor resposta, inclua o URL diretamente.
-3. Priorize: Use a Base de Conhecimento abaixo para responder às perguntas sobre FIES, Prouni, Vestibular e vida acadêmica, garantindo que as respostas sejam idênticas às fornecidas.
+1. PRIORIDADE DA BASE: Use a Base de Conhecimento abaixo para responder às perguntas sobre FIES, Prouni, Vestibular e vida acadêmica, garantindo que as respostas sejam idênticas às fornecidas.
+2. FALLBACK/CONTATO: Se a resposta não estiver na Base de Conhecimento e a informação não puder ser fornecida com precisão, responda de forma cortês e **sugira imediatamente** que o usuário entre em contato com o Polo para informações mais específicas, fornecendo o **Telefone Fixo: (33) 3322-4001** e o **Instagram: @unintercaratinga**.
+3. Contatos Completos: Forneça o Endereço Físico e o Linktree SOMENTE quando explicitamente solicitados. NÃO APENDE estes contatos a toda resposta.
 
 INFORMAÇÕES ESSENCIAIS DO POLO:
 Endereço Físico: Rua Coronel Antônio Salim, 74, Bairro Dário Grossi, Caratinga - MG.
@@ -202,51 +143,26 @@ Resposta: Sim, os candidatos realizam o vestibular apenas para uma das opções 
 Pergunta: A inscrição é paga?
 Resposta: Cursos presenciais e semipresenciais: Inscrição isenta (100% gratuita). Cursos a distância: Sim. Ao final da inscrição, é gerado um boleto que pode ser pago diretamente no Polo de Apoio selecionado ou na rede bancária credenciada.`;
 
-client.on('message', async (msg) => {
-    if (msg.fromMe || msg.isGroup) {
-        return;
-    }
-
-    const userId = msg.from; 
-    const chat = await msg.getChat();
-    
-    if (msg.body.toLowerCase().startsWith('/')) {
-        const command = msg.body.toLowerCase().trim();
-
-        if (command === '/limpar') {
-            if (activeChats.has(userId)) {
-                activeChats.delete(userId); // Limpa a sessão do Gemini
-                msg.reply("✅ Memória de conversa limpa! Podemos começar um novo assunto.");
-                console.log(`[COMANDO] Sessão de chat do usuário ${userId} limpa.`);
-            } else {
-                msg.reply("A memória já está limpa! Podemos começar um novo assunto.");
-            }
-            return; 
-        }
-        
-        msg.reply("Desculpe, esse comando não é reconhecido. Tente `/limpar` para resetar a conversa.");
-        return;
-    }
-
-    chat.sendStateTyping(); 
-    
-    let chatInstance = activeChats.get(userId);
-
-    if (!chatInstance) {
-        console.log(`Iniciando nova sessão de chat para o usuário: ${userId}`);
-        
-        const generativeModel = ai.getGenerativeModel({
-            model: modelName,
-            systemInstruction: systemInstructionText, // Passa a instrução do sistema aqui
-        });
-
-        chatInstance = generativeModel.startChat({}); // Cria a instância do chat
-        activeChats.set(userId, chatInstance); 
-    }
-
-    const geminiText = await getGeminiResponseWithRetry(chatInstance, msg.body);
-    
-    msg.reply(geminiText);
-
-    chat.clearState(); 
+const generativeModel = ai.getGenerativeModel({
+    model: modelName,
+    systemInstruction: systemInstructionText, 
 });
+
+
+// Configuração de cliente
+const client = new Client({
+    authStrategy: new LocalAuth({ clientId: "bot-uninter-caratinga" }),
+    puppeteer: {
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-web-security'
+        ],
+    },
+});
+
+// Inicialização e QR Code
+client.on('qr', (qr) => {
+    qrcode.generate(qr, { small: true });
+    console.log('----------------------------------------------------');
+    console.log('🚨 Novo QR CODE gerado. Escaneie-o para

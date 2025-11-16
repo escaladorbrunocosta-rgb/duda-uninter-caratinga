@@ -151,4 +151,138 @@ const generativeModel = ai.getGenerativeModel({
 
 // Configuração de cliente
 const client = new Client({
-    authStrategy: new LocalAuth({ clientId: "bot-uninter-car
+    authStrategy: new LocalAuth({ clientId: "bot-uninter-caratinga" }),
+    puppeteer: {
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-web-security'
+        ],
+    },
+});
+
+// Inicialização e QR Code
+client.on('qr', (qr) => {
+    qrcode.generate(qr, { small: true });
+    console.log('----------------------------------------------------');
+    console.log('🚨 Novo QR CODE gerado. Escaneie-o para continuar.');
+    console.log('----------------------------------------------------');
+});
+
+// Confirmação de que o cliente está pronto
+client.on('ready', () => {
+    console.log('Client is ready! Bot Uninter Caratinga está ONLINE, com MEMÓRIA e comandos.');
+});
+
+client.initialize();
+
+/**
+ * Função para chamar a API do Gemini com lógica de repetição (retry) para erros 503/400.
+ * @param {object} chatInstance - A instância do chat (com memória).
+ * @param {string} prompt - A mensagem de entrada.
+ * @param {number} retryCount - Contador de tentativas (interno).
+ * @returns {Promise<string>} A resposta do Gemini.
+ */
+async function getGeminiResponseWithRetry(chatInstance, prompt, retryCount = 0) {
+    // --- Nova mensagem de erro padronizada ---
+    const standardizedErrorMessage = "Desculpe, a inteligência artificial está sobrecarregada no momento. Por favor, entre em contato diretamente com a Central UNINTER: *Telefone Geral: 0800 702 0500* ou acesse *www.uninter.com*.";
+
+    if (retryCount >= MAX_RETRIES) {
+        console.error(`Falha após ${MAX_RETRIES} tentativas. O modelo Gemini continua indisponível.`);
+        return standardizedErrorMessage; // Retorna a mensagem padronizada
+    }
+
+    try {
+        const result = await chatInstance.sendMessage(prompt);
+        const response = await result.response;
+        return response.text();
+
+    } catch (error) {
+        const status = error.status || (error.message.includes('400') || error.message.includes('503') ? 400 : 0);
+
+        if (status === 503 || status === 400) {
+            console.warn(`[GEMINI - Tentativa ${retryCount + 1}] Erro ${status}. Tentando novamente em ${RETRY_DELAY_MS / 1000}s...`);
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+
+            return getGeminiResponseWithRetry(chatInstance, prompt, retryCount + 1);
+        } else {
+            console.error('Erro não tratado na API do Gemini:', error);
+            return standardizedErrorMessage; // Retorna a mensagem padronizada para outros erros
+        }
+    }
+}
+
+
+client.on('message', async (msg) => {
+    if (msg.fromMe || msg.isGroup) {
+        return;
+    }
+
+    // --- Verifica se a mensagem é de texto (evita travar com mídias) ---
+    if (msg.type !== 'chat') {
+        await msg.reply("Desculpe, Duda só consegue processar mensagens de texto por enquanto. Por favor, digite sua pergunta.");
+        return;
+    }
+    // --- FIM VERIFICAÇÃO ---
+
+    const userId = msg.from;
+    const chat = await msg.getChat();
+
+    if (msg.body.toLowerCase().startsWith('/')) {
+        const command = msg.body.toLowerCase().trim();
+
+        if (command === '/limpar') {
+            if (activeChats.has(userId)) {
+                activeChats.delete(userId); // Limpa a sessão do Gemini
+                await msg.reply("✅ Memória de conversa limpa! Podemos começar um novo assunto.");
+                console.log(`[COMANDO] Sessão de chat do usuário ${userId} limpa.`);
+            } else {
+                await msg.reply("A memória já está limpa! Podemos começar um novo assunto.");
+            }
+            return;
+        }
+
+        await msg.reply("Desculpe, esse comando não é reconhecido. Tente `/limpar` para resetar a conversa.");
+        return;
+    }
+
+    chat.sendStateTyping();
+
+    let chatInstance = activeChats.get(userId);
+
+    if (!chatInstance) {
+        console.log(`Iniciando nova sessão de chat para o usuário: ${userId}`);
+
+        chatInstance = generativeModel.startChat({}); // Usa o modelo já configurado
+        activeChats.set(userId, chatInstance);
+    }
+
+    const geminiText = await getGeminiResponseWithRetry(chatInstance, msg.body);
+
+    await msg.reply(geminiText);
+
+    chat.clearState();
+});
+
+
+// =======================================================
+// === NOVO BLOCO: KEEP-ALIVE HTTP SERVER PARA RENDER ====
+// =======================================================
+
+// Cria o app Express
+const app = express();
+
+// A porta deve ser lida da variável de ambiente PORT, fornecida pela Render.
+const PORT = process.env.PORT || 3000;
+
+// Endpoint de saúde simples - Este é o alvo do UptimeRobot
+app.get('/', (req, res) => {
+    // Apenas envia um status 200 para manter o worker ativo
+    res.status(200).send('Duda Bot is Running and Awake!');
+});
+
+// Ouve na porta para manter o worker ativo na Render
+app.listen(PORT, () => {
+    console.log(`HTTP Server running for Keep-Alive on port ${PORT}`);
+});
+```http://googleusercontent.com/image_generation_content/2

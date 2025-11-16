@@ -1,24 +1,26 @@
 {
-  "name": "01-robo-duda",
+  "name": "duda-uninter-caratinga",
   "version": "1.0.0",
-  "description": "Bot para integração com WhatsApp e Gemini, rodando na Render.",
+  "description": "Duda, o assistente virtual da UNINTER Caratinga, via WhatsApp.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "keywords": [
     "whatsapp",
-    "gemini",
-    "ai",
-    "bot"
+    "bot",
+    "uninter",
+    "caratinga",
+    "gemini"
   ],
-  "author": "Bruno Costa Ribeiro",
-  "license": "MIT",
+  "author": "Bruno Costa",
+  "license": "ISC",
   "dependencies": {
-    "whatsapp-web.js": "^1.23.0",
-    "qrcode-terminal": "^1.2.0",
-    "@google/generative-ai": "^0.15.0",
+    "@google/generative-ai": "^0.11.0",
     "dotenv": "^16.4.5",
-    "express": "^4.18.2" 
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
   }
 }

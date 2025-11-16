@@ -1,13 +1,16 @@
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const express = require('express'); // <<< NOVO: Importa o Express
+const express = require('express');
 
-// Carrega as variáveis de ambiente do arquivo .env
+// Carrega as variáveis de ambiente do arquivo .env (apenas para PORT se ainda usar,
+// a chave GEMINI_API_KEY agora está embutida diretamente aqui)
 require('dotenv').config();
 
 // --- Configuração da API Gemini ---
-const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Sua chave da API do Gemini foi inserida diretamente aqui:
+const GEMINI_API_KEY = 'AIzaSyAZ4ZwxspHz_XQfW1EtHmqIooEj51RicMM';
+const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 const modelName = "gemini-1.5-flash";
 
 // Configurações de Resiliência (Retry Logic)
@@ -17,7 +20,7 @@ const RETRY_DELAY_MS = 5000; // 5 segundos de espera
 // Armazenamento de chats por usuário (Memory)
 const activeChats = new Map();
 
-// --- Configuração do Modelo e System Instruction (Melhorado) ---
+// --- Configuração do Modelo e System Instruction ---
 const systemInstructionText = `Você é Duda, o assistente virtual da UNINTER Caratinga. Sua principal missão é fornecer informações EXATAS, CONCISAS e ATUALIZADAS.
 
 REGRAS DE RESPOSTA:
@@ -266,16 +269,17 @@ client.on('message', async (msg) => {
 
 
 // =======================================================
-// === NOVO BLOCO: KEEP-ALIVE HTTP SERVER PARA RENDER ====
+// === BLOCO KEEP-ALIVE HTTP SERVER PARA RENDER ====
 // =======================================================
 
 // Cria o app Express
 const app = express();
 
 // A porta deve ser lida da variável de ambiente PORT, fornecida pela Render.
+// Se não houver, usa 3000 como padrão.
 const PORT = process.env.PORT || 3000;
 
-// Endpoint de saúde simples - Este é o alvo do UptimeRobot
+// Endpoint de saúde simples - Este é o alvo do UptimeRobot (ou outro serviço de monitoramento)
 app.get('/', (req, res) => {
     // Apenas envia um status 200 para manter o worker ativo
     res.status(200).send('Duda Bot is Running and Awake!');
@@ -285,4 +289,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`HTTP Server running for Keep-Alive on port ${PORT}`);
 });
-```http://googleusercontent.com/image_generation_content/2

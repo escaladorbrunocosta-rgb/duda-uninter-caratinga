@@ -119,4 +119,197 @@ Pergunta: Qual é a renda per capita máxima para concorrer à bolsa parcial e i
 Resposta: Parcial: não ultrapassar três salários mínimos por pessoa. Integral: não ultrapassar um salário mínimo e meio por pessoa.
 
 Pergunta: Devo apresentar Histórico Escolar?
-Resposta: Sim, nos casos em que o estudante se enquadre
+Resposta: Sim, nos casos em que o estudante se enquadre na escolaridade: quando todos os períodos letivos do ensino médio tiverem sido concluídos ou em instituição pública, ou em instituição privada na condição de bolsista integral; ou quando concluídos parcialmente em escola da rede pública e parcialmente em instituição privada (bolsista parcial ou sem condição de bolsista).
+
+Pergunta: Quem compõe o grupo familiar?
+Resposta: Pai, mãe, irmão/a, enteado, avô, avó, madrasta e padrasto ou membro familiar que comprove que reside com o candidato.
+
+Pergunta: Como são as provas do vestibular UNINTER?
+Resposta: A prova terá tempo de duração total de 1h (uma hora) e será on-line. Ela é dividida em Língua Portuguesa e Conhecimentos Gerais (comuns a todos) e, para completar, questões de Matemática ou Específicas da Área (somente Jurídica). A nota mínima para aprovação é de 200 pontos.
+
+Pergunta: Onde é aplicada a prova do vestibular?
+Resposta: 100% on-line para todos os cursos (presenciais, semipresenciais e a distância).
+
+Pergunta: Quais são as formas de ingressar nos cursos de graduação?
+Resposta: Além do vestibular, os candidatos podem utilizar a nota do Enem ou pedir transferência de outras instituições.
+
+Pergunta: Como utilizo minha nota do ENEM para participar do processo seletivo?
+Resposta: No momento da inscrição, selecione a opção SOMENTE ENEM para concorrer com a nota do Exame Nacional do Ensino Médio, sem precisar participar do vestibular.
+
+Pergunta: Posso mudar de curso depois do vestibular?
+Resposta: Cursos presenciais e semipresenciais: Sim, desde que haja vagas. Solicite a alteração pelo e-mail vestibular@grupouninter.com.br e aguarde retorno (em até 2 dias úteis). Cursos a distância: Sim. Acesse uninter.com/graduacao-ead/vestibular >> comprovante de inscrição, informe seu CPF e clique em Atualizar Informações de Curso e Local.
+
+Pergunta: Fui aprovado no vestibular, mas ainda não conclui o ensino médio. Posso me matricular?
+Resposta: Não. De acordo com a Lei de Diretrizes e Bases da Educação, só podem se matricular no ensino superior alunos com ensino médio completo. Você pode participar do vestibular para treinar e se preparar.
+
+Pergunta: A inscrição é valida apenas para um curso?
+Resposta: Sim, os candidatos realizam o vestibular apenas para uma das opções de cursos disponíveis. Aqueles que desejam frequentar dois cursos devem enviar solicitação para o e-mail vestibular@uninter.com.
+
+Pergunta: A inscrição é paga?
+Resposta: Cursos presenciais e semipresenciais: Inscrição isenta (100% gratuita). Cursos a distância: Sim. Ao final da inscrição, é gerado um boleto que pode ser pago diretamente no Polo de Apoio selecionado ou na rede bancária credenciada.`;
+
+const generativeModel = ai.getGenerativeModel({
+    model: modelName,
+    systemInstruction: systemInstructionText,
+});
+
+
+// Configuração de cliente
+const client = new Client({
+    authStrategy: new LocalAuth({ clientId: "bot-uninter-caratinga" }),
+    puppeteer: {
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-web-security'
+        ],
+        // Configurações para rodar headless (sem interface gráfica) na Render
+        headless: true, // Garante que o navegador não tente abrir uma janela
+    },
+});
+
+let currentQrCode = null; // Variável para armazenar o QR Code atual
+
+// Inicialização e QR Code
+client.on('qr', (qr) => {
+    // qrcode.generate(qr, { small: true }); // Comentado para não gerar no log
+    currentQrCode = qr; // Armazena o QR Code na variável
+    console.log('----------------------------------------------------');
+    console.log('🚨 NOVO QR CODE GERADO! Acesse a URL do seu serviço Render para escanear:');
+    console.log('   (Ex: https://01-robo-duda.onrender.com/qr)');
+    console.log('   Este QR Code expira em alguns segundos. Seja rápido!');
+    console.log('----------------------------------------------------');
+});
+
+// Confirmação de que o cliente está pronto
+client.on('ready', () => {
+    console.log('Client is ready! Bot Uninter Caratinga está ONLINE, com MEMÓRIA e comandos.');
+    currentQrCode = null; // Limpa o QR Code assim que o bot conecta
+});
+
+// Evento de desconexão (útil para saber se a sessão expirou)
+client.on('disconnected', (reason) => {
+    console.log('Client foi desconectado:', reason);
+    // Tenta inicializar novamente para gerar um novo QR Code
+    client.initialize();
+});
+
+client.initialize();
+
+/**
+ * Função para chamar a API do Gemini com lógica de repetição (retry) para erros 503/400.
+ * @param {object} chatInstance - A instância do chat (com memória).
+ * @param {string} prompt - A mensagem de entrada.
+ * @param {number} retryCount - Contador de tentativas (interno).
+ * @returns {Promise<string>} A resposta do Gemini.
+ */
+async function getGeminiResponseWithRetry(chatInstance, prompt, retryCount = 0) {
+    const standardizedErrorMessage = "Desculpe, a inteligência artificial está sobrecarregada no momento. Por favor, entre em contato diretamente com a Central UNINTER: *Telefone Geral: 0800 702 0500* ou acesse *www.uninter.com*.";
+
+    if (retryCount >= MAX_RETRIES) {
+        console.error(`Falha após ${MAX_RETRIES} tentativas. O modelo Gemini continua indisponível.`);
+        return standardizedErrorMessage;
+    }
+
+    try {
+        const result = await chatInstance.sendMessage(prompt);
+        const response = await result.response;
+        return response.text();
+
+    } catch (error) {
+        const status = error.status || (error.message.includes('400') || error.message.includes('503') ? 400 : 0);
+
+        if (status === 503 || status === 400) {
+            console.warn(`[GEMINI - Tentativa ${retryCount + 1}] Erro ${status}. Tentando novamente em ${RETRY_DELAY_MS / 1000}s...`);
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+            return getGeminiResponseWithRetry(chatInstance, prompt, retryCount + 1);
+        } else {
+            console.error('Erro não tratado na API do Gemini:', error);
+            return standardizedErrorMessage;
+        }
+    }
+}
+
+
+client.on('message', async (msg) => {
+    if (msg.fromMe || msg.isGroup) {
+        return;
+    }
+
+    if (msg.type !== 'chat') {
+        await msg.reply("Desculpe, Duda só consegue processar mensagens de texto por enquanto. Por favor, digite sua pergunta.");
+        return;
+    }
+
+    const userId = msg.from;
+    const chat = await msg.getChat();
+
+    if (msg.body.toLowerCase().startsWith('/')) {
+        const command = msg.body.toLowerCase().trim();
+
+        if (command === '/limpar') {
+            if (activeChats.has(userId)) {
+                activeChats.delete(userId);
+                await msg.reply("✅ Memória de conversa limpa! Podemos começar um novo assunto.");
+                console.log(`[COMANDO] Sessão de chat do usuário ${userId} limpa.`);
+            } else {
+                await msg.reply("A memória já está limpa! Podemos começar um novo assunto.");
+            }
+            return;
+        }
+
+        await msg.reply("Desculpe, esse comando não é reconhecido. Tente `/limpar` para resetar a conversa.");
+        return;
+    }
+
+    chat.sendStateTyping();
+
+    let chatInstance = activeChats.get(userId);
+
+    if (!chatInstance) {
+        console.log(`Iniciando nova sessão de chat para o usuário: ${userId}`);
+        chatInstance = generativeModel.startChat({});
+        activeChats.set(userId, chatInstance);
+    }
+
+    const geminiText = await getGeminiResponseWithRetry(chatInstance, msg.body);
+    await msg.reply(geminiText);
+    chat.clearState();
+});
+
+
+// =======================================================
+// === BLOCO KEEP-ALIVE HTTP SERVER PARA RENDER ====
+// =======================================================
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Endpoint de saúde para Keep-Alive
+app.get('/', (req, res) => {
+    res.status(200).send('Duda Bot is Running and Awake!');
+});
+
+// NOVO: Endpoint para exibir o QR Code como imagem
+app.get('/qr', async (req, res) => {
+    if (currentQrCode) {
+        // Se houver um QR Code, gera uma imagem SVG (melhor qualidade) e envia
+        const qrcodeSVG = require('qrcode'); // Precisamos instalar 'qrcode'
+        try {
+            const svg = await qrcodeSVG.toString(currentQrCode, { type: 'svg' });
+            res.type('image/svg+xml');
+            res.send(svg);
+        } catch (err) {
+            console.error('Erro ao gerar SVG do QR Code:', err);
+            res.status(500).send('Erro ao gerar QR Code.');
+        }
+    } else {
+        // Se não houver QR Code (bot já conectado ou não gerado ainda)
+        res.status(200).send('QR Code não disponível ou bot já conectado. Verifique os logs da Render.');
+    }
+});
+
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`HTTP Server running for Keep-Alive on port ${PORT}`);
+});

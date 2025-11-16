@@ -4,8 +4,6 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const express = require('express');
 
 // Carrega as variáveis de ambiente do arquivo .env
-// Isso fará com que o 'dotenv' procure um arquivo .env na mesma pasta
-// e carregue suas variáveis no 'process.env'
 require('dotenv').config();
 
 // --- Configuração da API Gemini ---
@@ -135,4 +133,171 @@ Pergunta: Quem compõe o grupo familiar?
 Resposta: Pai, mãe, irmão/a, enteado, avô, avó, madrasta e padrasto ou membro familiar que comprove que reside com o candidato.
 
 Pergunta: Como são as provas do vestibular UNINTER?
-Resposta: A prova terá tempo de duração total de 1h (uma hora) e será on-line
+Resposta: A prova terá tempo de duração total de 1h (uma hora) e será on-line. Ela é dividida em Língua Portuguesa e Conhecimentos Gerais (comuns a todos) e, para completar, questões de Matemática ou Específicas da Área (somente Jurídica). A nota mínima para aprovação é de 200 pontos.
+
+Pergunta: Onde é aplicada a prova do vestibular?
+Resposta: 100% on-line para todos os cursos (presenciais, semipresenciais e a distância).
+
+Pergunta: Quais são as formas de ingressar nos cursos de graduação?
+Resposta: Além do vestibular, os candidatos podem utilizar a nota do Enem ou pedir transferência de outras instituições.
+
+Pergunta: Como utilizo minha nota do ENEM para participar do processo seletivo?
+Resposta: No momento da inscrição, selecione a opção SOMENTE ENEM para concorrer com a nota do Exame Nacional do Ensino Médio, sem precisar participar do vestibular.
+
+Pergunta: Posso mudar de curso depois do vestibular?
+Resposta: Cursos presenciais e semipresenciais: Sim, desde que haja vagas. Solicite a alteração pelo e-mail vestibular@grupouninter.com.br e aguarde retorno (em até 2 dias úteis). Cursos a distância: Sim. Acesse uninter.com/graduacao-ead/vestibular >> comprovante de inscrição, informe seu CPF e clique em Atualizar Informações de Curso e Local.
+
+Pergunta: Fui aprovado no vestibular, mas ainda não conclui o ensino médio. Posso me matricular?
+Resposta: Não. De acordo com a Lei de Diretrizes e Bases da Educação, só podem se matricular no ensino superior alunos com ensino médio completo. Você pode participar do vestibular para treinar e se preparar.
+
+Pergunta: A inscrição é valida apenas para um curso?
+Resposta: Sim, os candidatos realizam o vestibular apenas para uma das opções de cursos disponíveis. Aqueles que desejam frequentar dois cursos devem enviar solicitação para o e-mail vestibular@uninter.com.
+
+Pergunta: A inscrição é paga?
+Resposta: Cursos presenciais e semipresenciais: Inscrição isenta (100% gratuita). Cursos a distância: Sim. Ao final da inscrição, é gerado um boleto que pode ser pago diretamente no Polo de Apoio selecionado ou na rede bancária credenciada.`;
+
+const generativeModel = ai.getGenerativeModel({
+    model: modelName,
+    systemInstruction: systemInstructionText,
+});
+
+
+// Configuração de cliente
+const client = new Client({
+    authStrategy: new LocalAuth({ clientId: "bot-uninter-caratinga" }),
+    puppeteer: {
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-web-security'
+        ],
+    },
+});
+
+// Inicialização e QR Code
+client.on('qr', (qr) => {
+    qrcode.generate(qr, { small: true });
+    console.log('----------------------------------------------------');
+    console.log('🚨 Novo QR CODE gerado. Escaneie-o para continuar.');
+    console.log('----------------------------------------------------');
+});
+
+// Confirmação de que o cliente está pronto
+client.on('ready', () => {
+    console.log('Client is ready! Bot Uninter Caratinga está ONLINE, com MEMÓRIA e comandos.');
+});
+
+client.initialize();
+
+/**
+ * Função para chamar a API do Gemini com lógica de repetição (retry) para erros 503/400.
+ * @param {object} chatInstance - A instância do chat (com memória).
+ * @param {string} prompt - A mensagem de entrada.
+ * @param {number} retryCount - Contador de tentativas (interno).
+ * @returns {Promise<string>} A resposta do Gemini.
+ */
+async function getGeminiResponseWithRetry(chatInstance, prompt, retryCount = 0) {
+    // --- Nova mensagem de erro padronizada ---
+    const standardizedErrorMessage = "Desculpe, a inteligência artificial está sobrecarregada no momento. Por favor, entre em contato diretamente com a Central UNINTER: *Telefone Geral: 0800 702 0500* ou acesse *www.uninter.com*.";
+
+    if (retryCount >= MAX_RETRIES) {
+        console.error(`Falha após ${MAX_RETRIES} tentativas. O modelo Gemini continua indisponível.`);
+        return standardizedErrorMessage; // Retorna a mensagem padronizada
+    }
+
+    try {
+        const result = await chatInstance.sendMessage(prompt);
+        const response = await result.response;
+        return response.text();
+
+    } catch (error) {
+        const status = error.status || (error.message.includes('400') || error.message.includes('503') ? 400 : 0);
+
+        if (status === 503 || status === 400) {
+            console.warn(`[GEMINI - Tentativa ${retryCount + 1}] Erro ${status}. Tentando novamente em ${RETRY_DELAY_MS / 1000}s...`);
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+
+            return getGeminiResponseWithRetry(chatInstance, prompt, retryCount + 1);
+        } else {
+            console.error('Erro não tratado na API do Gemini:', error);
+            return standardizedErrorMessage; // Retorna a mensagem padronizada para outros erros
+        }
+    }
+}
+
+
+client.on('message', async (msg) => {
+    if (msg.fromMe || msg.isGroup) {
+        return;
+    }
+
+    // --- Verifica se a mensagem é de texto (evita travar com mídias) ---
+    if (msg.type !== 'chat') {
+        await msg.reply("Desculpe, Duda só consegue processar mensagens de texto por enquanto. Por favor, digite sua pergunta.");
+        return;
+    }
+    // --- FIM VERIFICAÇÃO ---
+
+    const userId = msg.from;
+    const chat = await msg.getChat();
+
+    if (msg.body.toLowerCase().startsWith('/')) {
+        const command = msg.body.toLowerCase().trim();
+
+        if (command === '/limpar') {
+            if (activeChats.has(userId)) {
+                activeChats.delete(userId); // Limpa a sessão do Gemini
+                await msg.reply("✅ Memória de conversa limpa! Podemos começar um novo assunto.");
+                console.log(`[COMANDO] Sessão de chat do usuário ${userId} limpa.`);
+            } else {
+                await msg.reply("A memória já está limpa! Podemos começar um novo assunto.");
+            }
+            return;
+        }
+
+        await msg.reply("Desculpe, esse comando não é reconhecido. Tente `/limpar` para resetar a conversa.");
+        return;
+    }
+
+    chat.sendStateTyping();
+
+    let chatInstance = activeChats.get(userId);
+
+    if (!chatInstance) {
+        console.log(`Iniciando nova sessão de chat para o usuário: ${userId}`);
+
+        chatInstance = generativeModel.startChat({}); // Usa o modelo já configurado
+        activeChats.set(userId, chatInstance);
+    }
+
+    const geminiText = await getGeminiResponseWithRetry(chatInstance, msg.body);
+
+    await msg.reply(geminiText);
+
+    chat.clearState();
+});
+
+
+// =======================================================
+// === BLOCO KEEP-ALIVE HTTP SERVER PARA RENDER ====
+// =======================================================
+
+// Cria o app Express
+const app = express();
+
+// A porta deve ser lida da variável de ambiente PORT, fornecida pela Render.
+// Se não houver, usa 3000 como padrão.
+const PORT = process.env.PORT || 3000;
+
+// Endpoint de saúde simples - Este é o alvo do UptimeRobot (ou outro serviço de monitoramento)
+app.get('/', (req, res) => {
+    // Apenas envia um status 200 para manter o worker ativo
+    res.status(200).send('Duda Bot is Running and Awake!');
+});
+
+// Ouve na porta para manter o worker ativo na Render
+// Importante: especificar '0.0.0.0' para que o servidor seja acessível externamente na Render
+app.listen(PORT, '0.0.0.0', () => { // <--- CORREÇÃO APLICADA AQUI
+    console.log(`HTTP Server running for Keep-Alive on port ${PORT}`);
+});
+````http://googleusercontent.com/image_generation_content/5

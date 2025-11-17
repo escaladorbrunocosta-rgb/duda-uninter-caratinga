@@ -1,4 +1,3 @@
-const PORT = process.env.PORT || 3000;
 
 // Endpoint de saúde para Keep-Alive
 app.get('/', (req, res) => {
@@ -23,6 +22,31 @@ app.get('/qr', async (req, res) => {
 });
 
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`HTTP Server running for Keep-Alive on port ${PORT}`);
 });
+
+
+// Keep-alive HTTP server for Render
+
+const express = require('express);
+
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+
+
+app.get('/, (req, res) => {
+
+});
+
+
+
+app.get('/qr, (req, res) => {
+
+  if (currentQrCodeData) {
+
+    qrcode.toDataURL(currentQrCodeData, (err, url) => {
+
+      if (err) {
+
+        console.error('Erro

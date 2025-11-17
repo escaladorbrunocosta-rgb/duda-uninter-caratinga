@@ -1,52 +1,74 @@
+// =========================================================================
+// BOT DUDA UNINTER CARATINGA - INICIALIZAÇÃO
+// =========================================================================
 
-// Endpoint de saúde para Keep-Alive
-app.get('/', (req, res) => {
-    res.status(200).send('Duda Bot is Running and Awake!');
+require('dotenv').config();
+const qrcode = require('qrcode-terminal');
+const { Client, LocalAuth } = require('whatsapp-web.js');
+// Importar a biblioteca Gemini (necessária para a IA, mesmo que a lógica esteja pendente)
+const { GoogleGenAI } = require('@google/genai'); 
+
+// Inicializa a GoogleGenAI com a variável de ambiente GEMINI_API_KEY
+// O Render deve ter essa variável configurada!
+const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
 });
 
-// NOVO: Endpoint para exibir o QR Code como imagem
-app.get('/qr', async (req, res) => {
-    if (currentQrCode) {
-        const qrcodeSVG = require('qrcode'); // Necessário porque qrcode-terminal não gera imagem
-        try {
-            const svg = await qrcodeSVG.toString(currentQrCode, { type: 'svg' });
-            res.type('image/svg+xml');
-            res.send(svg);
-        } catch (err) {
-            console.error('Erro ao gerar SVG do QR Code:', err);
-            res.status(500).send('Erro ao gerar QR Code.');
-        }
-    } else {
-        res.status(200).send('QR Code não disponível ou bot já conectado. Verifique os logs da Render.');
+// Configuração do cliente WhatsApp
+const client = new Client({
+    authStrategy: new LocalAuth({
+        clientId: 'duda-uninter-caratinga' // Nome do arquivo de sessão
+    }),
+    puppeteer: {
+        headless: true, // Mantenha como true para o Render (sem tela)
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox'
+        ]
     }
 });
 
+// =========================================================================
+// EVENTOS DE AUTENTICAÇÃO
+// =========================================================================
 
+client.on('qr', (qr) => {
+    // BLOCO CORRIGIDO: Imprime a string pura do QR Code para uso no Render.
+    console.log('----------------------------------------------------');
+    console.log('🚨 NOVO CÓDIGO SECRETO GERADO: COPIE A LINHA ABAIXO!');
+    console.log(qr); // <<< AQUI ESTÁ A STRING PURA: 2@...==
+    console.log('----------------------------------------------------');
+    qrcode.generate(qr, { small: true });
 });
 
-
-// Keep-alive HTTP server for Render
-
-const express = require('express);
-
-const app = express();
-
-const PORT = process.env.PORT || 3000;
-
-
-
-app.get('/, (req, res) => {
-
+client.on('ready', () => {
+    console.log('Client is ready! Bot Uninter Caratinga está ONLINE.');
 });
 
+client.on('authenticated', () => {
+    console.log('AUTENTICADO COM SUCESSO! Conexão estabelecida.');
+});
 
+client.on('auth_failure', msg => {
+    // Disparado se a autenticação falhar
+    console.error('Falha na autenticação. Verifique se o QR code foi escaneado a tempo.', msg);
+});
 
-app.get('/qr, (req, res) => {
+// =========================================================================
+// INICIALIZAÇÃO DO BOT
+// =========================================================================
 
-  if (currentQrCodeData) {
+console.log('Iniciando o bot Duda UNINTER Caratinga...');
+client.initialize();
 
-    qrcode.toDataURL(currentQrCodeData, (err, url) => {
+// =========================================================================
+// LOGICA DE RESPOSTAS (A SER IMPLEMENTADA)
+// =========================================================================
 
-      if (err) {
-
-        console.error('Erro
+client.on('message', async msg => {
+    // Aqui estaria sua lógica robusta usando o objeto 'ai' (GoogleGenAI)
+    // Exemplo básico:
+    if (msg.body.toLowerCase() === 'olá') {
+        msg.reply('Olá! Sou a Duda, o assistente virtual da UNINTER Caratinga. Em que posso ajudar hoje?');
+    }
+});

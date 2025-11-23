@@ -1,0 +1,435 @@
+0 verbose cli /usr/local/nvm/versions/node/v24.11.1/bin/node /usr/local/nvm/versions/node/v24.11.1/bin/npm
+1 info using npm@11.6.2
+2 info using node@v24.11.1
+3 silly config load:file:/usr/local/nvm/versions/node/v24.11.1/lib/node_modules/npm/npmrc
+4 silly config load:file:/home/escaladorbrunocosta/.npmrc
+5 silly config load:file:/usr/local/nvm/versions/node/v24.11.1/etc/npmrc
+6 verbose title npm install whatsapp-web.js@latest qrcode-terminal@latest
+7 verbose argv "install" "whatsapp-web.js@latest" "qrcode-terminal@latest"
+8 verbose logfile logs-max:10 dir:/home/escaladorbrunocosta/.npm/_logs/2025-11-23T12_49_55_321Z-
+9 verbose logfile /home/escaladorbrunocosta/.npm/_logs/2025-11-23T12_49_55_321Z-debug-0.log
+10 silly logfile start cleaning logs, removing 1 files
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:2348810240 maxSize:587202560 maxEntrySize:293601280
+13 silly packumentCache corgi:https://registry.npmjs.org/whatsapp-web.js cache-miss
+14 silly packumentCache corgi:https://registry.npmjs.org/qrcode-terminal cache-miss
+15 http fetch GET 200 https://registry.npmjs.org/whatsapp-web.js 157ms (cache revalidated)
+16 silly packumentCache corgi:https://registry.npmjs.org/whatsapp-web.js set size:194719 disposed:false
+17 http fetch GET 200 https://registry.npmjs.org/qrcode-terminal 174ms (cache miss)
+18 silly packumentCache corgi:https://registry.npmjs.org/qrcode-terminal set size:undefined disposed:false
+19 silly idealTree buildDeps
+20 silly fetch manifest qrcode-terminal@0.12.0
+21 silly packumentCache full:https://registry.npmjs.org/qrcode-terminal cache-miss
+22 http fetch GET 200 https://registry.npmjs.org/qrcode-terminal 35ms (cache revalidated)
+23 silly packumentCache full:https://registry.npmjs.org/qrcode-terminal set size:29799 disposed:false
+24 silly fetch manifest whatsapp-web.js@1.34.2
+25 silly packumentCache full:https://registry.npmjs.org/whatsapp-web.js cache-miss
+26 http fetch GET 200 https://registry.npmjs.org/whatsapp-web.js 85ms (cache revalidated)
+27 silly packumentCache full:https://registry.npmjs.org/whatsapp-web.js set size:345780 disposed:false
+28 silly placeDep ROOT qrcode-terminal@0.12.0 REPLACE for: whatsapp-bot-uninter@1.0.0 want: 0.12.0
+29 silly placeDep ROOT whatsapp-web.js@1.34.2 REPLACE for: whatsapp-bot-uninter@1.0.0 want: 1.34.2
+30 silly reify moves {}
+31 silly audit bulk request {
+31 silly audit   '@pedroslopez/moduleraid': [ '5.0.2' ],
+31 silly audit   '@types/node': [ '24.10.1' ],
+31 silly audit   '@types/yauzl': [ '2.10.3' ],
+31 silly audit   'agent-base': [ '6.0.2' ],
+31 silly audit   archiver: [ '5.3.2' ],
+31 silly audit   'archiver-utils': [ '2.1.0', '3.0.4' ],
+31 silly audit   'readable-stream': [ '2.3.8', '3.6.2' ],
+31 silly audit   'safe-buffer': [ '5.1.2', '5.2.1' ],
+31 silly audit   string_decoder: [ '1.1.1', '1.3.0' ],
+31 silly audit   async: [ '3.2.6', '0.2.10' ],
+31 silly audit   'balanced-match': [ '1.0.2' ],
+31 silly audit   'base64-js': [ '1.5.1' ],
+31 silly audit   'big-integer': [ '1.6.52' ],
+31 silly audit   binary: [ '0.3.0' ],
+31 silly audit   bl: [ '4.1.0' ],
+31 silly audit   bluebird: [ '3.4.7' ],
+31 silly audit   'brace-expansion': [ '1.1.12', '2.0.2' ],
+31 silly audit   buffer: [ '5.7.1' ],
+31 silly audit   'buffer-crc32': [ '0.2.13' ],
+31 silly audit   'buffer-indexof-polyfill': [ '1.0.2' ],
+31 silly audit   buffers: [ '0.1.1' ],
+31 silly audit   chainsaw: [ '0.1.0' ],
+31 silly audit   chownr: [ '1.1.4' ],
+31 silly audit   'compress-commons': [ '4.1.2' ],
+31 silly audit   'concat-map': [ '0.0.1' ],
+31 silly audit   'core-util-is': [ '1.0.3' ],
+31 silly audit   'crc-32': [ '1.2.2' ],
+31 silly audit   'crc32-stream': [ '4.0.3' ],
+31 silly audit   'cross-fetch': [ '3.1.5' ],
+31 silly audit   'node-fetch': [ '2.6.7', '2.7.0' ],
+31 silly audit   debug: [ '4.4.3', '4.3.4' ],
+31 silly audit   'devtools-protocol': [ '0.0.1045489' ],
+31 silly audit   duplexer2: [ '0.1.4' ],
+31 silly audit   'end-of-stream': [ '1.4.5' ],
+31 silly audit   'extract-zip': [ '2.0.1' ],
+31 silly audit   'fd-slicer': [ '1.1.0' ],
+31 silly audit   'fluent-ffmpeg': [ '2.1.3' ],
+31 silly audit   'fs-constants': [ '1.0.0' ],
+31 silly audit   'fs-extra': [ '10.1.0' ],
+31 silly audit   'fs.realpath': [ '1.0.0' ],
+31 silly audit   fstream: [ '1.0.12' ],
+31 silly audit   rimraf: [ '2.7.1', '3.0.2' ],
+31 silly audit   'get-stream': [ '5.2.0' ],
+31 silly audit   glob: [ '7.2.3' ],
+31 silly audit   'graceful-fs': [ '4.2.11' ],
+31 silly audit   'https-proxy-agent': [ '5.0.1' ],
+31 silly audit   ieee754: [ '1.2.1' ],
+31 silly audit   inflight: [ '1.0.6' ],
+31 silly audit   inherits: [ '2.0.4' ],
+31 silly audit   isarray: [ '1.0.0' ],
+31 silly audit   isexe: [ '2.0.0' ],
+31 silly audit   jsonfile: [ '6.2.0' ],
+31 silly audit   lazystream: [ '1.0.1' ],
+31 silly audit   listenercount: [ '1.0.1' ],
+31 silly audit   'lodash.defaults': [ '4.2.0' ],
+31 silly audit   'lodash.difference': [ '4.5.0' ],
+31 silly audit   'lodash.flatten': [ '4.4.0' ],
+31 silly audit   'lodash.isplainobject': [ '4.0.6' ],
+31 silly audit   'lodash.union': [ '4.6.0' ],
+31 silly audit   mime: [ '3.0.0' ],
+31 silly audit   minimatch: [ '3.1.2', '5.1.6' ],
+31 silly audit   minimist: [ '1.2.8' ],
+31 silly audit   mkdirp: [ '0.5.6' ],
+31 silly audit   'mkdirp-classic': [ '0.5.3' ],
+31 silly audit   ms: [ '2.1.3', '2.1.2' ],
+31 silly audit   'node-webpmux': [ '3.1.7' ],
+31 silly audit   'normalize-path': [ '3.0.0' ],
+31 silly audit   once: [ '1.4.0' ],
+31 silly audit   'path-is-absolute': [ '1.0.1' ],
+31 silly audit   pend: [ '1.2.0' ],
+31 silly audit   'process-nextick-args': [ '2.0.1' ],
+31 silly audit   progress: [ '2.0.3' ],
+31 silly audit   'proxy-from-env': [ '1.1.0' ],
+31 silly audit   pump: [ '3.0.3' ],
+31 silly audit   puppeteer: [ '18.2.1' ],
+31 silly audit   'puppeteer-core': [ '18.2.1' ],
+31 silly audit   'readdir-glob': [ '1.1.3' ],
+31 silly audit   setimmediate: [ '1.0.5' ],
+31 silly audit   'tar-fs': [ '2.1.1' ],
+31 silly audit   'tar-stream': [ '2.2.0' ],
+31 silly audit   through: [ '2.3.8' ],
+31 silly audit   tr46: [ '0.0.3' ],
+31 silly audit   traverse: [ '0.3.9' ],
+31 silly audit   'unbzip2-stream': [ '1.4.3' ],
+31 silly audit   'undici-types': [ '7.16.0' ],
+31 silly audit   universalify: [ '2.0.1' ],
+31 silly audit   unzipper: [ '0.10.14' ],
+31 silly audit   'util-deprecate': [ '1.0.2' ],
+31 silly audit   'webidl-conversions': [ '3.0.1' ],
+31 silly audit   'whatwg-url': [ '5.0.0' ],
+31 silly audit   which: [ '1.3.1' ],
+31 silly audit   wrappy: [ '1.0.2' ],
+31 silly audit   ws: [ '8.9.0' ],
+31 silly audit   yauzl: [ '2.10.0' ],
+31 silly audit   'zip-stream': [ '4.1.1' ],
+31 silly audit   'qrcode-terminal': [ '0.12.0' ],
+31 silly audit   'whatsapp-web.js': [ '1.34.2' ]
+31 silly audit }
+32 http cache qrcode-terminal@https://registry.npmjs.org/qrcode-terminal/-/qrcode-terminal-0.12.0.tgz 0ms (cache hit)
+33 http cache whatsapp-web.js@https://registry.npmjs.org/whatsapp-web.js/-/whatsapp-web.js-1.34.2.tgz 0ms (cache hit)
+34 http cache zip-stream@https://registry.npmjs.org/zip-stream/-/zip-stream-4.1.1.tgz 0ms (cache hit)
+35 http cache yauzl@https://registry.npmjs.org/yauzl/-/yauzl-2.10.0.tgz 0ms (cache hit)
+36 http cache ws@https://registry.npmjs.org/ws/-/ws-8.9.0.tgz 0ms (cache hit)
+37 http cache wrappy@https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz 0ms (cache hit)
+38 http cache whatwg-url@https://registry.npmjs.org/whatwg-url/-/whatwg-url-5.0.0.tgz 0ms (cache hit)
+39 http cache webidl-conversions@https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz 0ms (cache hit)
+40 http cache util-deprecate@https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz 0ms (cache hit)
+41 http cache which@https://registry.npmjs.org/which/-/which-1.3.1.tgz 0ms (cache hit)
+42 http cache unzipper@https://registry.npmjs.org/unzipper/-/unzipper-0.10.14.tgz 0ms (cache hit)
+43 http cache universalify@https://registry.npmjs.org/universalify/-/universalify-2.0.1.tgz 0ms (cache hit)
+44 http cache undici-types@https://registry.npmjs.org/undici-types/-/undici-types-7.16.0.tgz 0ms (cache hit)
+45 http cache traverse@https://registry.npmjs.org/traverse/-/traverse-0.3.9.tgz 0ms (cache hit)
+46 http cache unbzip2-stream@https://registry.npmjs.org/unbzip2-stream/-/unbzip2-stream-1.4.3.tgz 0ms (cache hit)
+47 http cache tr46@https://registry.npmjs.org/tr46/-/tr46-0.0.3.tgz 0ms (cache hit)
+48 http cache through@https://registry.npmjs.org/through/-/through-2.3.8.tgz 0ms (cache hit)
+49 http cache tar-stream@https://registry.npmjs.org/tar-stream/-/tar-stream-2.2.0.tgz 0ms (cache hit)
+50 http cache tar-fs@https://registry.npmjs.org/tar-fs/-/tar-fs-2.1.1.tgz 0ms (cache hit)
+51 http cache string_decoder@https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz 0ms (cache hit)
+52 http cache setimmediate@https://registry.npmjs.org/setimmediate/-/setimmediate-1.0.5.tgz 0ms (cache hit)
+53 http cache safe-buffer@https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.2.1.tgz 0ms (cache hit)
+54 http cache rimraf@https://registry.npmjs.org/rimraf/-/rimraf-3.0.2.tgz 0ms (cache hit)
+55 http cache readdir-glob@https://registry.npmjs.org/readdir-glob/-/readdir-glob-1.1.3.tgz 0ms (cache hit)
+56 http cache puppeteer-core@https://registry.npmjs.org/puppeteer-core/-/puppeteer-core-18.2.1.tgz 0ms (cache hit)
+57 http cache readable-stream@https://registry.npmjs.org/readable-stream/-/readable-stream-3.6.2.tgz 0ms (cache hit)
+58 http cache puppeteer@https://registry.npmjs.org/puppeteer/-/puppeteer-18.2.1.tgz 0ms (cache hit)
+59 http cache pump@https://registry.npmjs.org/pump/-/pump-3.0.3.tgz 0ms (cache hit)
+60 http cache proxy-from-env@https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz 0ms (cache hit)
+61 http cache progress@https://registry.npmjs.org/progress/-/progress-2.0.3.tgz 0ms (cache hit)
+62 http cache process-nextick-args@https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-2.0.1.tgz 0ms (cache hit)
+63 http cache pend@https://registry.npmjs.org/pend/-/pend-1.2.0.tgz 0ms (cache hit)
+64 http cache once@https://registry.npmjs.org/once/-/once-1.4.0.tgz 0ms (cache hit)
+65 http cache path-is-absolute@https://registry.npmjs.org/path-is-absolute/-/path-is-absolute-1.0.1.tgz 0ms (cache hit)
+66 http cache normalize-path@https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz 0ms (cache hit)
+67 http cache node-fetch@https://registry.npmjs.org/node-fetch/-/node-fetch-2.7.0.tgz 0ms (cache hit)
+68 http cache node-webpmux@https://registry.npmjs.org/node-webpmux/-/node-webpmux-3.1.7.tgz 0ms (cache hit)
+69 http cache ms@https://registry.npmjs.org/ms/-/ms-2.1.3.tgz 0ms (cache hit)
+70 http cache mkdirp@https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.6.tgz 0ms (cache hit)
+71 http cache mkdirp-classic@https://registry.npmjs.org/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz 0ms (cache hit)
+72 http cache minimatch@https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz 0ms (cache hit)
+73 http cache minimist@https://registry.npmjs.org/minimist/-/minimist-1.2.8.tgz 0ms (cache hit)
+74 http cache lodash.union@https://registry.npmjs.org/lodash.union/-/lodash.union-4.6.0.tgz 0ms (cache hit)
+75 http cache mime@https://registry.npmjs.org/mime/-/mime-3.0.0.tgz 0ms (cache hit)
+76 http cache lodash.isplainobject@https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz 0ms (cache hit)
+77 http cache lodash.difference@https://registry.npmjs.org/lodash.difference/-/lodash.difference-4.5.0.tgz 0ms (cache hit)
+78 http cache lodash.flatten@https://registry.npmjs.org/lodash.flatten/-/lodash.flatten-4.4.0.tgz 0ms (cache hit)
+79 http cache lodash.defaults@https://registry.npmjs.org/lodash.defaults/-/lodash.defaults-4.2.0.tgz 0ms (cache hit)
+80 http cache listenercount@https://registry.npmjs.org/listenercount/-/listenercount-1.0.1.tgz 0ms (cache hit)
+81 http cache lazystream@https://registry.npmjs.org/lazystream/-/lazystream-1.0.1.tgz 0ms (cache hit)
+82 http cache jsonfile@https://registry.npmjs.org/jsonfile/-/jsonfile-6.2.0.tgz 0ms (cache hit)
+83 http cache isexe@https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz 0ms (cache hit)
+84 http cache isarray@https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz 0ms (cache hit)
+85 http cache inherits@https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz 0ms (cache hit)
+86 http cache ieee754@https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz 0ms (cache hit)
+87 http cache inflight@https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz 0ms (cache hit)
+88 http cache https-proxy-agent@https://registry.npmjs.org/https-proxy-agent/-/https-proxy-agent-5.0.1.tgz 0ms (cache hit)
+89 http cache graceful-fs@https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz 0ms (cache hit)
+90 http cache get-stream@https://registry.npmjs.org/get-stream/-/get-stream-5.2.0.tgz 0ms (cache hit)
+91 http cache glob@https://registry.npmjs.org/glob/-/glob-7.2.3.tgz 0ms (cache hit)
+92 http cache fstream@https://registry.npmjs.org/fstream/-/fstream-1.0.12.tgz 0ms (cache hit)
+93 http cache fs.realpath@https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz 1ms (cache hit)
+94 http cache fs-extra@https://registry.npmjs.org/fs-extra/-/fs-extra-10.1.0.tgz 0ms (cache hit)
+95 http cache fs-constants@https://registry.npmjs.org/fs-constants/-/fs-constants-1.0.0.tgz 0ms (cache hit)
+96 http cache fluent-ffmpeg@https://registry.npmjs.org/fluent-ffmpeg/-/fluent-ffmpeg-2.1.3.tgz 0ms (cache hit)
+97 http cache fd-slicer@https://registry.npmjs.org/fd-slicer/-/fd-slicer-1.1.0.tgz 0ms (cache hit)
+98 http cache extract-zip@https://registry.npmjs.org/extract-zip/-/extract-zip-2.0.1.tgz 0ms (cache hit)
+99 http cache duplexer2@https://registry.npmjs.org/duplexer2/-/duplexer2-0.1.4.tgz 0ms (cache hit)
+100 http cache end-of-stream@https://registry.npmjs.org/end-of-stream/-/end-of-stream-1.4.5.tgz 0ms (cache hit)
+101 http cache devtools-protocol@https://registry.npmjs.org/devtools-protocol/-/devtools-protocol-0.0.1045489.tgz 0ms (cache hit)
+102 http cache crc32-stream@https://registry.npmjs.org/crc32-stream/-/crc32-stream-4.0.3.tgz 0ms (cache hit)
+103 http cache cross-fetch@https://registry.npmjs.org/cross-fetch/-/cross-fetch-3.1.5.tgz 0ms (cache hit)
+104 http cache core-util-is@https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.3.tgz 0ms (cache hit)
+105 http cache compress-commons@https://registry.npmjs.org/compress-commons/-/compress-commons-4.1.2.tgz 0ms (cache hit)
+106 http cache concat-map@https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz 0ms (cache hit)
+107 http cache crc-32@https://registry.npmjs.org/crc-32/-/crc-32-1.2.2.tgz 0ms (cache hit)
+108 http cache chownr@https://registry.npmjs.org/chownr/-/chownr-1.1.4.tgz 0ms (cache hit)
+109 http cache chainsaw@https://registry.npmjs.org/chainsaw/-/chainsaw-0.1.0.tgz 0ms (cache hit)
+110 http cache buffers@https://registry.npmjs.org/buffers/-/buffers-0.1.1.tgz 0ms (cache hit)
+111 http cache buffer-indexof-polyfill@https://registry.npmjs.org/buffer-indexof-polyfill/-/buffer-indexof-polyfill-1.0.2.tgz 0ms (cache hit)
+112 http cache buffer-crc32@https://registry.npmjs.org/buffer-crc32/-/buffer-crc32-0.2.13.tgz 0ms (cache hit)
+113 http cache buffer@https://registry.npmjs.org/buffer/-/buffer-5.7.1.tgz 0ms (cache hit)
+114 http cache brace-expansion@https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.12.tgz 0ms (cache hit)
+115 http cache bluebird@https://registry.npmjs.org/bluebird/-/bluebird-3.4.7.tgz 0ms (cache hit)
+116 http cache bl@https://registry.npmjs.org/bl/-/bl-4.1.0.tgz 0ms (cache hit)
+117 http cache big-integer@https://registry.npmjs.org/big-integer/-/big-integer-1.6.52.tgz 0ms (cache hit)
+118 http cache binary@https://registry.npmjs.org/binary/-/binary-0.3.0.tgz 0ms (cache hit)
+119 http cache balanced-match@https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz 0ms (cache hit)
+120 http cache base64-js@https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz 0ms (cache hit)
+121 http cache archiver-utils@https://registry.npmjs.org/archiver-utils/-/archiver-utils-2.1.0.tgz 0ms (cache hit)
+122 http cache async@https://registry.npmjs.org/async/-/async-3.2.6.tgz 0ms (cache hit)
+123 http cache archiver@https://registry.npmjs.org/archiver/-/archiver-5.3.2.tgz 0ms (cache hit)
+124 http cache agent-base@https://registry.npmjs.org/agent-base/-/agent-base-6.0.2.tgz 0ms (cache hit)
+125 http cache @types/node@https://registry.npmjs.org/@types/node/-/node-24.10.1.tgz 0ms (cache hit)
+126 http cache @types/yauzl@https://registry.npmjs.org/@types/yauzl/-/yauzl-2.10.3.tgz 0ms (cache hit)
+127 http cache @pedroslopez/moduleraid@https://registry.npmjs.org/@pedroslopez/moduleraid/-/moduleraid-5.0.2.tgz 0ms (cache hit)
+128 http cache string_decoder@https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz 0ms (cache hit)
+129 http cache archiver-utils@https://registry.npmjs.org/archiver-utils/-/archiver-utils-3.0.4.tgz 0ms (cache hit)
+130 http cache safe-buffer@https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz 0ms (cache hit)
+131 http cache readable-stream@https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.8.tgz 0ms (cache hit)
+132 http cache brace-expansion@https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz 0ms (cache hit)
+133 http cache ms@https://registry.npmjs.org/ms/-/ms-2.1.2.tgz 0ms (cache hit)
+134 http cache debug@https://registry.npmjs.org/debug/-/debug-4.3.4.tgz 0ms (cache hit)
+135 http cache string_decoder@https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz 0ms (cache hit)
+136 http cache minimatch@https://registry.npmjs.org/minimatch/-/minimatch-5.1.6.tgz 0ms (cache hit)
+137 http cache readable-stream@https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.8.tgz 0ms (cache hit)
+138 http cache safe-buffer@https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz 0ms (cache hit)
+139 http cache rimraf@https://registry.npmjs.org/rimraf/-/rimraf-2.7.1.tgz 0ms (cache hit)
+140 http cache async@https://registry.npmjs.org/async/-/async-0.2.10.tgz 0ms (cache hit)
+141 http cache string_decoder@https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz 0ms (cache hit)
+142 http cache readable-stream@https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.8.tgz 0ms (cache hit)
+143 http cache safe-buffer@https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz 0ms (cache hit)
+144 http cache safe-buffer@https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.2.tgz 0ms (cache hit)
+145 http cache node-fetch@https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.7.tgz 0ms (cache hit)
+146 http cache string_decoder@https://registry.npmjs.org/string_decoder/-/string_decoder-1.1.1.tgz 0ms (cache hit)
+147 http cache readable-stream@https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.8.tgz 0ms (cache hit)
+148 http cache debug@https://registry.npmjs.org/debug/-/debug-4.4.3.tgz 0ms (cache hit)
+149 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 389ms
+150 silly audit report {
+150 silly audit report   'tar-fs': [
+150 silly audit report     {
+150 silly audit report       id: 1109532,
+150 silly audit report       url: 'https://github.com/advisories/GHSA-vj76-c3g6-qr5v',
+150 silly audit report       title: 'tar-fs has a symlink validation bypass if destination directory is predictable with a specific tarball',
+150 silly audit report       severity: 'high',
+150 silly audit report       vulnerable_versions: '>=2.0.0 <2.1.4',
+150 silly audit report       cwe: [Array],
+150 silly audit report       cvss: [Object]
+150 silly audit report     },
+150 silly audit report     {
+150 silly audit report       id: 1109543,
+150 silly audit report       url: 'https://github.com/advisories/GHSA-8cj5-5rvv-wf4v',
+150 silly audit report       title: 'tar-fs can extract outside the specified dir with a specific tarball',
+150 silly audit report       severity: 'high',
+150 silly audit report       vulnerable_versions: '>=2.0.0 <2.1.3',
+150 silly audit report       cwe: [Array],
+150 silly audit report       cvss: [Object]
+150 silly audit report     },
+150 silly audit report     {
+150 silly audit report       id: 1109552,
+150 silly audit report       url: 'https://github.com/advisories/GHSA-pq67-2wwv-3xjx',
+150 silly audit report       title: 'tar-fs Vulnerable to Link Following and Path Traversal via Extracting a Crafted tar File',
+150 silly audit report       severity: 'high',
+150 silly audit report       vulnerable_versions: '>=2.0.0 <2.1.2',
+150 silly audit report       cwe: [Array],
+150 silly audit report       cvss: [Object]
+150 silly audit report     }
+150 silly audit report   ],
+150 silly audit report   ws: [
+150 silly audit report     {
+150 silly audit report       id: 1098392,
+150 silly audit report       url: 'https://github.com/advisories/GHSA-3h5v-q93c-6h6q',
+150 silly audit report       title: 'ws affected by a DoS when handling a request with many HTTP headers',
+150 silly audit report       severity: 'high',
+150 silly audit report       vulnerable_versions: '>=8.0.0 <8.17.1',
+150 silly audit report       cwe: [Array],
+150 silly audit report       cvss: [Object]
+150 silly audit report     }
+150 silly audit report   ]
+150 silly audit report }
+151 silly packumentCache corgi:https://registry.npmjs.org/tar-fs cache-miss
+152 silly packumentCache corgi:https://registry.npmjs.org/ws cache-miss
+153 warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+154 warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+155 warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+156 warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+157 http fetch GET 200 https://registry.npmjs.org/ws 235ms (cache revalidated)
+158 silly packumentCache corgi:https://registry.npmjs.org/ws set size:193390 disposed:false
+159 http fetch GET 200 https://registry.npmjs.org/tar-fs 243ms (cache revalidated)
+160 silly packumentCache corgi:https://registry.npmjs.org/tar-fs set size:54422 disposed:false
+161 silly packumentCache corgi:https://registry.npmjs.org/puppeteer-core cache-miss
+162 warn deprecated fstream@1.0.12: This package is no longer supported.
+163 http fetch GET 200 https://registry.npmjs.org/puppeteer-core 97ms (cache revalidated)
+164 silly packumentCache corgi:https://registry.npmjs.org/puppeteer-core set size:513282 disposed:false
+165 silly packumentCache corgi:https://registry.npmjs.org/puppeteer cache-miss
+166 http fetch GET 200 https://registry.npmjs.org/puppeteer 65ms (cache revalidated)
+167 silly packumentCache corgi:https://registry.npmjs.org/puppeteer set size:1733587 disposed:false
+168 silly packumentCache corgi:https://registry.npmjs.org/whatsapp-web.js cache-hit
+169 warn deprecated puppeteer@18.2.1: < 24.15.0 is no longer supported
+170 warn deprecated fluent-ffmpeg@2.1.3: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+171 info run puppeteer@18.2.1 postinstall node_modules/puppeteer node install.js
+172 info run puppeteer@18.2.1 postinstall { code: 0, signal: null }
+173 silly ADD node_modules/whatsapp-web.js
+174 silly ADD node_modules/qrcode-terminal
+175 silly ADD node_modules/zip-stream
+176 silly ADD node_modules/zip-stream/node_modules/archiver-utils
+177 silly ADD node_modules/yauzl
+178 silly ADD node_modules/ws
+179 silly ADD node_modules/wrappy
+180 silly ADD node_modules/which
+181 silly ADD node_modules/whatwg-url
+182 silly ADD node_modules/webidl-conversions
+183 silly ADD node_modules/util-deprecate
+184 silly ADD node_modules/unzipper
+185 silly ADD node_modules/unzipper/node_modules/string_decoder
+186 silly ADD node_modules/unzipper/node_modules/safe-buffer
+187 silly ADD node_modules/unzipper/node_modules/readable-stream
+188 silly ADD node_modules/universalify
+189 silly ADD node_modules/undici-types
+190 silly ADD node_modules/unbzip2-stream
+191 silly ADD node_modules/traverse
+192 silly ADD node_modules/tr46
+193 silly ADD node_modules/through
+194 silly ADD node_modules/tar-stream
+195 silly ADD node_modules/tar-fs
+196 silly ADD node_modules/string_decoder
+197 silly ADD node_modules/setimmediate
+198 silly ADD node_modules/safe-buffer
+199 silly ADD node_modules/rimraf
+200 silly ADD node_modules/readdir-glob
+201 silly ADD node_modules/readdir-glob/node_modules/minimatch
+202 silly ADD node_modules/readdir-glob/node_modules/brace-expansion
+203 silly ADD node_modules/readable-stream
+204 silly ADD node_modules/puppeteer-core
+205 silly ADD node_modules/puppeteer-core/node_modules/ms
+206 silly ADD node_modules/puppeteer-core/node_modules/debug
+207 silly ADD node_modules/puppeteer
+208 silly ADD node_modules/pump
+209 silly ADD node_modules/proxy-from-env
+210 silly ADD node_modules/progress
+211 silly ADD node_modules/process-nextick-args
+212 silly ADD node_modules/pend
+213 silly ADD node_modules/path-is-absolute
+214 silly ADD node_modules/once
+215 silly ADD node_modules/normalize-path
+216 silly ADD node_modules/node-webpmux
+217 silly ADD node_modules/node-fetch
+218 silly ADD node_modules/ms
+219 silly ADD node_modules/mkdirp-classic
+220 silly ADD node_modules/mkdirp
+221 silly ADD node_modules/minimist
+222 silly ADD node_modules/minimatch
+223 silly ADD node_modules/mime
+224 silly ADD node_modules/lodash.union
+225 silly ADD node_modules/lodash.isplainobject
+226 silly ADD node_modules/lodash.flatten
+227 silly ADD node_modules/lodash.difference
+228 silly ADD node_modules/lodash.defaults
+229 silly ADD node_modules/listenercount
+230 silly ADD node_modules/lazystream
+231 silly ADD node_modules/lazystream/node_modules/string_decoder
+232 silly ADD node_modules/lazystream/node_modules/safe-buffer
+233 silly ADD node_modules/lazystream/node_modules/readable-stream
+234 silly ADD node_modules/jsonfile
+235 silly ADD node_modules/isexe
+236 silly ADD node_modules/isarray
+237 silly ADD node_modules/inherits
+238 silly ADD node_modules/inflight
+239 silly ADD node_modules/ieee754
+240 silly ADD node_modules/https-proxy-agent
+241 silly ADD node_modules/graceful-fs
+242 silly ADD node_modules/glob
+243 silly ADD node_modules/get-stream
+244 silly ADD node_modules/fstream
+245 silly ADD node_modules/fstream/node_modules/rimraf
+246 silly ADD node_modules/fs.realpath
+247 silly ADD node_modules/fs-extra
+248 silly ADD node_modules/fs-constants
+249 silly ADD node_modules/fluent-ffmpeg
+250 silly ADD node_modules/fluent-ffmpeg/node_modules/async
+251 silly ADD node_modules/fd-slicer
+252 silly ADD node_modules/extract-zip
+253 silly ADD node_modules/end-of-stream
+254 silly ADD node_modules/duplexer2
+255 silly ADD node_modules/duplexer2/node_modules/string_decoder
+256 silly ADD node_modules/duplexer2/node_modules/safe-buffer
+257 silly ADD node_modules/duplexer2/node_modules/readable-stream
+258 silly ADD node_modules/devtools-protocol
+259 silly ADD node_modules/debug
+260 silly ADD node_modules/cross-fetch
+261 silly ADD node_modules/cross-fetch/node_modules/node-fetch
+262 silly ADD node_modules/crc32-stream
+263 silly ADD node_modules/crc-32
+264 silly ADD node_modules/core-util-is
+265 silly ADD node_modules/concat-map
+266 silly ADD node_modules/compress-commons
+267 silly ADD node_modules/chownr
+268 silly ADD node_modules/chainsaw
+269 silly ADD node_modules/buffers
+270 silly ADD node_modules/buffer-indexof-polyfill
+271 silly ADD node_modules/buffer-crc32
+272 silly ADD node_modules/buffer
+273 silly ADD node_modules/brace-expansion
+274 silly ADD node_modules/bluebird
+275 silly ADD node_modules/bl
+276 silly ADD node_modules/binary
+277 silly ADD node_modules/big-integer
+278 silly ADD node_modules/base64-js
+279 silly ADD node_modules/balanced-match
+280 silly ADD node_modules/async
+281 silly ADD node_modules/archiver-utils
+282 silly ADD node_modules/archiver-utils/node_modules/string_decoder
+283 silly ADD node_modules/archiver-utils/node_modules/safe-buffer
+284 silly ADD node_modules/archiver-utils/node_modules/readable-stream
+285 silly ADD node_modules/archiver
+286 silly ADD node_modules/agent-base
+287 silly ADD node_modules/@types/yauzl
+288 silly ADD node_modules/@types/node
+289 silly ADD node_modules/@pedroslopez/moduleraid
+290 verbose cwd /home/escaladorbrunocosta
+291 verbose os Linux 6.6.111+
+292 verbose node v24.11.1
+293 verbose npm  v11.6.2
+294 verbose exit 0
+295 info ok

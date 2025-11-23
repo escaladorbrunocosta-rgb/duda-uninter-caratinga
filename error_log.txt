@@ -1,0 +1,16 @@
+[2025-11-23T12:10:46.991Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "veterinária" | Detalhes: Tentativa: 1 de 3
+[2025-11-23T12:11:19.386Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "veterinária" | Detalhes: Tentativa: 1 de 3
+[2025-11-23T12:11:25.294Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "jornalismo" | Detalhes: Tentativa: 2 de 3
+[2025-11-23T12:14:22.539Z] [ESCALADA] Chat: 553399725952@c.us | Mensagem: "jornalismo" | Detalhes: Motivo: 3 falhas consecutivas. Dados do usuário: colega 
+[2025-11-23T12:16:53.717Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "jornalismo" | Detalhes: Tentativa: 1 de 3
+[2025-11-23T12:18:33.432Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "veterinária" | Detalhes: Tentativa: 2 de 3
+[2025-11-23T12:18:37.976Z] [ESCALADA] Chat: 553399725952@c.us | Mensagem: "jornalismo" | Detalhes: Motivo: 3 falhas consecutivas. Dados do usuário: colega 
+[2025-11-23T12:24:26.079Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "biomedicina" | Detalhes: Tentativa: 1 de 3
+[2025-11-23T12:24:33.294Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "veterinária" | Detalhes: Tentativa: 2 de 3
+[2025-11-23T12:30:38.690Z] [ESCALADA] Chat: 553399725952@c.us | Mensagem: "nutrição" | Detalhes: Motivo: 3 falhas consecutivas. Dados do usuário: colega 
+[2025-11-23T12:32:25.966Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "farmácia" | Detalhes: Tentativa: 1 de 3
+[2025-11-23T12:32:38.882Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "administração" | Detalhes: Tentativa: 2 de 3
+[2025-11-23T13:19:51.700Z] [FALLBACK/CONTEXTO] Chat: 553399725952@c.us | Mensagem: "nutrição" | Detalhes: Ativado fluxo de refinamento. Tentativa: 1
+[2025-11-23T13:21:00.751Z] [FALLBACK/CONTEXTO] Chat: 553399725952@c.us | Mensagem: "bolsa" | Detalhes: Ativado fluxo de refinamento. Tentativa: 1
+[2025-11-23T13:57:28.879Z] [FALLBACK/CONTEXTO] Chat: 553199441614@c.us | Mensagem: "nutrição" | Detalhes: Ativado fluxo de refinamento. Tentativa: 1
+[2025-11-23T14:08:13.053Z] [FALLBACK/CONTEXTO] Chat: 553199441614@c.us | Mensagem: "pós graduação em medicina veterinária" | Detalhes: Ativado fluxo de refinamento. Tentativa: 1

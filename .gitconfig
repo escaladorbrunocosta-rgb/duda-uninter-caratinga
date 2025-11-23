@@ -1,0 +1,5 @@
+[user]
+	email = escaladorbrunocosta@gmail.com
+	name = Bruno Costa
+[http]
+	postBuffer = 524288000

@@ -1,0 +1,21 @@
+{
+  "553399725952@c.us": {
+    "fallbackCount": 0,
+    "currentStep": null,
+    "lastGreetingTime": 1763906016197,
+    "name": "Bruno costa ribeiro",
+    "registration": "04468779640"
+  },
+  "553199441614@c.us": {
+    "fallbackCount": 1,
+    "lastGreetingTime": 1763904117594,
+    "currentStep": "ask_context",
+    "name": "An",
+    "registration": "05117825608"
+  },
+  "225554921988284@lid": {
+    "fallbackCount": 0,
+    "lastGreetingTime": 1763905840963,
+    "currentStep": "ask_name"
+  }
+}

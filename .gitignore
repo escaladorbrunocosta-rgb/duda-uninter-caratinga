@@ -4,3 +4,5 @@ duda-uninter.zip
 .bash_history
 .codeoss/
 .wwebjs_auth/session/
+node_modules/
+.npm/

@@ -14,3 +14,6 @@
 [2025-11-23T13:21:00.751Z] [FALLBACK/CONTEXTO] Chat: 553399725952@c.us | Mensagem: "bolsa" | Detalhes: Ativado fluxo de refinamento. Tentativa: 1
 [2025-11-23T13:57:28.879Z] [FALLBACK/CONTEXTO] Chat: 553199441614@c.us | Mensagem: "nutrição" | Detalhes: Ativado fluxo de refinamento. Tentativa: 1
 [2025-11-23T14:08:13.053Z] [FALLBACK/CONTEXTO] Chat: 553199441614@c.us | Mensagem: "pós graduação em medicina veterinária" | Detalhes: Ativado fluxo de refinamento. Tentativa: 1
+[2025-11-25T01:28:24.329Z] [FALLBACK/CONTEXTO] Chat: 553399725952@c.us | Mensagem: "duda" | Detalhes: Ativado fluxo de refinamento. Tentativa: 1
+[2025-11-25T01:29:25.927Z] [FALLBACK] Chat: 553399725952@c.us | Mensagem: "catálogo" | Detalhes: Tentativa: 2 de 3
+[2025-11-25T01:29:39.106Z] [ESCALADA] Chat: 553399725952@c.us | Mensagem: "catálogo de curso" | Detalhes: Motivo: 3 falhas consecutivas. Dados do usuário: Bruno (Mat./CPF: 04468779640)

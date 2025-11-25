@@ -2,7 +2,7 @@
 
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const aiModule = require("@google/generative-ai");
+const GoogleGenAI = require("@google/generative-ai").GoogleGenAI;
 const GoogleGenAI = aiModule.GoogleGenAI;
 const http = require('http'); // Necessário para manter o processo ativo em hospedagem
 

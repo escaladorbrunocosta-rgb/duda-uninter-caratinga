@@ -2,6 +2,9 @@ import qrcode from "qrcode-terminal";
 import { Client, LocalAuth } from "whatsapp-web.js";
 import { GoogleGenAI } from "@google/generative-ai";
 import http from "http";
+import qrcode from "qrcode-terminal";
+import { Client, LocalAuth } from "whatsapp-web.js";
+import http from "http";
 // index.js
 
 

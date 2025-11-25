@@ -1,14 +1,13 @@
+import qrcode from "qrcode-terminal";
+import { Client, LocalAuth } from "whatsapp-web.js";
+import { GoogleGenAI } from "@google/generative-ai";
+import http from "http";
 // index.js
 
-const qrcode = require('qrcode-terminal');
-const { Client, LocalAuth } = require('whatsapp-web.js');
-const GoogleGenAI = require("@google/generative-ai").GoogleGenAI;
-const http = require('http'); // Necessário para manter o processo ativo em hospedagem
 
 // --- Variáveis Globais ---
 const MODELO_GEMINI = 'gemini-2.5-flash';
 const CHATS = new Map(); // Armazena as sessões de chat da IA por ID do chat.
-let aiInstance; // Armazena a instância da GoogleGenAI.
 
 // --- CONFIGURAÇÃO DO GOOGLE GEMINI (Inicialização Segura) ---
 try {
@@ -16,8 +15,6 @@ try {
     if (!apiKey) {
         throw new Error("A variável de ambiente GEMINI_API_KEY não está configurada.");
     }
-    aiInstance = new GoogleGenAI(apiKey);
-    console.log("Instância do GoogleGenAI criada com sucesso.");
 } catch (error) {
     console.error('ERRO FATAL NA CONFIGURAÇÃO DA API:', error.message);
     // Encerra o processo se a chave da API não estiver configurada.

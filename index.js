@@ -1,143 +1,127 @@
-// index.js
-
-import { default as makeWASocket, DisconnectReason } from '@whiskeysockets/baileys';
-import { useSingleFileAuthState } from '@whiskeysockets/baileys/lib/Utils';
-import { GoogleGenAI } from '@google/generative-ai';
+import makeWASocket, { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion } from '@whiskeysockets/baileys';
 import qrcode from 'qrcode-terminal';
+import { GoogleGenAI } from '@google/generative-ai';
 import http from 'http';
+import { existsSync } from 'fs';
+import path from 'path';
 
-// --- Configuração de autenticação Baileys ---
-const { state, saveState } = useSingleFileAuthState('./auth_info.json');
-
-const client = makeWASocket({
-    auth: state,
-    printQRInTerminal: true
-});
-
-client.ev.on('creds.update', saveState);
-
-client.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect, qr } = update;
-
-    if (qr) {
-        qrcode.generate(qr, { small: true });
-        console.log('QR Code gerado. Escaneie com seu celular.');
-    }
-
-    if (connection === 'close') {
-        const shouldReconnect = (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut);
-        console.log('Conexão fechada. Tentando reconectar:', shouldReconnect);
-        if (shouldReconnect) startBot();
-    } else if (connection === 'open') {
-        console.log('✅ WhatsApp conectado com sucesso! Bot ONLINE.');
-    }
-});
+// --- Variáveis Globais ---
+const MODELO_GEMINI = 'gemini-2.5-flash';
+const CHATS = new Map(); // Armazena sessões da IA por chatId
 
 // --- Configuração Google Gemini ---
-const MODELO_GEMINI = 'gemini-2.5-flash';
-
-if (!process.env.GEMINI_API_KEY) {
-    console.error('❌ GEMINI_API_KEY não configurada no .env');
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+    console.error("ERRO FATAL: GEMINI_API_KEY não configurada.");
     process.exit(1);
 }
+const aiInstance = new GoogleGenAI({ apiKey });
 
-const aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// --- Configuração Baileys ---
+const authFile = './auth_info.json';
+const { state, saveState } = useSingleFileAuthState(authFile);
 
-// --- Sessões de chat ---
-const CHATS = new Map();
+async function startBot() {
+    const { version } = await fetchLatestBaileysVersion();
+    const client = makeWASocket({
+        version,
+        auth: state,
+        printQRInTerminal: true
+    });
 
-// --- Mensagens de menu ---
-const MENU_PRINCIPAL = `Desculpe, [NOME]! Não entendi. Sua dúvida é sobre:
-1. 💰 *Financeiro* (Boletos, Dívidas, FIES)
-2. 📚 *Acadêmico* (Provas, Notas, Tutoria)
-3. 🎓 *Cursos/Matrícula* (Catálogo, Inscrição, ENEM)
-Responda com o número ou digite *MENU*.`;
-
-const SUBMENU_CURSOS = `🎓 Cursos e Ingresso
-Digite sua dúvida específica, por exemplo:
-- catálogo de cursos
-- como fazer matrícula
-- nota do ENEM`;
-
-// --- Função de envio ---
-const sendMessageAndBypassAI = async (chatId, text, contactName) => {
-    await client.sendMessage(chatId, text.replace('[NOME]', contactName));
-};
-
-// --- Lógica de mensagens ---
-client.ev.on('messages.upsert', async (m) => {
-    if (!m.messages) return;
-    const msg = m.messages[0];
-    const chatId = msg.key.remoteJid;
-    if (!msg.message || msg.key.fromMe) return;
-
-    const userMessage = msg.message.conversation || '';
-    const cleanMessage = userMessage.trim().toLowerCase();
-
-    const contact = await client.getContact(chatId);
-    const contactName = contact.pushname || 'Aluno(a)';
-
-    // Reset menu
-    if (['menu', 'ajuda', 'duda'].includes(cleanMessage)) {
-        CHATS.delete(chatId);
-        await sendMessageAndBypassAI(chatId, MENU_PRINCIPAL, contactName);
-        return;
-    }
-
-    // Se chat não existe
-    if (!CHATS.has(chatId)) {
-        CHATS.set(chatId, aiInstance.chats.create({
-            model: MODELO_GEMINI,
-            config: {
-                systemInstruction: `Você é assistente UNINTER Caratinga. Não interrompa o menu fixo. Nome do usuário: ${contactName}`
+    client.ev.on('connection.update', update => {
+        const { connection, lastDisconnect, qr } = update;
+        if (qr) {
+            qrcode.generate(qr, { small: true });
+            console.log('QR Code gerado. Escaneie no WhatsApp Web.');
+        }
+        if (connection === 'close') {
+            const reason = (lastDisconnect.error)?.output?.statusCode;
+            console.log('Desconectado:', reason);
+            if (reason !== DisconnectReason.loggedOut) {
+                startBot(); // reconecta automaticamente
             }
-        }));
-        await sendMessageAndBypassAI(chatId, MENU_PRINCIPAL, contactName);
-        return;
-    }
+        } else if (connection === 'open') {
+            console.log('✅ WhatsApp conectado com sucesso!');
+        }
+    });
 
-    // Opções menu
-    if (cleanMessage === '1') {
-        await sendMessageAndBypassAI(chatId, '💰 FINANCEIRO\nPara boletos, FIES ou negociação, acesse o AVA ou ligue: 0800 702 0500, Opção 1.', contactName);
-        return;
-    } else if (cleanMessage === '2') {
-        await sendMessageAndBypassAI(chatId, '📚 ACADÊMICO\nPara provas, notas ou Tutoria, acesse o AVA.', contactName);
-        return;
-    } else if (cleanMessage === '3') {
-        await sendMessageAndBypassAI(chatId, SUBMENU_CURSOS, contactName);
-        return;
-    }
+    client.ev.on('creds.update', saveState);
 
-    // Submenu cursos
-    if (/catalogo|cursos|gradua|pos/i.test(cleanMessage)) {
-        await sendMessageAndBypassAI(chatId, "📘 CATÁLOGO DE CURSOS\nAcesse no portal oficial: 🔗 [INSIRA O LINK]", contactName);
-        return;
-    } else if (/matricul|inscrição|inscrev/i.test(cleanMessage)) {
-        await sendMessageAndBypassAI(chatId, "📝 MATRÍCULA\nVocê pode iniciar pelo site ou ligar para o Polo Caratinga: (33) 9807-2110.", contactName);
-        return;
-    } else if (/enem|vestibular|nota/i.test(cleanMessage)) {
-        await sendMessageAndBypassAI(chatId, "🎓 ENEM\nA Uninter aceita ENEM. Ligue para o Polo Caratinga para mais informações.", contactName);
-        return;
-    }
+    // --- Lógica de mensagens ---
+    client.ev.on('messages.upsert', async m => {
+        const msg = m.messages[0];
+        if (!msg.message || msg.key.fromMe) return;
 
-    // IA Gemini
-    try {
+        const chatId = msg.key.remoteJid;
+        const userMessage = msg.message.conversation || '';
+        const cleanMessage = userMessage.trim().toLowerCase();
+
+        // Resposta rápida de menu
+        const sendMessage = text => client.sendMessage(chatId, { text });
+
+        if (cleanMessage === 'menu' || cleanMessage === 'ajuda') {
+            sendMessage(
+                `Desculpe! Não entendi. Escolha:\n1. Financeiro\n2. Acadêmico\n3. Cursos/Matrícula`
+            );
+            CHATS.delete(chatId);
+            return;
+        }
+
+        if (!CHATS.has(chatId)) {
+            // cria sessão da IA
+            const chatSession = aiInstance.chats.create({
+                model: MODELO_GEMINI,
+                config: {
+                    systemInstruction: "Você é um assistente UNINTER Caratinga. Responda de forma cordial e profissional."
+                }
+            });
+            CHATS.set(chatId, chatSession);
+        }
+
         const chatSession = CHATS.get(chatId);
-        const response = await chatSession.sendMessage({ message: userMessage });
-        await client.sendMessage(chatId, response.text);
-    } catch (err) {
-        console.error('Erro IA:', err);
-        await sendMessageAndBypassAI(chatId, '🚨 ERRO DE IA 🚨 Tente novamente ou digite MENU.', contactName);
-    }
-});
 
-// --- Servidor Web ---
+        // Menu simples
+        if (cleanMessage === '1') {
+            sendMessage("💰 FINANCEIRO: Boletos, FIES e dívidas - acesse o AVA ou ligue 0800 702 0500.");
+            return;
+        } else if (cleanMessage === '2') {
+            sendMessage("📚 ACADÊMICO: Provas, Notas e Tutoria - acesse o AVA.");
+            return;
+        } else if (cleanMessage === '3') {
+            sendMessage("🎓 CURSOS: Digite 'catálogo', 'matrícula' ou 'ENEM' para detalhes.");
+            return;
+        }
+
+        // Palavras-chave opção 3
+        if (cleanMessage.includes('catálogo') || cleanMessage.includes('cursos')) {
+            sendMessage("📘 Catálogo completo: [INSIRA LINK OFICIAL]");
+            return;
+        } else if (cleanMessage.includes('matrícula') || cleanMessage.includes('inscrição')) {
+            sendMessage("📝 Matrícula: Ligue (33) 9807-2110 ou acesse o portal para instruções.");
+            return;
+        } else if (cleanMessage.includes('enem') || cleanMessage.includes('nota')) {
+            sendMessage("🎓 ENEM: Aceito para ingresso! Ligue para o Polo Caratinga (33) 9807-2110.");
+            return;
+        }
+
+        // Resposta via IA
+        try {
+            const response = await chatSession.sendMessage({ message: userMessage });
+            sendMessage(response.text);
+        } catch (error) {
+            console.error('ERRO IA:', error);
+            sendMessage("🚨 ERRO DE IA. Tente novamente ou digite MENU.");
+        }
+    });
+}
+
+// Inicializa
+startBot();
+
+// Servidor HTTP simples para Render/Heroku
 const PORT = process.env.PORT || 3000;
 http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bot Duda ativo!');
+    res.end('Bot WhatsApp ativo!');
 }).listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
-
-// --- Inicializa ---
-const startBot = () => client;
-startBot();

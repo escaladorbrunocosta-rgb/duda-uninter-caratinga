@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Robô WhatsApp Duda Uninter - Polo Caratinga",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js"
   },
@@ -14,10 +15,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@whiskeysockets/baileys": "5.0.2",
     "@google/generative-ai": "^0.24.1",
     "puppeteer-core": "^24.31.0",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.23.0"
-  },
-  "type": "module"
+    "http": "^0.0.1-security"
+  }
 }

@@ -12,6 +12,11 @@ const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 const app = express();
 const PORT = process.env.PORT || 10000;
 
+// IMPORTANTE: Obter o caminho do novo navegador leve
+const chromium = require('chromium-for-lambda');
+const executablePath = await chromium.executablePath;
+
+
 // Configuração do WhatsApp Client
 const client = new Client({
     authStrategy: new LocalAuth({ clientId: 'auth' }), 
@@ -19,7 +24,20 @@ const client = new Client({
         type: 'remote',
         remotePath: 'https://raw.githubusercontent.com/wwebjs/builds/main/html/2.2413.51-beta/index.html',
     },
-    // CORREÇÃO FINAL: Sintaxe correta
+    // Corrigido para usar o novo caminho do navegador
+    puppeteer: {
+        executablePath: executablePath,
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process', // Necessário para alguns ambientes gratuitos
+            '--disable-gpu'
+        ],
+    },
     printQRInTerminal: true, 
 });
 

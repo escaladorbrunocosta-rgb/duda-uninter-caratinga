@@ -1,5 +1,5 @@
 import qrcode from 'qrcode-terminal';
-import { GoogleGenAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import http from 'http';
 import { existsSync } from 'fs';
 import path from 'path';
@@ -14,7 +14,7 @@ if (!apiKey) {
     console.error("ERRO FATAL: GEMINI_API_KEY não configurada.");
     process.exit(1);
 }
-const aiInstance = new GoogleGenAI({ apiKey });
+const aiInstance = new GoogleGenerativeAI({ apiKey });
 
 // --- Configuração Baileys ---
 const authFile = './auth_info.json';

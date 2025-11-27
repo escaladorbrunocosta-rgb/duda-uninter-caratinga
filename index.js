@@ -21,7 +21,7 @@ const client = new Client({
         remotePath: 'https://raw.githubusercontent.com/wwebjs/builds/main/html/2.2413.51-beta/index.html',
     },
     // Corrigido: Sintaxe e palavra-chave 'true'
-    printQRInTerminal: true, 
+    printQRInTerminal: true,, 
     // Outras configuracoes, se necessario
 });
 

@@ -3,19 +3,15 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';
 
 // Configuração da IA
-// Certifique-se de que a variável de ambiente GEMINI_API_KEY está configurada no Render
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const app = express();
 const PORT = process.env.PORT || 10000;
-
-// IMPORTANTE: Obter o caminho do novo navegador leve
-const chromium = require('chromium-for-lambda');
-const executablePath = await chromium.executablePath;
-
 
 // Configuração do WhatsApp Client
 const client = new Client({
@@ -24,19 +20,13 @@ const client = new Client({
         type: 'remote',
         remotePath: 'https://raw.githubusercontent.com/wwebjs/builds/main/html/2.2413.51-beta/index.html',
     },
-    // Corrigido para usar o novo caminho do navegador
+    // Configuração para o puppeteer leve (@sparticuz/chromium)
     puppeteer: {
-        executablePath: executablePath,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process', // Necessário para alguns ambientes gratuitos
-            '--disable-gpu'
-        ],
+        executablePath: await chromium.executablePath,
+        args: chromium.args,
+        headless: chromium.headless,
+        defaultViewport: chromium.defaultViewport,
+        ignoreHTTPSErrors: true,
     },
     printQRInTerminal: true, 
 });

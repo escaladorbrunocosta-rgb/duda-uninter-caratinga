@@ -21,8 +21,7 @@ const authFile = './auth_info.json';
 async function startBot() {
     const { version } = await fetchLatestBaileysVersion();
         auth: state,
-        printQRInTerminal: true,
-    });
+printQRInTerminal: true,    });
 
     client.ev.on('connection.update', update => {
         const { connection, lastDisconnect, qr } = update;

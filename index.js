@@ -10,7 +10,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const app = express();
-const PORT = process.env.PORT || 10000; // Usando 10000, um padrao para Render
+const PORT = process.env.PORT || 10000;
 
 // Configuração do WhatsApp Client
 const client = new Client({
@@ -19,7 +19,7 @@ const client = new Client({
         type: 'remote',
         remotePath: 'https://raw.githubusercontent.com/wwebjs/builds/main/html/2.2413.51-beta/index.html',
     },
-    // Correção de sintaxe e código desnecessário removido
+    // CORREÇÃO FINAL: Sintaxe correta
     printQRInTerminal: true, 
 });
 

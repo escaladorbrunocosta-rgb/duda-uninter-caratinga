@@ -1,10 +1,11 @@
-import { Client, LocalAuth, MessageMedia } from 'whatsapp-web.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import express from 'express';
-import { fileURLToPath } from 'url';
-import path from 'path';
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
+
+// **CORREÇÃO AQUI:** Usando 'require' para módulos CommonJS problemáticos.
+import pkg from 'whatsapp-web.js';
+const { Client, LocalAuth } = pkg;
 
 // Configuração da IA
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;

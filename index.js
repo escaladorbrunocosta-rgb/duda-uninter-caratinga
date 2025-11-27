@@ -10,19 +10,17 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000; // Usando 10000, um padrao para Render
 
 // Configuração do WhatsApp Client
 const client = new Client({
-    // Corrigido: Usando LocalAuth do whatsapp-web.js
     authStrategy: new LocalAuth({ clientId: 'auth' }), 
     webVersionCache: {
         type: 'remote',
         remotePath: 'https://raw.githubusercontent.com/wwebjs/builds/main/html/2.2413.51-beta/index.html',
     },
-    // Corrigido: Sintaxe e palavra-chave 'true'
-    printQRInTerminal: true,, 
-    // Outras configuracoes, se necessario
+    // Correção de sintaxe e código desnecessário removido
+    printQRInTerminal: true, 
 });
 
 
@@ -33,7 +31,7 @@ client.on('qr', (qr) => {
 });
 
 client.on('ready', () => {
-    console.log('Client is ready!');
+    console.log('Client is ready! O Duda-Bot está conectado.');
 });
 
 client.on('message', async (msg) => {

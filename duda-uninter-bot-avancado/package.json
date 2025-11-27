@@ -1,0 +1,16 @@
+{
+  "name": "duda-uninter-bot-avancado",
+  "version": "1.0.0",
+  "description": "Bot WhatsApp Baileys avançado",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.9",
+    "qrcode-terminal": "^0.12.0",
+    "ws": "^8.17.0",
+    "node-fetch": "^3.3.2"
+  }
+}

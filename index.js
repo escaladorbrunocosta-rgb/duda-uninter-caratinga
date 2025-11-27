@@ -18,7 +18,6 @@ const aiInstance = new GoogleGenerativeAI({ apiKey });
 
 // --- Configuração Baileys ---
 const authFile = './auth_info.json';
-
 async function startBot() {
     const { version } = await fetchLatestBaileysVersion();
     const client = makeWASocket({

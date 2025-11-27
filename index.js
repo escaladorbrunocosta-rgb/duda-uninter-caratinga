@@ -1,4 +1,3 @@
-import makeWASocket, { useSingleFileAuthState, DisconnectReason, fetchLatestBaileysVersion } from '@whiskeysockets/baileys';
 import qrcode from 'qrcode-terminal';
 import { GoogleGenAI } from '@google/generative-ai';
 import http from 'http';

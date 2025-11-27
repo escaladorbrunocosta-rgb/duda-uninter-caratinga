@@ -20,8 +20,6 @@ const aiInstance = new GoogleGenerativeAI({ apiKey });
 const authFile = './auth_info.json';
 async function startBot() {
     const { version } = await fetchLatestBaileysVersion();
-    const client = makeWASocket({
-        version,
         auth: state,
         printQRInTerminal: true
     });

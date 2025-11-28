@@ -1,0 +1,5 @@
+# Use o editor 'nano' para criar e colar o conteúdo de cada arquivo
+nano package.json
+nano index.js
+nano config.js
+nano knowledgeBase.js

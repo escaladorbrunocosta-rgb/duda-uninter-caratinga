@@ -1,2 +1,392 @@
 2025-11-23T14:06:46: PM2 log: App [DudaBot:0] starting in -fork mode-
 2025-11-23T14:06:46: PM2 log: App [DudaBot:0] online
+2025-11-26T16:10:28: PM2 log: ===============================================================================
+2025-11-26T16:10:28: PM2 log: --- New PM2 Daemon started ----------------------------------------------------
+2025-11-26T16:10:28: PM2 log: Time                 : Wed Nov 26 2025 16:10:28 GMT+0000 (Coordinated Universal Time)
+2025-11-26T16:10:28: PM2 log: PM2 version          : 6.0.14
+2025-11-26T16:10:28: PM2 log: Node.js version      : 24.11.1
+2025-11-26T16:10:28: PM2 log: Current arch         : x64
+2025-11-26T16:10:28: PM2 log: PM2 home             : /home/escaladorbrunocosta/.pm2
+2025-11-26T16:10:28: PM2 log: PM2 PID file         : /home/escaladorbrunocosta/.pm2/pm2.pid
+2025-11-26T16:10:28: PM2 log: RPC socket file      : /home/escaladorbrunocosta/.pm2/rpc.sock
+2025-11-26T16:10:28: PM2 log: BUS socket file      : /home/escaladorbrunocosta/.pm2/pub.sock
+2025-11-26T16:10:28: PM2 log: Application log path : /home/escaladorbrunocosta/.pm2/logs
+2025-11-26T16:10:28: PM2 log: Worker Interval      : 30000
+2025-11-26T16:10:28: PM2 log: Process dump file    : /home/escaladorbrunocosta/.pm2/dump.pm2
+2025-11-26T16:10:28: PM2 log: Concurrent actions   : 2
+2025-11-26T16:10:28: PM2 log: SIGTERM timeout      : 1600
+2025-11-26T16:10:28: PM2 log: Runtime Binary       : /usr/local/nvm/versions/node/v24.11.1/bin/node
+2025-11-26T16:10:28: PM2 log: ===============================================================================
+2025-11-26T16:10:28: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:28: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:28: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:28: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:28: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:28: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:28: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:28: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:29: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:30: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:31: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:31: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:31: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:31: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:31: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:31: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:31: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:31: PM2 log: Script /home/escaladorbrunocosta/duda-uninter-bot-limpo/duda-uninter-bot-avancado/index.js had too many unstable restarts (16). Stopped. "errored"
+2025-11-26T16:10:34: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:34: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:34: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:34: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:34: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:34: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:34: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:34: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:35: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:36: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:37: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:37: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:37: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:37: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:37: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:10:37: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:10:37: PM2 log: App [duda-whatsapp-bot:0] exited with code [1] via signal [SIGINT]
+2025-11-26T16:10:37: PM2 log: Script /home/escaladorbrunocosta/duda-uninter-bot-limpo/duda-uninter-bot-avancado/index.js had too many unstable restarts (16). Stopped. "errored"
+2025-11-26T16:14:21: PM2 log: Stopping app:duda-whatsapp-bot id:0
+2025-11-26T16:14:21: PM2 error: app=duda-whatsapp-bot id=0 does not have a pid
+2025-11-26T16:14:22: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:14:22: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:17:03: PM2 log: Stopping app:duda-whatsapp-bot id:0
+2025-11-26T16:17:03: PM2 log: App [duda-whatsapp-bot:0] exited with code [0] via signal [SIGINT]
+2025-11-26T16:17:03: PM2 log: pid=42607 msg=process killed
+2025-11-26T16:17:03: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:17:03: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:18:16: PM2 log: Stopping app:duda-whatsapp-bot id:0
+2025-11-26T16:18:16: PM2 log: App [duda-whatsapp-bot:0] exited with code [0] via signal [SIGINT]
+2025-11-26T16:18:16: PM2 log: pid=43249 msg=process killed
+2025-11-26T16:18:16: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:18:16: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:18:16: PM2 log: Stopping app:duda-whatsapp-bot id:0
+2025-11-26T16:18:16: PM2 log: App [duda-whatsapp-bot:0] exited with code [0] via signal [SIGINT]
+2025-11-26T16:18:16: PM2 log: pid=43522 msg=process killed
+2025-11-26T16:38:55: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:38:55: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:45:00: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:00: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:00: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:00: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:00: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:01: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:02: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:45:03: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:45:03: PM2 log: Script /home/escaladorbrunocosta/duda-uninter-bot-limpo/duda-whatsapp-bot/index.js had too many unstable restarts (16). Stopped. "errored"
+2025-11-26T16:54:38: PM2 log: Stopping app:duda-whatsapp-bot id:0
+2025-11-26T16:54:38: PM2 log: App [duda-whatsapp-bot:0] exited with code [0] via signal [SIGINT]
+2025-11-26T16:54:38: PM2 log: pid=144185 msg=process killed
+2025-11-26T16:54:38: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T16:54:38: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T16:54:38: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:38: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:38: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:38: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:38: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:39: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:40: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T16:54:41: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T16:54:42: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T16:54:42: PM2 log: Script /home/escaladorbrunocosta/duda-uninter-bot-limpo/duda-whatsapp-bot/index.js had too many unstable restarts (16). Stopped. "errored"
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:18: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:19: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:20: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:21: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:21: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:21: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:21: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:21: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:03:21: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:03:21: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:03:21: PM2 log: Script /home/escaladorbrunocosta/duda-uninter-bot/index.js had too many unstable restarts (16). Stopped. "errored"
+2025-11-26T17:04:56: PM2 log: Stopping app:duda-whatsapp-bot id:0
+2025-11-26T17:04:56: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:56: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:56: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:56: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:56: PM2 log: App [duda-whatsapp-bot:0] exited with code [0] via signal [SIGINT]
+2025-11-26T17:04:56: PM2 log: pid=151262 msg=process killed
+2025-11-26T17:04:56: PM2 log: App [duda-whatsapp-bot:0] starting in -fork mode-
+2025-11-26T17:04:56: PM2 log: App [duda-whatsapp-bot:0] online
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:57: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:58: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:04:59: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] starting in -fork mode-
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] online
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:1] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: Script /home/escaladorbrunocosta/duda-uninter-bot-limpo/duda-whatsapp-bot/index.js had too many unstable restarts (16). Stopped. "errored"
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] starting in -fork mode-
+2025-11-26T17:05:00: PM2 log: App [duda-whatsapp-bot:2] online
+2025-11-26T17:05:01: PM2 log: App [duda-whatsapp-bot:2] exited with code [1] via signal [SIGINT]
+2025-11-26T17:05:01: PM2 log: Script /home/escaladorbrunocosta/duda-uninter-bot/index.js had too many unstable restarts (16). Stopped. "errored"
+2025-11-26T20:12:50: PM2 error: Error: ENOSPC: no space left on device, write

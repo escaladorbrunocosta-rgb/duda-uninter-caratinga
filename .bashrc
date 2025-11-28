@@ -116,3 +116,4 @@ if ! shopt -oq posix; then
   fi
 fi
 source /google/devshell/bashrc.google
+export PATH=~/.npm-global/bin:$PATH

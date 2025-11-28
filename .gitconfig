@@ -1,5 +1,5 @@
 [user]
-	email = escaladorbrunocosta@gmail.com
-	name = Bruno Costa
+	email = seu_email_do_github@exemplo.com
+	name = Seu Nome
 [http]
 	postBuffer = 524288000

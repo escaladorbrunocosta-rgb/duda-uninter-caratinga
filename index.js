@@ -1,104 +1,153 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import express from 'express';
-import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
+import baileys, {
+  useMultiFileAuthState,
+  fetchLatestBaileysVersion,
+  DisconnectReason
+} from "@whiskeysockets/baileys";
+import express from "express";
+import fs from "fs/promises"; // 1. Importar o módulo File System
+import qrcode from "qrcode-terminal";
+import pino from "pino";
+import { getResponse } from "./knowledgeBase.js";
 
-// **CORREÇÃO AQUI:** Usando 'require' para módulos CommonJS problemáticos.
-import pkg from 'whatsapp-web.js';
-const { Client, LocalAuth } = pkg;
+// 2. Definir o nome do arquivo de log
+const CONVERSATION_LOG_FILE = "conversations.log";
 
-// Configuração da IA
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
+// Objeto para armazenar o estado da conversa de cada usuário
+const userStates = {};
 
-const app = express();
-const PORT = process.env.PORT || 10000;
+async function iniciarBot() {
+  const { state, saveCreds } = await useMultiFileAuthState("./auth");
+  const { version } = await fetchLatestBaileysVersion();
 
-// Configuração do WhatsApp Client
-const client = new Client({ puppeteer: require('./puppeteer-config'),{
-    authStrategy: new LocalAuth({ clientId: 'auth' }), 
-    webVersionCache: {
-        type: 'remote',
-        remotePath: 'https://raw.githubusercontent.com/wwebjs/builds/main/html/2.2413.51-beta/index.html',
-    },
-    // Configuração para o puppeteer leve (@sparticuz/chromium)
-    puppeteer: {
-        executablePath: await chromium.executablePath,
-        args: chromium.args,
-        headless: chromium.headless,
-        defaultViewport: chromium.defaultViewport,
-        ignoreHTTPSErrors: true,
-    },
-    printQRInTerminal: true, 
-});
+  const sock = baileys.default({
+    auth: state,
+    version,
+    printQRInTerminal: true,
+    logger: pino({ level: "info" }),
+    syncFullHistory: false,
+  });
 
+  sock.ev.on("creds.update", saveCreds);
 
-// Funções de Gerenciamento do Bot
-client.on('qr', (qr) => {
-    // ESTA É A STRING QUE VOCÊ PRECISA COPIAR
-    console.log('QR CODE STRING:', qr);
-});
+  sock.ev.on("messages.upsert", async (msg) => {
+    const message = msg.messages[0];
 
-client.on('ready', () => {
-    console.log('Client is ready! O Duda-Bot está conectado.');
-});
+    // Ignora mensagens sem conteúdo ou enviadas pelo próprio bot
+    if (!message.message || message.key.fromMe) {
+      return;
+    }
 
-client.on('message', async (msg) => {
-    // Ignora mensagens de grupos
-    if (msg.from.endsWith('@g.us')) return;
+    const sender = message.key.remoteJid;
+    const text = (
+      message.message.conversation ||
+      message.message.extendedTextMessage?.text ||
+      ""
+    ).trim();
 
-    if (msg.body === 'Oi') {
-        client.sendMessage(msg.from, 'Olá! Eu sou o Duda, seu assistente virtual. Em que posso ajudar?');
+    console.log(`📩 Mensagem recebida de ${sender}: "${text}"`);
+
+    // --- LÓGICA DE CONTEXTO ---
+    // 1. Verifica se há um estado salvo para este usuário
+    if (userStates[sender] === 'awaiting_course_area') {
+      const expectedAnswers = ['saúde', 'tecnologia', 'educação'];
+      // Verifica se a resposta do usuário é uma das esperadas
+      if (expectedAnswers.includes(text.toLowerCase())) {
+        // Resposta válida! Processa normalmente.
+        console.log(`🗣️  Contexto: Usuário ${sender} escolheu a área "${text}"`);
+        // Limpa o estado para a próxima mensagem ser processada normalmente
+        delete userStates[sender];
+      } else {
+        // Resposta inválida! O usuário não respondeu o que era esperado.
+        console.log(`⚠️ Contexto: Resposta inesperada de ${sender}: "${text}"`);
+        // Relembra o usuário das opções e NÃO limpa o estado.
+        await sock.sendMessage(sender, { 
+          text: "Desculpe, não entendi sua resposta. Por favor, escolha uma das áreas que sugeri (Saúde, Tecnologia ou Educação)." 
+        });
+        // Interrompe o processamento desta mensagem para não procurar na base de conhecimento.
+        return; 
+      }
+    }
+    // --- FIM DA LÓGICA DE CONTEXTO ---
+
+    // Procura por uma resposta na base de conhecimento
+    const response = getResponse(text);
+
+    // 3. Criar a entrada de log e salvá-la no arquivo
+    const logResponse = response ? `(${response.type}) ${response.content}` : 'Nenhuma resposta definida';
+    const logEntry = `[${new Date().toISOString()}] [FROM: ${sender}] User: "${text}" | Bot: "${logResponse}"\n`;
+
+    try {
+      await fs.appendFile(CONVERSATION_LOG_FILE, logEntry);
+    } catch (err) {
+      console.error("❌ Erro ao salvar log da conversa:", err);
     }
     
-    // Processamento da IA (Gemini)
-    if (msg.body.startsWith('!ai')) {
-        const prompt = msg.body.substring(4).trim();
-        if (!prompt) {
-            client.sendMessage(msg.from, 'Por favor, forneça um prompt após !ai.');
-            return;
-        }
+    if (response) {
+      // Lógica para enviar diferentes tipos de mensagem
+      switch (response.type) {
+        case 'text':
+          await sock.sendMessage(sender, { text: response.content });
+          break;
+        case 'image':
+          await sock.sendMessage(sender, { 
+            image: { url: response.content },
+            caption: response.caption 
+          });
+          break;
+        case 'document':
+          await sock.sendMessage(sender, { 
+            document: { url: response.content },
+            mimetype: 'application/pdf',
+            fileName: response.fileName
+          });
+          break;
+        case 'buttons':
+          const buttons = response.buttons.map(btn => ({
+            buttonId: btn.id,
+            buttonText: { displayText: btn.text },
+            type: 1
+          }));
 
-        try {
-            const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
-            
-            // Verifica se a mensagem tem mídia (imagem)
-            let imagePart = [];
-            if (msg.hasMedia) {
-                const media = await msg.downloadMedia();
-                if (media.mimetype.startsWith('image/')) {
-                    imagePart = [{
-                        inlineData: {
-                            data: media.data,
-                            mimeType: media.mimetype
-                        }
-                    }];
-                }
-            }
+          const buttonMessage = {
+            text: response.content,
+            footer: response.footer,
+            buttons: buttons,
+            headerType: 1
+          };
+          await sock.sendMessage(sender, buttonMessage);
 
-            const textPart = { text: prompt };
-
-            const response = await model.generateContent([
-                ...imagePart,
-                textPart
-            ]);
-
-            const responseText = response.text;
-            client.sendMessage(msg.from, responseText);
-        } catch (error) {
-            console.error('Erro ao chamar a API Gemini:', error);
-            client.sendMessage(msg.from, 'Desculpe, houve um erro ao processar sua solicitação de IA. Verifique sua chave API.');
-        }
+          // 2. Define o estado do usuário após fazer a pergunta
+          userStates[sender] = 'awaiting_course_area';
+          console.log(`📝 Estado definido para ${sender}: awaiting_course_area`);
+          break;
+      }
+    } else {
+      // Opcional: Enviar uma mensagem padrão se nenhum comando for encontrado
+      // await sock.sendMessage(sender, { text: "Desculpe, não entendi o que você disse. Pode tentar de outra forma?" });
+      // Se quiser logar também as mensagens não entendidas, o código acima já faz isso.
     }
-});
+  });
 
-client.initialize();
+  sock.ev.on("connection.update", (update) => {
+    const { connection, lastDisconnect } = update;
+    if (update.connection === "close") {
+      const shouldReconnect =
+        lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+      console.log("🔌 Conexão fechada por: ", lastDisconnect?.error, ", reconectando: ", shouldReconnect);
 
-// Servidor Express para manter o Render ativo
-app.get('/', (req, res) => {
-    res.send('Duda-Bot está rodando!');
-});
+      if (shouldReconnect) {
+        iniciarBot();
+      }
+    } else if (update.connection === "open") {
+      console.log("✅ Bot conectado ao WhatsApp!");
+    }
+  });
+}
 
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
+const app = express();
+app.get("/", (req, res) => res.send("Bot rodando!"));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor iniciado na porta ${PORT}`));
+
+iniciarBot();

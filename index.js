@@ -15,7 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 // Configuração do WhatsApp Client
-const client = new Client({
+const client = new Client({ puppeteer: require('./puppeteer-config'),{
     authStrategy: new LocalAuth({ clientId: 'auth' }), 
     webVersionCache: {
         type: 'remote',

@@ -1,4 +1,5 @@
 {
+  "engines": { "node": "18.x" },{
   "name": "dudabot",
   "version": "1.0.0",
   "description": "Bot para Duda Uninter usando Gemini API e whatsapp-web.js",

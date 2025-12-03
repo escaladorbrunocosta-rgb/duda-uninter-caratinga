@@ -1,0 +1,36 @@
+[
+  {
+    "match": ["oi", "ola", "bom dia", "boa tarde", "boa noite"],
+    "response": {
+      "type": "text",
+      "content": "Olá! Sou a Duda, sua assistente virtual. Como posso te ajudar hoje?"
+    }
+  },
+  {
+    "match": ["curso", "cursos", "graduação"],
+    "response": {
+      "type": "buttons",
+      "content": "Ótimo! Temos cursos incríveis em diversas áreas. Qual delas te interessa mais?",
+      "footer": "Selecione uma das opções",
+      "buttons": [
+        { "id": "cursos_saude", "text": "Saúde" },
+        { "id": "cursos_tecnologia", "text": "Tecnologia" },
+        { "id": "cursos_educacao", "text": "Educação" }
+      ]
+    }
+  },
+  {
+    "match": ["cursos_saude"],
+    "response": {
+      "type": "text",
+      "content": "Na área da Saúde, temos: Enfermagem, Nutrição, Fisioterapia e muito mais! Para qual deles você gostaria de mais informações?"
+    }
+  },
+  {
+    "match": ["obrigado", "obrigada", "vlw"],
+    "response": {
+      "type": "text",
+      "content": "De nada! Se precisar de mais alguma coisa, é só chamar. 😊"
+    }
+  }
+]

@@ -1,23 +1,221 @@
 {
   "greetings": ["oi", "ola", "olá"],
   "menu_trigger": "menu",
-  "menu": "🤖 Olá! Eu sou a Duda, sua assistente virtual do Polo EAD Uninter de Caratinga.\n\nComo posso te ajudar hoje? Digite o número da opção desejada:\n\n1️⃣. Cursos e Matrículas\n2️⃣. Informações para Alunos (Secretaria)\n3️⃣. Suporte Técnico\n4️⃣. Falar com o Setor Comercial\n\nA qualquer momento, digite \"menu\" para ver estas opções novamente.",
+  "menu_tree": {
+    "main": {
+      "text": "🤖 Olá! Eu sou a Duda, sua assistente virtual do Polo EAD Uninter de Caratinga.\n\nComo posso te ajudar hoje? Digite o número da opção desejada:",
+      "options": {
+        "1": "Cursos e Matrículas",
+        "2": "Informações para Alunos",
+        "3": "Suporte e Financeiro",
+        "4": "Contatos e Links Úteis"
+      }
+    },
+    "1": {
+      "text": "Para informações sobre nossos cursos e como fazer sua matrícula, por favor, entre em contato com nosso setor comercial. Você pode ligar para (33) 3322-4001 ou aguardar para ser transferido."
+    },
+    "2": {
+      "text": "Certo! Sobre qual assunto de aluno você gostaria de saber?",
+      "options": {
+        "1": "Secretaria (documentos, notas, etc)",
+        "2": "DP (Dependência de matéria)",
+        "3": "Trocar de curso ou polo",
+        "4": "Dúvidas sobre o FIES"
+      }
+    },
+    "3": {
+      "text": "Para qual setor você precisa de ajuda?",
+      "options": {
+        "1": "Suporte Técnico (problemas no portal/AVA)",
+        "2": "Financeiro (boletos, negociação, etc)",
+        "3": "Tutoria (dúvidas de conteúdo)",
+        "4": "CMA (procedimentos acadêmicos)"
+      }
+    },
+    "4": {
+      "text": "Aqui estão nossos principais contatos e links:\n\n*   *Telefone Fixo e WhatsApp:* (33) 3322-4001\n*   *Endereço:* Rua Coronel Antônio Salim, 74, Bairro Dário Grossi, Caratinga - MG\n*   *Instagram:* @unintercaratinga\n*   *Todos os links (Linktree):* https://linktr.ee/Uninter_Caratinga\n\nPara outros canais, como Ouvidoria ou Financeiro geral, por favor, seja mais específico."
+    }
+  },
   "responses": [
     {
-      "keywords": ["1", "cursos", "matrículas", "matriculas"],
-      "answer": "Para informações sobre nossos cursos e como fazer sua matrícula, por favor, entre em contato com nosso setor comercial pelo número (XX) XXXX-XXXX ou aguarde para ser transferido."
+      "keywords": ["prova", "onde", "aplicada"],
+      "answer": "A prova do vestibular é 100% on-line para todas as modalidades de curso (presencial, semipresencial e a distância)."
     },
     {
-      "keywords": ["2", "alunos", "secretaria"],
-      "answer": "Para assuntos da secretaria, como prazos, documentos e notas, acesse seu portal do aluno ou entre em contato pelo e-mail secretaria.caratinga@uninter.com."
+      "keywords": ["formas", "ingressar", "ingresso", "graduação"],
+      "answer": "Além do vestibular, os candidatos podem utilizar a nota do Enem ou pedir transferência de outras instituições."
     },
     {
-      "keywords": ["3", "suporte", "técnico", "tecnico", "ava"],
-      "answer": "Se você está com problemas técnicos no seu portal ou AVA, por favor, descreva seu problema em detalhes para que eu possa tentar ajudar ou encaminhar para o suporte."
+      "keywords": ["nota", "enem"],
+      "answer": "No momento da inscrição, selecione a opção 'SOMENTE ENEM' para concorrer com a nota do Exame Nacional do Ensino Médio, sem precisar participar do vestibular."
     },
     {
-      "keywords": ["4", "comercial", "falar"],
-      "answer": "Para falar com o setor comercial, ligue para (XX) XXXX-XXXX ou envie uma mensagem para o WhatsApp deste número."
+      "keywords": ["mudar", "trocar", "curso"],
+      "answer": "Sim, é possível mudar de curso.\n\n*Cursos presenciais e semipresenciais:*\nSolicite a alteração pelo e-mail vestibular@grupouninter.com.br e aguarde o retorno (normalmente em até 2 dias úteis).\n\n*Cursos a distância:*\nAcesse uninter.com/graduacao-ead/vestibular >> comprovante de inscrição, informe seu CPF e clique em 'Atualizar Informações de Curso e Local'. Se já tiver pago algum boleto, entre em contato com o financeiro antes de se matricular."
+    },
+    {
+      "keywords": ["aprovado", "ensino médio", "concluí"],
+      "answer": "Não. De acordo com a Lei de Diretrizes e Bases da Educação, só podem se matricular no ensino superior alunos com ensino médio completo. Você pode participar do vestibular para treinar e se preparar."
+    },
+    {
+      "keywords": ["inscrição", "dois cursos", "dois"],
+      "answer": "A inscrição é válida para apenas um curso. Se você deseja frequentar dois cursos, deve enviar uma solicitação para o e-mail vestibular@uninter.com.br."
+    },
+    {
+      "keywords": ["inscrição", "paga", "gratuita", "valor"],
+      "answer": "Para cursos presenciais e semipresenciais, a inscrição é 100% gratuita. Para cursos a distância, é gerado um boleto que pode ser pago no Polo de Apoio ou na rede bancária."
+    },
+    {
+      "keywords": ["inscrever", "inscrição", "onde", "processo seletivo"],
+      "answer": "Você pode se inscrever de várias formas:\n\n*Cursos presenciais e semipresenciais:*\nPelo site uninter.com, no teleatendimento (0800 702 0500) ou no Campus Garcez (R. Luiz Xavier, 103, Centro).\n\n*Cursos a distância:*\nPelo site uninter.com, no teleatendimento (0800 702 0500) ou no Polo de Apoio Presencial de sua escolha."
+    },
+    {
+      "keywords": ["pensão", "alimentícia", "comprovar"],
+      "answer": "Para comprovar o recebimento de pensão alimentícia, você deve apresentar a determinação judicial."
+    },
+    {
+      "keywords": ["moradia", "casa", "cedida"],
+      "answer": "Se a sua moradia for cedida, você deve apresentar uma declaração de casa cedida assinada pelo proprietário do imóvel (registrada em cartório e com duas testemunhas), acompanhada do carnê do IPTU em nome do proprietário."
+    },
+    {
+      "keywords": ["renda", "per capita", "bolsa", "parcial", "integral"],
+      "answer": "A renda per capita máxima para concorrer à bolsa é:\n\n*   **Bolsa Parcial:** não pode ultrapassar três salários mínimos por pessoa.\n*   **Bolsa Integral:** não pode ultrapassar um salário mínimo e meio por pessoa."
+    },
+    {
+      "keywords": ["histórico", "escolar"],
+      "answer": "Sim, a apresentação do Histórico Escolar é necessária em diversos casos, como quando o ensino médio foi concluído em escola pública ou em escola privada com bolsa integral. Para detalhes específicos sobre o seu caso, consulte o edital do processo seletivo."
+    },
+    {
+      "keywords": ["grupo", "familiar", "compõe"],
+      "answer": "O grupo familiar é composto por pai, mãe, irmão(ã), enteado(a), avô(ó), madrasta, padrasto ou outro membro da família que comprove residir com o candidato."
+    },
+    {
+      "keywords": ["provas", "vestibular", "como", "composição"],
+      "answer": "A prova do vestibular UNINTER é on-line e tem duração de 1 hora. Ela é composta por questões de Língua Portuguesa, Conhecimentos Gerais e uma parte específica que pode ser de Matemática ou de conhecimentos da área do curso escolhido (como na Escola Jurídica).\n\nA nota mínima para aprovação é de 200 pontos."
+    },
+    {
+      "keywords": ["fases", "processo", "seletivo", "prouni"],
+      "answer": "O processo seletivo do Prouni tem 4 fases:\n1. *Inscrição:* no site do Prouni.\n2. *Pré-seleção:* com base nas notas do Enem.\n3. *Confirmação de dados:* você envia a documentação para a instituição.\n4. *Concessão da bolsa:* após a confirmação, você assina o Termo de Concessão."
+    },
+    {
+      "keywords": ["qualquer curso", "qualquer instituição", "prouni"],
+      "answer": "Sim, desde que a instituição participe do Prouni. Ao se inscrever, você pode escolher até duas opções de curso, turno e instituição, de acordo com seu perfil. Fique atento, pois a matrícula só pode ser feita no perfil exato que foi aprovado."
+    },
+    {
+      "keywords": ["comprovar", "sem renda", "não possui renda"],
+      "answer": "Se você não possui renda, deve apresentar uma cópia da sua carteira de trabalho (páginas da foto, dados pessoais, último registro e a próxima página em branco) e uma declaração de não obtenção de renda, reconhecida em cartório e com duas testemunhas."
+    },
+    {
+      "keywords": ["renda bruta"],
+      "answer": "Renda bruta é o total dos seus vencimentos. Apenas férias, 13º salário e participação nos lucros (se recebida anualmente) não são considerados no cálculo."
+    },
+    {
+      "keywords": ["formação", "turma", "não formou", "pré-selecionado"],
+      "answer": "Se não houver formação de turma para o curso em que você foi pré-selecionado, você será reprovado nesta chamada. No entanto, você continuará concorrendo nas chamadas seguintes e poderá participar da Lista de Espera do Prouni."
+    },
+    {
+      "keywords": ["precisa", "vestibular", "prouni"],
+      "answer": "Não, o candidato à bolsa do Prouni não precisa fazer vestibular. No entanto, a instituição pode aplicar um processo seletivo próprio e gratuito para os pré-selecionados. Essa informação estará disponível no momento da sua inscrição."
+    },
+    {
+      "keywords": ["cursos", "autorizados", "mec"],
+      "answer": "Sim. Os centros universitários, como a Uninter, possuem autonomia para abrir novos cursos. Todos os cursos que a Uninter oferece são autorizados pelo MEC, por meio dessa autonomia."
+    },
+    {
+      "keywords": ["registra", "emite", "diplomas"],
+      "answer": "Com o credenciamento como Centro Universitário, os diplomas dos alunos são registrados e emitidos pela própria UNINTER, o que garante a validade nacional do documento."
+    },
+    {
+      "keywords": ["cursos", "reconhecidos", "mec"],
+      "answer": "O reconhecimento do curso pelo MEC é solicitado após o início da primeira turma. Muitos de nossos cursos já são reconhecidos. Você pode verificar o andamento do processo de cada curso no site emec.mec.gov.br."
+    },
+    {
+      "keywords": ["legalidade", "uninter"],
+      "answer": "A Uninter é um Centro Universitário reconhecido pelo MEC desde 2012 (Portaria nº 688). Isso nos dá autonomia para criar cursos e também para emitir e registrar os diplomas dos nossos formados."
+    },
+    {
+      "keywords": ["credenciamento", "autorização", "reconhecimento"],
+      "answer": "São etapas do processo de regulamentação de um curso junto ao MEC:\n\n*   **Credenciamento:** Permissão para a instituição de ensino superior começar a funcionar.\n*   **Autorização:** Permissão para uma faculdade (que não tem autonomia) iniciar um curso. Centros Universitários como a Uninter não precisam desta etapa.\n*   **Reconhecimento:** Confirmação da qualidade do curso após ele já ter começado, o que é necessário para que o diploma tenha validade nacional."
+    },
+    {
+      "keywords": ["centro universitário"],
+      "answer": "É uma instituição de ensino superior que se destaca pela excelência e qualidade. Centros Universitários, como a Uninter, têm autonomia para criar novos cursos e registrar os diplomas dos seus próprios alunos, sem precisar de autorização prévia do MEC para cada etapa."
+    },
+    {
+      "keywords": ["acesso", "acessar", "univirtus"],
+      "answer": "Para acessar o UNIVIRTUS:\n\n*   **Pelo navegador:** acesse univirtus.uninter.com/ava/web/\n*   **Pelo celular/tablet:** baixe o aplicativo na loja oficial (atualmente disponível para Android)."
+    },
+    {
+      "keywords": ["semipresenciais", "semipresencial", "funcionam"],
+      "answer": "No formato semipresencial da Uninter, você acessa os conteúdos teóricos pela nossa plataforma digital e realiza atividades práticas presenciais (em polos, laboratórios ou empresas parceiras) conforme o planejamento do curso, sempre com o apoio de mediadores pedagógicos. É a união da flexibilidade do online com experiências reais para o mercado de trabalho."
+    },
+    {
+      "keywords": ["fies", "financia", "juros"],
+      "answer": "A taxa de juros da modalidade Fies é zero. Para outras dúvidas sobre o FIES, entre em contato diretamente com os canais oficiais:\n\n*   **Site:** www.mec.gov.br\n*   **Telefone:** 0800-726-0101 (9h às 18h)\n*   **E-mail Uninter:** fies@uninter.com"
+    },
+    {
+      "keywords": ["pagamento", "saldo devedor", "fies"],
+      "answer": "O pagamento do saldo devedor do FIES se inicia no primeiro mês após a conclusão do curso, desde que você possua renda. O valor será descontado diretamente da sua fonte de renda."
+    },
+    {
+      "keywords": ["pagar", "durante", "curso", "fies"],
+      "answer": "Sim. Durante o curso, o estudante paga mensalmente um valor referente ao encargo operacional e ao seguro de vida, diretamente à instituição financeira contratada."
+    },
+    {
+      "keywords": ["cpsa", "comissão"],
+      "answer": "A CPSA (Comissão Permanente de Supervisão e Acompanhamento) é a equipe responsável por validar as informações que você presta na inscrição do Prouni/FIES e também nos aditamentos de contrato."
+    },
+    {
+      "keywords": ["desconto", "mensalidades", "indicação", "amigo"],
+      "answer": "Além dos descontos para empresas conveniadas, você pode ganhar bônus participando do nosso programa de indicação, o Bônus Amigo Uninter. Saiba mais em: www.uninter.com/addamigos/"
+    },
+    {
+      "keywords": ["pós-graduação", "graduação", "matricular"],
+      "answer": "Para se matricular em uma pós-graduação, é obrigatório apresentar o diploma de conclusão da sua graduação no ato da inscrição."
+    },
+    {
+      "keywords": ["trocar", "mudar", "polo"],
+      "answer": "Sim, você pode solicitar a transferência de Polo a qualquer momento, desde que esteja com a matrícula regular. A solicitação é feita pelo seu portal Único (Taxas e Serviços >> Transferência de Polo) e está sujeita à existência de vagas no Polo de destino. Se você for bolsista Prouni, consulte o setor responsável antes para verificar a disponibilidade de transferência da bolsa."
+    },
+    {
+      "keywords": ["mudar", "trocar", "curso", "matriculado"],
+      "answer": "Sim, é possível mudar de curso após a matrícula. A solicitação deve ser feita pelo seu portal Único (Taxas e Serviços >> Mudança de Curso de Ingresso) até a segunda semana de aula e está sujeita à disponibilidade de vagas. Não se esqueça de informar o curso desejado no campo de observações."
+    },
+    {
+      "keywords": ["arquitetura", "urbanismo", "grade curricular"],
+      "answer": "Olá novamente! Que bom que você está revisitando Arquitetura e Urbanismo, é realmente um curso espetacular!\n\nOs principais diferenciais da Uninter para este curso são:\n*   *Foco Prático e Tecnológico:* Nossas aulas e projetos te preparam para o mercado, utilizando as ferramentas e softwares mais modernos.\n*   *Corpo Docente de Ponta:* Professores com vasta experiência no mercado trazem o \"mundo real\" para a sala de aula virtual.\n*   *Flexibilidade e Suporte:* Estude no seu tempo, com a qualidade de ensino da Uninter e todo o apoio do nosso Polo.\n\nSobre a *grade curricular detalhada*, a maneira mais garantida de você ter acesso ao documento completo e atualizado é entrando em contato diretamente com o nosso Polo aqui em Caratinga. Por favor, chame no nosso WhatsApp de Suporte: *(33) 3322-4001*."
+    },
+    {
+      "keywords": ["dp", "dependência", "perdi prazo", "reoferta"],
+      "answer": "Ah, que pena que essa questão da DP está te preocupando! Entendo perfeitamente e estou aqui para te ajudar a resolver isso.\n\nO caminho usual seria acessar o *Univirtus* (https://univirtus.uninter.com/ava/web) e procurar por opções como *\"Reoferta de Disciplina\"* ou *\"Serviços Acadêmicos\"*.\n\n*No entanto, como o acesso online pode ser complicado, a forma mais rápida e GARANTIDA de resolver sua situação agora é falando diretamente com o nosso Polo de Caratinga.* Nossa equipe pode verificar seu caso individualmente e te orientar sem nenhuma complicação!\n\nPor favor, entre em contato com a gente pelo nosso WhatsApp de Suporte: *(33) 3322-4001*."
+    },
+    {
+      "keywords": ["cma", "mediação acadêmica"],
+      "answer": "A Central de Mediação Acadêmica (CMA) ajuda com procedimentos acadêmicos (postagens, notas, calendário, etc). Acesse o atendimento on-line da CMA por meio do seu AVA Univirtus, ou ligue para 0800-702-0500 (opção 2), das 8h às 21h."
+    },
+    {
+      "keywords": ["secretaria", "documentos"],
+      "answer": "Você pode solicitar documentos como Declaração de Matrícula e Histórico Escolar diretamente no seu AVA Univirtus, no módulo 'Serviços'."
+    },
+    {
+      "keywords": ["tutoria", "tutor", "dúvida conteúdo"],
+      "answer": "Para esclarecer dúvidas de conteúdo de aula, exercícios e avaliações, entre em contato com o seu tutor pelo ícone 'Tutoria', dentro da sua disciplina, no AVA Univirtus."
+    },
+    {
+      "keywords": ["fica", "cancelamento", "trancamento"],
+      "answer": "Para solicitar o cancelamento, trancamento ou transferência da matrícula, você deve ligar EXCLUSIVAMENTE para o FICA, no telefone 0800 727 0530 (segunda a sexta, das 09h às 20h)."
+    },
+    {
+      "keywords": ["cobrança", "boleto", "dívidas", "negociação"],
+      "answer": "Para assuntos financeiros, use um dos canais:\n*   *Cobrança:* 0800 704 0501\n*   *Correção de boletos:* financeiro@uninter.com\n*   *Negociação de dívidas:* cobranca@uninter.com ou WhatsApp (41) 2104-2700"
+    },
+    {
+      "keywords": ["ouvidoria"],
+      "answer": "Para acessar a Ouvidoria, utilize o link oficial: https://www.uninter.com/ouvidoria/"
+    },
+    {
+      "keywords": ["transferência externa"],
+      "answer": "Se você estuda em outra instituição e quer vir para a Uninter, pode solicitar a transferência externa aqui: https://www.uninter.com/transferencia-externa/"
     }
   ],
   "fallback": "Desculpe, não entendi sua solicitação. Por favor, digite \"menu\" para ver as opções disponíveis."

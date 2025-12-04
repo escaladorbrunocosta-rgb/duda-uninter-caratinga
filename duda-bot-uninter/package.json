@@ -1,5 +1,13 @@
-# Use o editor 'nano' para criar e colar o conteúdo de cada arquivo
-nano package.json
-nano index.js
-nano config.js
-nano knowledgeBase.js
+{
+  "name": "duda-uninter-bot",
+  "version": "1.0.0",
+  "description": "Bot de atendimento para a Uninter Caratinga",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "whatsapp-web.js": "^1.23.0"
+  }
+}

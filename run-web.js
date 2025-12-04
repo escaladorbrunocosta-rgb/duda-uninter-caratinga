@@ -56,10 +56,16 @@ client.on('message', async (msg) => {
         const userName = contact.pushname || 'você'; // Usa 'você' se o nome não estiver disponível
 
         const response = getResponse(chatId, messageText, userName);
-        await client.sendMessage(chatId, response);
-        logger.info({ chatId, response }, 'Resposta enviada');
+
+        // Verifica se a resposta não é vazia antes de enviar
+        if (response) {
+            await client.sendMessage(chatId, response);
+            logger.info({ chatId, response }, 'Resposta enviada');
+        } else {
+            logger.warn({ chatId, message: messageText }, 'Nenhuma resposta foi gerada pela knowledgeBase.');
+        }
     } catch (error) {
-        logger.error({ error }, '❌ Erro ao processar mensagem');
+        logger.error({ err: error, stack: error.stack }, '❌ Erro ao processar mensagem');
     }
 });
 

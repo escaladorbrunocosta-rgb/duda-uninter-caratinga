@@ -3,3 +3,6 @@ node_modules
 
 # Arquivos de sessão do Baileys (contém credenciais)
 session
+
+# Arquivos de log
+*.log

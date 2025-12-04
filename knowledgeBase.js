@@ -12,6 +12,21 @@ const conversationState = {};
 const MAX_FALLBACKS = 2; // O transbordo ocorrerá na terceira tentativa
 const MEMORY_SIZE = 5; // Número de mensagens anteriores a serem lembradas
 
+// --- OTIMIZAÇÃO: PRÉ-PROCESSAMENTO E INDEXAÇÃO DE PALAVRAS-CHAVE ---
+// Cria um índice invertido para mapear palavras-chave diretamente para as respostas.
+// Isso evita a necessidade de iterar sobre todas as respostas para cada mensagem.
+const keywordIndex = new Map();
+knowledgeBase.responses.forEach((responseItem, index) => {
+  // Adiciona um ID único para cada item de resposta para facilitar a pontuação.
+  responseItem.id = index;
+
+  responseItem.keywords.forEach(keyword => {
+    const normalizedKeyword = keyword.toLowerCase();
+    if (!keywordIndex.has(normalizedKeyword)) keywordIndex.set(normalizedKeyword, []);
+    keywordIndex.get(normalizedKeyword).push(responseItem);
+  });
+});
+
 /**
  * Formata e constrói uma mensagem de menu a partir de um nó da árvore de menu.
  * @param {object} menuNode - O nó do menu contendo texto e opções.
@@ -72,54 +87,64 @@ export function getResponse(chatId, messageText, userName) {
     return buildMenuMessage(knowledgeBase.menu_tree.main, userName);
   }
 
-  // --- LÓGICA DE BUSCA INTELIGENTE POR PALAVRAS-CHAVE ---
-  let bestMatch = { score: 0, answer: null };
+  // --- LÓGICA DE BUSCA OTIMIZADA COM ÍNDICE ---
+  const contextText = state.history.join(' ').toLowerCase();
+  const uniqueWordsInContext = [...new Set(contextText.match(/\b(\w+)\b/g) || [])];
+  const responseScores = new Map();
 
-  // Constrói um texto de contexto com as últimas mensagens
-  const contextText = state.history.join(' ');
-
-  for (const item of knowledgeBase.responses) {
-    let currentScore = 0;
-    for (const keyword of item.keywords) {
-      const regex = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      if (regex.test(contextText)) {
-        currentScore++;
-      }
-    }
-
-    if (currentScore > bestMatch.score) {
-      bestMatch = { score: currentScore, answer: item.answer };
+  // Itera sobre as palavras da mensagem do usuário e usa o índice para encontrar respostas candidatas.
+  for (const word of uniqueWordsInContext) {
+    if (keywordIndex.has(word)) {
+      const candidateResponses = keywordIndex.get(word);
+      candidateResponses.forEach(responseItem => {
+        // Incrementa a pontuação para cada resposta candidata encontrada.
+        responseScores.set(responseItem.id, (responseScores.get(responseItem.id) || 0) + 1);
+      });
     }
   }
 
-  // Considera uma correspondência válida se pelo menos uma palavra-chave for encontrada.
-  // Você pode aumentar o `bestMatch.score > 0` para `> 1` para exigir mais palavras-chave.
+  // Encontra a resposta com a maior pontuação.
+  let bestMatch = { score: 0, id: -1 };
+  for (const [id, score] of responseScores.entries()) {
+    if (score > bestMatch.score) {
+      bestMatch = { score, id };
+    }
+  }
+
+  // Se uma correspondência válida for encontrada (pontuação > 0), retorna a resposta.
   if (bestMatch.score > 0) {
     state.fallbackCount = 0; // Reseta o estado de fallback ao encontrar uma resposta
-    return bestMatch.answer;
+    return knowledgeBase.responses[bestMatch.id].answer;
   }
   // --- FIM DA LÓGICA DE BUSCA INTELIGENTE ---
 
   // Se não encontrou por keyword, verifica se é uma opção de menu (ex: "1", "2")
   // Verifica se o usuário está em um submenu
-  const currentMenu = conversationState[chatId]?.currentMenu;
-  let nextMenuKey = lowerCaseText;
+  if (/^\d+$/.test(lowerCaseText)) {
+    const currentMenuKey = conversationState[chatId]?.currentMenu;
+    let nextMenuKey = lowerCaseText; // Por padrão, a chave é a própria entrada do usuário.
 
-  if (currentMenu && /^\d+$/.test(lowerCaseText)) {
-    // Se está em um menu e digitou um número, constrói a chave do submenu (ex: "2-4")
-    nextMenuKey = `${currentMenu}-${lowerCaseText}`;
-  }
-
-  const menuNode = knowledgeBase.menu_tree[nextMenuKey];
-  if (menuNode) {
-    // Se o nó encontrado for um novo menu (tem opções), atualiza o estado
-    if (menuNode.options) {
-      conversationState[chatId] = { ...conversationState[chatId], currentMenu: nextMenuKey };
-    } else {
-      // Se for uma resposta final, limpa o estado do menu
-      delete conversationState[chatId]?.currentMenu;
+    // Se está em um menu, constrói a chave do submenu (ex: "2-4")
+    if (currentMenuKey) {
+      const potentialNextKey = `${currentMenuKey}-${lowerCaseText}`;
+      // Verifica se a chave construída existe, senão, usa a entrada direta.
+      if (knowledgeBase.menu_tree[potentialNextKey]) {
+        nextMenuKey = potentialNextKey;
+      }
     }
-    return buildMenuMessage(menuNode, userName);
+
+    const menuNode = knowledgeBase.menu_tree[nextMenuKey];
+    if (menuNode) {
+      state.fallbackCount = 0; // Reseta o fallback ao navegar no menu
+      // Se o nó encontrado for um novo menu (tem opções), atualiza o estado
+      if (menuNode.options) {
+        conversationState[chatId].currentMenu = nextMenuKey;
+      } else {
+        // Se for uma resposta final, limpa o estado do menu
+        if (conversationState[chatId]) delete conversationState[chatId].currentMenu;
+      }
+      return buildMenuMessage(menuNode, userName);
+    }
   }
 
   // --- LÓGICA DE FALLBACK E TRANSBORDO ---

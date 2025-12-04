@@ -1,15 +1,17 @@
 // Polyfill para a API de criptografia global esperada pelo Baileys.
 // Isso é necessário em alguns ambientes Node.js onde `globalThis.crypto` não está disponível por padrão.
+// A importação direta para o escopo global é mais robusta em alguns ambientes de produção.
 // Referência: https://github.com/WhiskeySockets/Baileys/issues/962
-import { webcrypto } from 'node:crypto';
-if (typeof globalThis.crypto !== 'object') {
-    globalThis.crypto = webcrypto;
+import crypto, { webcrypto } from 'node:crypto';
+if (typeof globalThis.crypto !== 'object' || !globalThis.crypto.subtle) {
+    globalThis.crypto = crypto.webcrypto;
 }
 
 import pkg from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
-import fs from 'fs'; // Importa o módulo de sistema de arquivos nativo do Node.js
+import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs'; // Usa a versão de promises do fs
+import path from 'path'; // Importa o módulo para lidar com caminhos de arquivos
 import qrcode from 'qrcode-terminal'; // Importa a biblioteca para gerar QR Code no terminal
 import { getResponse } from './knowledgeBase.js';
 
@@ -20,6 +22,9 @@ const {
     fetchLatestBaileysVersion,
     useMultiFileAuthState
 } = pkg;
+
+let reconnectionAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
 
 /**
  * Processa as mensagens recebidas.
@@ -37,6 +42,7 @@ async function handleMessage(sock, m, logger) {
     // Extrai o ID do chat e o texto da mensagem
     const chatId = msg.key.remoteJid;
     const messageText = msg.message.conversation || msg.message.extendedTextMessage?.text;
+    const userName = msg.pushName || 'Usuário'; // Obtém o nome do usuário
 
     // Ignora se a mensagem não tiver texto
     if (!messageText) {
@@ -47,7 +53,7 @@ async function handleMessage(sock, m, logger) {
     logger.info({ chatId, message: messageText }, 'Mensagem recebida');
 
     // Obtém a resposta da nossa base de conhecimento
-    const response = getResponse(messageText);
+    const response = getResponse(chatId, messageText, userName);
 
     // Envia a resposta
     await sock.sendMessage(chatId, { text: response });
@@ -56,8 +62,33 @@ async function handleMessage(sock, m, logger) {
 
 async function startBot() {
     const logger = pino({ level: 'info', transport: { target: 'pino-pretty' } });
-    const sessionDir = 'session';
-    const { state, saveCreds } = await useMultiFileAuthState('session');
+    const sessionDir = 'session'; // Nome da pasta da sessão
+
+    let state, saveCreds;
+
+    // Prioriza o uso da sessão via variável de ambiente para ambientes de produção (Render, etc.)
+    if (process.env.WHATSAPP_SESSION) {
+        logger.info('Carregando sessão da variável de ambiente...');
+        try {
+            const sessionData = JSON.parse(process.env.WHATSAPP_SESSION);
+            if (!existsSync(sessionDir)) {
+                mkdirSync(sessionDir);
+            }
+            // Escreve os arquivos de sessão de forma assíncrona
+            const writePromises = Object.entries(sessionData).map(([fileName, fileContent]) =>
+                fs.writeFile(path.join(sessionDir, fileName), JSON.stringify(fileContent, null, 2))
+            );
+            await Promise.all(writePromises);
+            logger.info('Sessão carregada e arquivos recriados na pasta "session".');
+        } catch (error) {
+            logger.error({ error }, 'Falha ao carregar sessão da variável de ambiente. Verifique o formato do JSON.');
+            process.exit(1); // Encerra se a sessão do ambiente estiver corrompida
+        }
+    } else {
+        logger.info('Usando autenticação baseada em arquivo (pasta session)...');
+    }
+
+    ({ state, saveCreds } = await useMultiFileAuthState(sessionDir));
 
     const { version } = await fetchLatestBaileysVersion();
     logger.info(`Usando Baileys versão: ${version.join('.')}`);
@@ -65,7 +96,10 @@ async function startBot() {
     const sock = makeWASocket({
         version,
         auth: state,
-        logger: logger.child({ level: 'silent' }) // Usamos nosso próprio logger
+        logger: pino({ level: 'silent' }),
+        // Usar um User-Agent mais padrão pode aumentar a estabilidade da conexão inicial.
+        // Este simula o WhatsApp Web rodando em um navegador Chrome no Windows.
+        browser: ['Chrome (Windows)', 'Chrome', '114.0.5735.199']
     });
 
     sock.ev.on('creds.update', saveCreds);
@@ -74,39 +108,63 @@ async function startBot() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            logger.info('Gerando QR Code para escanear no terminal...');
-            qrcode.generate(qr, { small: true });
-            console.log('📡 Escaneie o QR Code com o seu WhatsApp (Configurações > Aparelhos conectados > Conectar um aparelho).');
+            // Só mostra o QR Code se não estivermos usando a sessão da variável de ambiente
+            if (!process.env.WHATSAPP_SESSION) {
+                qrcode.generate(qr, { small: true });
+                console.log('📡 Escaneie o QR Code com o seu WhatsApp (Configurações > Aparelhos conectados > Conectar um aparelho).');
+            }
         }
 
         if (connection === 'open') {
             logger.info('✅ Conexão com o WhatsApp aberta!');
+            reconnectionAttempts = 0; // Reseta o contador de tentativas ao conectar
         } else if (connection === 'close') {
-            const shouldReconnect = (lastDisconnect.error instanceof Boom) &&
-                                    lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut;
+            // A reconexão deve ocorrer em qualquer erro, exceto 'loggedOut' (desconectado manualmente).
+            const statusCode = lastDisconnect.error?.output?.statusCode;
+            const shouldReconnect = (lastDisconnect.error instanceof Boom) && statusCode !== DisconnectReason.loggedOut;
+            
+            const errorMessage = lastDisconnect.error?.output?.payload?.message || lastDisconnect.error?.message;
+            logger.warn({ error: lastDisconnect.error }, `❌ Conexão fechada: "${errorMessage}". Tentando reconectar: ${shouldReconnect}`);
 
-            logger.warn({ error: lastDisconnect.error }, `❌ Conexão fechada. Deve reconectar: ${shouldReconnect}`);
+            if (shouldReconnect && reconnectionAttempts < MAX_RECONNECT_ATTEMPTS) {
+                reconnectionAttempts++;
+                const delay = Math.pow(2, reconnectionAttempts) * 1000; // Backoff exponencial
 
-            if (shouldReconnect) {
-                logger.info('Tentando reconectar em 10 segundos...');
-                setTimeout(startBot, 10000); // Tenta reconectar após 10 segundos
-            } else {
-                logger.error('❗ Conexão permanente perdida (Logged Out).');
-                if (fs.existsSync(sessionDir)) {
-                    logger.info('Limpando sessão antiga para gerar um novo QR Code na próxima inicialização...');
-                    fs.rmSync(sessionDir, { recursive: true, force: true });
+                // Se o erro for um 500 (Internal Server Error), é provável que a sessão esteja corrompida.
+                // Vamos limpá-la para forçar a geração de um novo QR Code.
+                if (statusCode === 500 && existsSync(sessionDir)) {
+                    logger.warn('Erro 500 detectado. Limpando a sessão para forçar uma nova autenticação...');
+                    rmSync(sessionDir, { recursive: true, force: true });
                 }
-                logger.info('Encerrando o processo. O serviço deve reiniciar automaticamente e gerar um novo QR Code.');
-                // Encerra o processo. Em ambientes como Render, o serviço será reiniciado.
-                process.exit(1);
+                logger.info(`Tentando reconectar em ${delay / 1000} segundos... (Tentativa ${reconnectionAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+                setTimeout(startBot, delay);
+            } else {
+                if (reconnectionAttempts >= MAX_RECONNECT_ATTEMPTS) {
+                    logger.error(`❗ Atingido o número máximo de tentativas de reconexão. Encerrando.`);
+                } else {
+                    // Se a desconexão foi por 'loggedOut', a sessão é inválida.
+                    logger.error(`❗ Conexão permanente perdida, código: ${statusCode}. A sessão é inválida.`);
+                }
+                
+                if (existsSync(sessionDir)) {
+                    logger.info('Limpando sessão antiga para gerar um novo QR Code na próxima inicialização...');
+                    rmSync(sessionDir, { recursive: true, force: true });
+                }
+                // Em um ambiente de produção, queremos que o serviço pare e seja reiniciado pelo gerenciador (como o Render).
+                // Isso força uma reinicialização limpa em vez de um loop de reconexão falho.
+                logger.info('Encerrando o processo. O serviço de hospedagem deve reiniciar o bot automaticamente. Se estiver rodando localmente, inicie novamente.');
+                process.exit(1); // Encerra o processo com um código de erro.
             }
         }
     });
 
     sock.ev.on('messages.upsert', async (m) => {
         try {
-            await handleMessage(sock, m, logger);
+            // Itera sobre todas as mensagens recebidas no evento
+            const messagePromises = m.messages.map(msg => handleMessage(sock, { messages: [msg] }, logger));
+            await Promise.all(messagePromises);
         } catch (error) {
+            // Este catch agora lida com erros que podem ocorrer no Promise.all
             logger.error({ error }, '❌ Erro ao processar mensagem');
         }
     });

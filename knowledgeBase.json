@@ -34,6 +34,27 @@
     },
     "4": {
       "text": "Aqui estão nossos principais contatos e links:\n\n*   *Telefone Fixo e WhatsApp:* (33) 3322-4001\n*   *Endereço:* Rua Coronel Antônio Salim, 74, Bairro Dário Grossi, Caratinga - MG\n*   *Instagram:* @unintercaratinga\n*   *Todos os links (Linktree):* https://linktr.ee/Uninter_Caratinga\n\nPara outros canais, como Ouvidoria ou Financeiro geral, por favor, seja mais específico."
+    },
+    "2-4": {
+      "text": "Entendido! Qual é a sua dúvida específica sobre o FIES?",
+      "options": {
+        "1": "Qual a taxa de juros?",
+        "2": "Preciso pagar algo durante o curso?",
+        "3": "Quando começo a pagar o saldo devedor?",
+        "4": "Outras dúvidas (contato oficial)"
+      }
+    },
+    "2-4-1": {
+      "text": "A taxa efetiva de juros da modalidade Fies é de juros zero."
+    },
+    "2-4-2": {
+      "text": "Sim. Durante o curso, o estudante paga mensalmente um valor referente ao encargo operacional e ao seguro de vida, diretamente à instituição financeira contratada."
+    },
+    "2-4-3": {
+      "text": "O pagamento do saldo devedor do FIES se inicia no primeiro mês após a conclusão do curso, desde que você possua renda. O valor será descontado diretamente da sua fonte de renda."
+    },
+    "2-4-4": {
+      "text": "Para outras dúvidas sobre o FIES, entre em contato diretamente com os canais oficiais:\n\n*   **Site:** www.mec.gov.br\n*   **Telefone:** 0800-726-0101 (9h às 18h)\n*   **E-mail Uninter:** fies@uninter.com"
     }
   },
   "responses": [
@@ -148,10 +169,6 @@
     {
       "keywords": ["semipresenciais", "semipresencial", "funcionam"],
       "answer": "No formato semipresencial da Uninter, você acessa os conteúdos teóricos pela nossa plataforma digital e realiza atividades práticas presenciais (em polos, laboratórios ou empresas parceiras) conforme o planejamento do curso, sempre com o apoio de mediadores pedagógicos. É a união da flexibilidade do online com experiências reais para o mercado de trabalho."
-    },
-    {
-      "keywords": ["fies", "financia", "juros"],
-      "answer": "A taxa de juros da modalidade Fies é zero. Para outras dúvidas sobre o FIES, entre em contato diretamente com os canais oficiais:\n\n*   **Site:** www.mec.gov.br\n*   **Telefone:** 0800-726-0101 (9h às 18h)\n*   **E-mail Uninter:** fies@uninter.com"
     },
     {
       "keywords": ["pagamento", "saldo devedor", "fies"],

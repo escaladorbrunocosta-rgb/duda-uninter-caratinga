@@ -1,39 +1,39 @@
+import fs from 'fs';
+import path from 'path';
+
+// Carrega a base de conhecimento do arquivo JSON.
+// Usar `readFileSync` aqui é aceitável, pois é uma operação de inicialização
+// que acontece apenas uma vez, e o bot precisa desses dados para funcionar.
+const knowledgeBasePath = path.resolve(process.cwd(), 'knowledgeBase.json');
+const knowledgeBase = JSON.parse(fs.readFileSync(knowledgeBasePath, 'utf-8'));
+
 /**
  * Retorna uma resposta baseada no texto da mensagem recebida.
  * @param {string} messageText - O texto da mensagem do usuário.
  * @returns {string} A resposta do robô.
  */
 export function getResponse(messageText) {
-    const lowerCaseText = messageText.toLowerCase().trim();
+  const lowerCaseText = messageText.toLowerCase().trim();
 
-    // --- MENU PRINCIPAL ---
-    const menu = `🤖 Olá! Eu sou a Duda, sua assistente virtual do Polo EAD Uninter de Caratinga.
+  // Verifica se a mensagem é uma saudação ou um pedido de menu
+  const isGreeting = knowledgeBase.greetings.some(greeting => lowerCaseText.includes(greeting));
+  if (isGreeting || lowerCaseText === knowledgeBase.menu_trigger) {
+    return knowledgeBase.menu;
+  }
 
-Como posso te ajudar hoje? Digite o número da opção desejada:
-
-1️⃣. Cursos e Matrículas
-2️⃣. Informações para Alunos (Secretaria)
-3️⃣. Suporte Técnico
-4️⃣. Falar com o Setor Comercial
-
-A qualquer momento, digite "menu" para ver estas opções novamente.`;
-
-    // --- LÓGICA DE RESPOSTAS ---
-
-    if (lowerCaseText.includes('oi') || lowerCaseText.includes('ola') || lowerCaseText.includes('olá') || lowerCaseText === 'menu') {
-        return menu;
+  // Procura por uma palavra-chave correspondente nas respostas
+  for (const response of knowledgeBase.responses) {
+    // Verifica se alguma palavra-chave da resposta corresponde a uma palavra inteira na mensagem do usuário.
+    // Isso evita correspondências parciais (ex: "2" em "21").
+    const foundKeyword = response.keywords.find(keyword => {
+      const regex = new RegExp(`\\b${keyword}\\b`, 'i'); // \b representa uma fronteira de palavra
+      return regex.test(lowerCaseText);
+    });
+    if (foundKeyword) {
+      return response.answer;
     }
+  }
 
-    switch (lowerCaseText) {
-        case '1':
-            return 'Para informações sobre nossos cursos e como fazer sua matrícula, por favor, entre em contato com nosso setor comercial pelo número (XX) XXXX-XXXX ou aguarde para ser transferido.';
-        case '2':
-            return 'Para assuntos da secretaria, como prazos, documentos e notas, acesse seu portal do aluno ou entre em contato pelo e-mail secretaria.caratinga@uninter.com.';
-        case '3':
-            return 'Se você está com problemas técnicos no seu portal ou AVA, por favor, descreva seu problema em detalhes para que eu possa tentar ajudar ou encaminhar para o suporte.';
-        case '4':
-            return 'Para falar com o setor comercial, ligue para (XX) XXXX-XXXX ou envie uma mensagem para o WhatsApp deste número.';
-        default:
-            return `Desculpe, não entendi sua solicitação. Por favor, digite "menu" para ver as opções disponíveis.`;
-    }
+  // Se nenhuma resposta for encontrada, retorna a mensagem de fallback
+  return knowledgeBase.fallback;
 }

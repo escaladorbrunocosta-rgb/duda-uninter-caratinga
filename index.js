@@ -1,9 +1,16 @@
-import 'node:crypto'; // Adicionado para corrigir o erro de 'crypto' não definido
-// Versão com todas as correções aplicadas.
+// Polyfill para a API de criptografia global esperada pelo Baileys.
+// Isso é necessário em alguns ambientes Node.js onde `globalThis.crypto` não está disponível por padrão.
+// Referência: https://github.com/WhiskeySockets/Baileys/issues/962
+import { webcrypto } from 'node:crypto';
+if (typeof globalThis.crypto !== 'object') {
+    globalThis.crypto = webcrypto;
+}
 
 import pkg from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
+import fs from 'fs'; // Importa o módulo de sistema de arquivos nativo do Node.js
+import qrcode from 'qrcode-terminal'; // Importa a biblioteca para gerar QR Code no terminal
 import { getResponse } from './knowledgeBase.js';
 
 // Desestruturação para facilitar o acesso
@@ -48,7 +55,8 @@ async function handleMessage(sock, m, logger) {
 }
 
 async function startBot() {
-    const logger = pino({ level: 'info' });
+    const logger = pino({ level: 'info', transport: { target: 'pino-pretty' } });
+    const sessionDir = 'session';
     const { state, saveCreds } = await useMultiFileAuthState('session');
 
     const { version } = await fetchLatestBaileysVersion();
@@ -57,7 +65,6 @@ async function startBot() {
     const sock = makeWASocket({
         version,
         auth: state,
-        printQRInTerminal: true,
         logger: logger.child({ level: 'silent' }) // Usamos nosso próprio logger
     });
 
@@ -67,12 +74,8 @@ async function startBot() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            // O Render vai capturar este console.log e exibir nos logs.
-            // Não use qrcode-terminal aqui, pois ele não funciona bem em logs de servidores.
-            console.log('--- INÍCIO DO QR CODE ---');
-            console.log('Copie o texto abaixo e cole em um gerador de QR Code online ou use o terminal para escanear.');
-            console.log(qr);
-            console.log('--- FIM DO QR CODE ---');
+            logger.info('Gerando QR Code para escanear no terminal...');
+            qrcode.generate(qr, { small: true });
             console.log('📡 Escaneie o QR Code com o seu WhatsApp (Configurações > Aparelhos conectados > Conectar um aparelho).');
         }
 
@@ -88,7 +91,14 @@ async function startBot() {
                 logger.info('Tentando reconectar em 10 segundos...');
                 setTimeout(startBot, 10000); // Tenta reconectar após 10 segundos
             } else {
-                logger.error('❗ Conexão fechada permanentemente (Logged Out). Você precisa escanear o QR Code novamente. Se estiver no Render, reinicie o serviço e apague o disco de sessão.');
+                logger.error('❗ Conexão permanente perdida (Logged Out).');
+                if (fs.existsSync(sessionDir)) {
+                    logger.info('Limpando sessão antiga para gerar um novo QR Code na próxima inicialização...');
+                    fs.rmSync(sessionDir, { recursive: true, force: true });
+                }
+                logger.info('Encerrando o processo. O serviço deve reiniciar automaticamente e gerar um novo QR Code.');
+                // Encerra o processo. Em ambientes como Render, o serviço será reiniciado.
+                process.exit(1);
             }
         }
     });

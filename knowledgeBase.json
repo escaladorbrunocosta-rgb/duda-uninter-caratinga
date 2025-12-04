@@ -1,0 +1,24 @@
+{
+  "greetings": ["oi", "ola", "olá"],
+  "menu_trigger": "menu",
+  "menu": "🤖 Olá! Eu sou a Duda, sua assistente virtual do Polo EAD Uninter de Caratinga.\n\nComo posso te ajudar hoje? Digite o número da opção desejada:\n\n1️⃣. Cursos e Matrículas\n2️⃣. Informações para Alunos (Secretaria)\n3️⃣. Suporte Técnico\n4️⃣. Falar com o Setor Comercial\n\nA qualquer momento, digite \"menu\" para ver estas opções novamente.",
+  "responses": [
+    {
+      "keywords": ["1", "cursos", "matrículas", "matriculas"],
+      "answer": "Para informações sobre nossos cursos e como fazer sua matrícula, por favor, entre em contato com nosso setor comercial pelo número (XX) XXXX-XXXX ou aguarde para ser transferido."
+    },
+    {
+      "keywords": ["2", "alunos", "secretaria"],
+      "answer": "Para assuntos da secretaria, como prazos, documentos e notas, acesse seu portal do aluno ou entre em contato pelo e-mail secretaria.caratinga@uninter.com."
+    },
+    {
+      "keywords": ["3", "suporte", "técnico", "tecnico", "ava"],
+      "answer": "Se você está com problemas técnicos no seu portal ou AVA, por favor, descreva seu problema em detalhes para que eu possa tentar ajudar ou encaminhar para o suporte."
+    },
+    {
+      "keywords": ["4", "comercial", "falar"],
+      "answer": "Para falar com o setor comercial, ligue para (XX) XXXX-XXXX ou envie uma mensagem para o WhatsApp deste número."
+    }
+  ],
+  "fallback": "Desculpe, não entendi sua solicitação. Por favor, digite \"menu\" para ver as opções disponíveis."
+}

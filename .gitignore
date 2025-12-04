@@ -1,10 +1,5 @@
-node_modules/puppeteer-core/.local-chromium/
-duda-uninter.zip
-.cache/
-.bash_history
-.codeoss/
-.wwebjs_auth/session/
-node_modules/
-.npm/
-node_modules/
-.npm/
+# Dependências do Node.js
+node_modules
+
+# Arquivos de sessão do Baileys (contém credenciais)
+session

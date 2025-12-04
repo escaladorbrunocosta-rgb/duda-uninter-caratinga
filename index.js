@@ -1,3 +1,5 @@
+import 'node:crypto'; // Adicionado para corrigir o erro de 'crypto' não definido
+
 import pkg from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';

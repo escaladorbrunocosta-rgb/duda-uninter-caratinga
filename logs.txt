@@ -1,0 +1,103 @@
+nohup: ignoring input
+▶️ Aguardando QR...
+{"level":30,"time":"2025-12-03T14:04:56.605Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","browser":["DudaBot","Chrome","1.0"],"helloMsg":{"clientHello":{"ephemeral":"PzLPkTCdg6ckMqhI7B1oKDzpJjL6E5NoluMv9EqrGWA="}},"msg":"connected to WA"}
+{"level":30,"time":"2025-12-03T14:04:56.659Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","node":{"passive":false,"userAgent":{"platform":"WEB","appVersion":{"primary":2,"secondary":3000,"tertiary":1027934701},"mcc":"000","mnc":"000","osVersion":"0.1","manufacturer":"","device":"Desktop","osBuildNumber":"0.1","releaseChannel":"RELEASE","localeLanguageIso6391":"en","localeCountryIso31661Alpha2":"US"},"webInfo":{"webSubPlatform":"WEB_BROWSER"},"connectType":"WIFI_UNKNOWN","connectReason":"USER_ACTIVATED","devicePairingData":{"eRegid":"AAAAiw==","eKeytype":"BQ==","eIdent":"z82I++xjho83V08uOInuwZt/abPKZ4cHYhbGCILaoiY=","eSkeyId":"AAAB","eSkeyVal":"Y5EJYGw5pR3r1WltReHNIF0nww15rUmdbiEPOh4aCzg=","eSkeySig":"1QLP+NNgdWRHoetQplgCNyiI/kC957m4BH7s6QYcBdqnHadOGc453NuJ/cQ+qvTmIMctrSvlfBIEB5KiNswACg==","buildHash":"VLsNToSifLU6uyYzJzwXCA==","deviceProps":"CgdEdWRhQm90GAEgAA=="}},"msg":"not logged in, attempting registration..."}
+📲 ESCANEIE O QR NO SEU WHATSAPP:
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█ ▄▄▄▄▄ █▄▀▀█▀█▄▀▀ ▀▄█▄    ▀▄▀█ ▄▀█▀ ▄██▄██ ▀  ▄ ██ ▄▄▄▄▄ █
+█ █   █ █ ▄█▀▀█▄██▀▀▄█▄█ ▀ ██▄█▀▀█▄▄▀▀█▀▄█▀▄▀█▀▄ ██ █   █ █
+█ █▄▄▄█ █▄▄▄█▄▄▀▀▀▄█ ▀ ▄ █▀ ▄▄▄ █▀ █▄██ ▄▀▀▀ ▄▄▀▄██ █▄▄▄█ █
+█▄▄▄▄▄▄▄█▄█▄▀▄▀ █▄█▄▀▄█▄▀▄█ █▄█ ▀ ▀ █ ▀ ▀ ▀ ▀▄█ █ █▄▄▄▄▄▄▄█
+█ ▄ ▄██▄█▄▄  ▄▀▀██ ▀▀█  ▀▀█▄▄▄   █ ▄▀▀██▀▄▀▀▄▀▄▄▀▀ ██▄▄ ▀ █
+██▀▀▄█ ▄█    █ ▀█▄ ██ ▄▄█▀█▄▀█ ▀█▄▀▀▀▀ █▀ ▀█  █▀▄█ █▀▀ ▄ ▄█
+███▄▄ ▄▄█▄▀▀ ▄▄ ▄▄█▄▀ █▄██▀▄▄██▀▄█▀█  ▀ ▀▀▄▄▀█▀█▄▄▄ ▀█▀▄▄██
+█   ▀▄▀▄▄▄  █▄▄ █▀▀▀ ▀ ▄  ▀▄▀▄▀▀▄▀ █ ▄▀ █ ▄█▄ ▄ ▄▀▀  █▄  ██
+██▀▄▀▀█▄▀█  ▀▀ ▄▀▀▀▀█▄ ▀█▄  ▄▄▀▄  ▄ ██▄█ ▀▄█ ▄▄▀ ▄▄▄▄█▀ ▄▀█
+███▄▄▄█▄▄▄▄▀  ▀▀▀▀▄ ▀ ▀▀▄█ ▀█▄██▄█▀▄▄▄█▀▄▄ ▀▀ ▀   ▀▀▀█▄█▄▀█
+███▀▄▄▄▄ ▄▀██  ██ ▀███▄▄▀█  ▄ ▀ █▀▄█▄▀▄█ ▄▀▀▀▀█▄▄ ▀▄  ▄█ ▀█
+█▀▀▀ ██▄ ▀ ▄▄ ▄▄▀▄█▀ ▄▀▀  █▀███  ▄ █▀█▄█ █▄  ▄ ▄▀ ▀▀▄  ██▄█
+███  ▄█▄  ▀▀█▀ █▀▄ ▄█ █▀█▄██▀█▄█▄▄    ▀▀▀█▄▄ ▀▀▄▄▄ ▀█▀ █ ▄█
+█ ▄▀▀ ▄▄▄ ██ ▀▀▄ █▄▄▀▀█▄▄ ▄ ▄▄▄ █ ▀▄█▄█▄▄ █▄▄ ▀ ▄ ▄▄▄ █▀▀▀█
+█▀█ ▄ █▄█ █   ▄█▀▀█▄█▄▀▀ ██ █▄█ ▄▄█ ▀██▄█▀ ▄█▄ ▀▄ █▄█ █ ▀ █
+█▄███▄ ▄    █ ▀█▄██ ▀  █▀ ▄  ▄▄▄▀█▀ ▀███  ▀▄█▄██   ▄  █▄▄██
+█▀█▄ ▀▀▄▄█▄█▀█ ▀█▄ ▀ ▄▄ ▀▀█▄▄█▀▀▀▀ ▄ ▀ ██   ██▄██▄▀▀█▄█ ▀▀█
+█▀▄█▄ ▀▄███▀  ▀▀█ ▀▀▀██ █ ▄▀▀▀ █▄ █▄ ▄  ▀██ ▀▀██ ▀▄▄█▄▀██▄█
+█▀▀ ▄▄▄▄ ▀▄▄█▄▄ ██  ▀██▀ ▄█▀██▀ ██ ▄▄▄▀▀████▄▀▄▄▀ ▄▀ █▀ ▄██
+█ ▄▀ █▄▄  ▄ ▀▀▀▀ ▄▄█  ▄▀▄▀█▄ ▄▄▀ █ █ ▀█▄█▀▀ ▀▀ ▀ █▄▀██▀▀█▄█
+█▄█▄█▄▄▄▄▀▄█▄  ▀ ▀▀█ █▄█ █▀ ▀ ▄▀█▄▄▀█▀▄▄██ ▄▄▄▄▀▄▀  ▀  ▄▀ █
+██▀▀▄ █▄▄▀▀█▀█▀█  █▄▄██ ▄███ █▄ ██▀█ █▄█▀▀█▄▄▀█ █▀▄▀██▀█ ▀█
+█▀▄█▀▀█▄▀██ ██▄▀▄█▀▀▀█ █  █▄███▄▀▀ █ █▀██ █ █▀▄▄█▀ ███▄▄▄▀█
+█ ▀ ▀▀▄▄██▀█  ▀▄█ ▄  █▀▀▀▄ █   ▀ █ ▄▀▄ █ ▄█▄▀ █▀█▀▄  ▄ █ ▄█
+███████▄█▀▄▀▀ ▄▀▀██  ▀█▀█▄▄ ▄▄▄ ▄█ █▄ █▀ ▀▄▄ ▀▀▄▀ ▄▄▄ ▀▄█ █
+█ ▄▄▄▄▄ ██  ▀▄▄▀ █▀███ █▄▄▄ █▄█ █ █▄ ▄ ▄█ ▄▄ ▀▀▀▄ █▄█ ▀ █▀█
+█ █   █ █▀ ▀▀███▀█▀█ ▄▄█ ▀█  ▄  ▄▄█▀▀█▄▄██ █▄ █▀█    ▄▄▀ ██
+█ █▄▄▄█ █ ▀   ██  ▄ ▄▀ ▄█▀███▀█▀█   ▀▀█████▀▀▀▀▄▄ ▀ ██▄▄█▀█
+█▄▄▄▄▄▄▄█▄▄██▄█▄██▄███▄▄████▄████▄██▄███▄▄█▄██▄█▄▄▄█▄▄█████
+
+📲 ESCANEIE O QR NO SEU WHATSAPP:
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+█ ▄▄▄▄▄ █▀▄▄█▀▄   ▀  ▄▀█▄  ▄▀▄█ ▄▄▄▄▀▄▀  █ ▄███▄ ██ ▄▄▄▄▄ █
+█ █   █ █▄▄█▄  ▄▄█▄▄▀▄▄██▄███▄ ▄██▄▄▄▄ ▀██▄▀██▀▄ ██ █   █ █
+█ █▄▄▄█ █ ▄  ▀█████▄▀█▄ ▀▄  ▄▄▄ ▀ ▄▀ ▄▄▄ ▄   ▀ ▀▄██ █▄▄▄█ █
+█▄▄▄▄▄▄▄█ █ ▀▄▀▄▀ █▄▀ ▀ ▀▄█ █▄█ ▀▄█▄█ ▀▄█▄▀ ▀ ▀▄█ █▄▄▄▄▄▄▄█
+█▄ ▀▄██▄▄█▄▀▀█▄▀███▄▄█  ▄▄▄ ▄▄▄▄██ ▄▄▄ █▀▄▄▄▀▀▄▄▀██▄  ▀▄▄▀█
+█▄ █  ▀▄█▄█▀██▀█▀ ▀▄▄▄  ▄ ▀▀▀█▀ ▄ ██  ▀▀█▄  ▀▄██▄█ ▀██▀█▀ █
+███ ██▄▄▀█ ▀ ▄▄█▀▀█▄▀█ ▀██ ▀ ▄█▀▄ █▀   █▄▄▄█▀ ▄ █▄▄█▄▄▀▄▄ █
+███  ▄▄▄▀█   ▀▀ █▀ ▀█▀▀███▄▄▀▄▄▄▀▀█▄█▀ ▄▀▄▄▀▀▄█▄▄▄▄ ▀██▄███
+█▀████▄▄ ▀▄▄  ▀ █▄▄ ▀▀▄▀ █▀▄   █▀▄ ▄█▄▀▀▄▀▄█▀ █▄▀██  ▀▀ ▀▀█
+█  ▀█▀█▄▄▀▀▄  ▀▄ █▄ ▄▄▄▄▀  ▄ ▀██  ▄▀ ▀▄███ ▀██▄▄  █ ▄ ▄█ ▄█
+█▀▄▀▄▀ ▄█▄▀█ ▀███ ▄  █▄▄▄ █ ▄ ▄███▄██▄▀██ ▄▄▄▀█▄▀███  ▀ ▄▀█
+█  █▄ ▄▄██▀ ▀▄ ██ ▄ ▀ ██▀▀▄█▀▀▄▀▀▀▄▀▀▄█▀▄▀█▀  ▄  ▀▀█▄ ▀▄▄ █
+███████▄▄▄ ▄█  █▄▀ ▄██ ▄█▄▀▄▄ ▄█▄▀██  ▀▄▄ ▄▄ ▄▄▀ ███▀▄ █ ▀█
+██▀▀▀ ▄▄▄ ▄▀█▄▄▀ █▀▀▄▀█▄▀█▄ ▄▄▄   █▄ ▀▄▄▄ ▄▀▀ ▀ █ ▄▄▄ ▄▄▄▀█
+█ ▄▀▀ █▄█ ▀▀▀▀▀███▄█▄ ██▀▄▄ █▄█ █ ▄█ ▄█▀▀█ █▄ ▀▄█ █▄█ ▀  ▄█
+█▀█▄█▄▄▄▄ ███ ▀ ▀ █ ▀█▄ ▀ █▄▄ ▄▄▀ █▄▀██ ▀█ █▀▀▄▀▄▄  ▄▄▄▄▄ █
+█▄ ▀ ▀▄▄▄ ▄█▄ █▀▀██ █▄▄ █▄ ▄ █▄▄▄▀ ▄█ ███▄▄▄▀▀▄█▄▄▄▀▀█ █▄██
+█  ▄▀▄ ▄▀▀▀█▀▀ █▀▄  ▀ ▀▄█▀██▀▄▀▄▀▄▀    █▄▀▄ █▄ ▀  █ ▀▄ ▄▀▄█
+█▀▀█▀▀▄▄ ▄▀▀▀ ▄█    ▀  ▄ ▄█▄  ▄█ ▄█▀  ▀▄▄ ██▄ ▀▀▀ ▄▄█ ▀ █▀█
+██▀▀ █▀▄█ ▀ ▄ █▀ ▄▀ █ ▄▀▀▄ ▄ ▄▀ ▄█ ██▄ ▄▄ ▄█▄▀ ▀█ ▀▀██▄▄ ▄█
+██▄ ▀▀ ▄██▀█▀▄█▄▄█ ▄▀▀ ▀▀▄ ▄█▄█ ▄  █▄ █ ▀▀▀██  ██  ▀█▄██ ▄█
+██▀▄▀▄▀▄▄▄█▀▄█▀▀███▄▄  █▄██ █ ▄ █    █  ▄▄▀▄▄▄ ▀▀     ██ ▄█
+█▄▀▄▀██▄  ▄   ▄ ▄█▄▄▄█ ███ ▄██ ▀▄▀▄██ █▄█ █▄ ▀▄▄▄▄▀██▄▀▄▀▀█
+█ ▀ ▀▀▄▄█▄█▀▀▀  ▀▄ ▄▀▀▀▀ █ █▄▄▀ ▀▀▄ ▄█▀ ▄ █ ▄▄▀█▀ ▄▄▀▀ ▄▀ █
+███████▄▄▀▀▄▀ ▄▄▄    ▄  ▄█▄ ▄▄▄ ▄ █    ▄  ▄▄█▄█▀█ ▄▄▄  ▄█▀█
+█ ▄▄▄▄▄ █▄  ▄▀▀▀ ▄▄ ██ █▀▄▀ █▄█   █▄▀▀█▄▄  ▀▄█ ▀  █▄█ ▄█ ▀█
+█ █   █ █▀▄█▀ ▄▀█▀ ▄▀  ▀▀ ▄▄ ▄  █ ▀█▄ █ █▀▀▄▀ ▀██  ▄▄▄█   █
+█ █▄▄▄█ █▀ ██▄  ██▄ ▄▄█▀█▀█  ▄█▀█▄██▀ █  ▀█▀▀█▄▀▄ ▀█  ▄▄█▄█
+█▄▄▄▄▄▄▄█▄▄████████▄▄█▄▄▄▄▄█▄▄▄▄▄▄███▄▄█▄▄▄█▄█▄██████▄▄▄▄██
+
+{"level":30,"time":"2025-12-03T14:06:03.390Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","me":{"id":"553183315126:22@s.whatsapp.net"},"platform":"android","msg":"pairing configured successfully, expect to restart the connection..."}
+{"level":50,"time":"2025-12-03T14:06:03.618Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","node":{"tag":"stream:error","attrs":{"code":"515"}},"msg":"stream errored out"}
+{"level":30,"time":"2025-12-03T14:06:03.619Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","trace":"Error: Stream Errored (restart required)\n    at WebSocketClient.<anonymous> (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js:524:13)\n    at WebSocketClient.emit (node:events:517:28)\n    at /home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js:241:35\n    at Object.decodeFrame (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.js:149:17)\n    at WebSocketClient.onMessageReceived (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js:217:15)\n    at WebSocketClient.emit (node:events:517:28)\n    at WebSocket.<anonymous> (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Socket/Client/web-socket-client.js:46:100)\n    at WebSocket.emit (node:events:517:28)\n    at Receiver.receiverOnMessage (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/ws/lib/websocket.js:1220:20)\n    at Receiver.emit (node:events:517:28)","msg":"connection errored"}
+❌ Conexão fechada. Código: 515
+🔄 Deve reconectar? true
+▶️ Aguardando QR...
+{"level":30,"time":"2025-12-03T14:06:05.762Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","browser":["DudaBot","Chrome","1.0"],"helloMsg":{"clientHello":{"ephemeral":"XJD6mt7Eaw+PBaEb6T9pb2UyRxBwOn05aJY78xgQGUs="}},"msg":"connected to WA"}
+{"level":30,"time":"2025-12-03T14:06:05.822Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","node":{"username":"553183315126","passive":true,"userAgent":{"platform":"WEB","appVersion":{"primary":2,"secondary":3000,"tertiary":1027934701},"mcc":"000","mnc":"000","osVersion":"0.1","manufacturer":"","device":"Desktop","osBuildNumber":"0.1","releaseChannel":"RELEASE","localeLanguageIso6391":"en","localeCountryIso31661Alpha2":"US"},"webInfo":{"webSubPlatform":"WEB_BROWSER"},"connectType":"WIFI_UNKNOWN","connectReason":"USER_ACTIVATED","device":22},"msg":"logging in..."}
+{"level":30,"time":"2025-12-03T14:06:06.185Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"0 pre-keys found on server"}
+{"level":30,"time":"2025-12-03T14:06:06.185Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","count":30,"msg":"uploading pre-keys"}
+{"level":30,"time":"2025-12-03T14:06:06.289Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","count":30,"msg":"uploaded pre-keys"}
+{"level":30,"time":"2025-12-03T14:06:06.351Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"opened connection to WA"}
+{"level":40,"time":"2025-12-03T14:06:06.356Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"no name present, ignoring presence update request..."}
+✅ BOT CONECTADO AO WHATSAPP!
+{"level":30,"time":"2025-12-03T14:06:06.427Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"handled 0 offline messages/notifications"}
+{"level":40,"time":"2025-12-03T14:06:09.025Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"skipping app state sync, as myAppStateKeyId is not set"}
+{"level":30,"time":"2025-12-03T14:06:09.026Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","histNotification":{"fileSha256":"4dray5gia8HAxGI5IqZ6BDy9au5aSCo6KqiuCDyf3SE=","fileLength":"8681","mediaKey":"5EbKCL6XSIXdyB7M6cqcPSs8Eu0di6VXg+H+H41MAns=","fileEncSha256":"Tx2kW4WuwS5P8ilxw4LG3DxLJhmK6GXrG4STMy+4lb8=","directPath":"/v/t62.31111-24/592463157_3795576370747307_1111630063295353042_n.enc?ccb=11-4&oh=01_Q5Aa3AGYKdydXF-1WwjCW-UUm_U8jgKhmNfAifPendkA7zMiuw&oe=6957B618&_nc_sid=5e03e0","syncType":"PUSH_NAME","chunkOrder":1},"process":true,"id":"AC9499130B1F49B34EB56D962BFF2469","isLatest":true,"msg":"got history notification"}
+{"level":40,"time":"2025-12-03T14:06:09.795Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"skipping app state sync, as myAppStateKeyId is not set"}
+{"level":30,"time":"2025-12-03T14:06:09.795Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","histNotification":{"fileSha256":"4+H07yc2KHSLY5bmRGjmCKuoT3fWG5AmfKJb+CpLXug=","fileLength":"11236","mediaKey":"Fb/QKgee2UBBPdLiXEPqVDeyS8mV0leXDOspcgPiPoE=","fileEncSha256":"t9FNYdEFgoAUDSLcmnBsNUcyn+27ZLrEkCFINMzdFRg=","directPath":"/v/t62.31111-24/595134065_1527205048332409_2334978312722470979_n.enc?ccb=11-4&oh=01_Q5Aa3AGQ1dSFCwfl4kP4P8MKL5lngap5W6qfsN1cP_64k2aRGA&oe=6957CC2E&_nc_sid=5e03e0","syncType":"NON_BLOCKING_DATA"},"process":false,"id":"AC6E757D3C29C1E9A63FBB1FF1B05A30","isLatest":false,"msg":"got history notification"}
+{"level":30,"time":"2025-12-03T14:06:10.074Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","newAppStateSyncKeyId":"AAAAADE/","newKeys":["AAAAADE/"],"msg":"injecting new app state sync keys"}
+{"level":30,"time":"2025-12-03T14:06:10.076Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"doing initial app state sync"}
+{"level":30,"time":"2025-12-03T14:06:10.077Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"resyncing critical_block from v0"}
+{"level":30,"time":"2025-12-03T14:06:10.078Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"resyncing critical_unblock_low from v0"}
+{"level":30,"time":"2025-12-03T14:06:10.078Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"resyncing regular_high from v0"}
+{"level":30,"time":"2025-12-03T14:06:10.079Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"resyncing regular_low from v0"}
+{"level":30,"time":"2025-12-03T14:06:10.080Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"resyncing regular from v0"}
+{"level":30,"time":"2025-12-03T14:06:12.598Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"resyncing critical_block from v0"}
+{"level":30,"time":"2025-12-03T14:06:12.692Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"synced critical_block to v1"}
+{"level":30,"time":"2025-12-03T14:06:14.637Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"resyncing critical_unblock_low from v0"}
+{"level":30,"time":"2025-12-03T14:06:15.536Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","msg":"synced critical_unblock_low to v2"}
+{"level":50,"time":"2025-12-03T14:07:07.120Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","node":{"tag":"stream:error","attrs":{"code":"401"},"content":[{"tag":"conflict","attrs":{"type":"device_removed"}}]},"msg":"stream errored out"}
+{"level":30,"time":"2025-12-03T14:07:07.120Z","pid":44490,"hostname":"cs-273356214996-default","class":"baileys","trace":"Error: Stream Errored (conflict)\n    at WebSocketClient.<anonymous> (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js:524:13)\n    at WebSocketClient.emit (node:events:517:28)\n    at /home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js:241:35\n    at Object.decodeFrame (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Utils/noise-handler.js:149:17)\n    at WebSocketClient.onMessageReceived (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Socket/socket.js:217:15)\n    at WebSocketClient.emit (node:events:517:28)\n    at WebSocket.<anonymous> (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/@whiskeysockets/baileys/lib/Socket/Client/web-socket-client.js:46:100)\n    at WebSocket.emit (node:events:517:28)\n    at Receiver.receiverOnMessage (/home/escaladorbrunocosta/duda-uninter-bot-limpo/node_modules/ws/lib/websocket.js:1220:20)\n    at Receiver.emit (node:events:517:28)","msg":"connection errored"}
+❌ Conexão fechada. Código: 401
+🔄 Deve reconectar? false
+🚫 Logout detectado. Delete a pasta auth_info_multi e gere novo QR.

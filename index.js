@@ -1,197 +1,113 @@
-import baileys, {
-  fetchLatestBaileysVersion,
-  DisconnectReason
-} from "@whiskeysockets/baileys";
-import express from "express";
-import 'dotenv/config';
-import logger from "./logger.js";
-import { handleMessage } from "./messageHandler.js";
+import pkg from '@whiskeysockets/baileys';
+import { Boom } from '@hapi/boom';
+import pino from 'pino';
+import { getResponse } from './knowledgeBase.js';
 
-let botInstance = null; // Variável para armazenar a instância do bot
+// Desestruturação para facilitar o acesso
+const {
+    makeWASocket,
+    DisconnectReason,
+    fetchLatestBaileysVersion,
+    useMultiFileAuthState
+} = pkg;
 
-async function iniciarBot() {
-  if (botInstance) return botInstance; // Se já existe uma instância, não cria outra
+/**
+ * Processa as mensagens recebidas.
+ * @param {import('@whiskeysockets/baileys').WASocket} sock - A instância do socket do Baileys.
+ * @param {import('@whiskeysockets/baileys').proto.IWebMessageInfo} m - O objeto da mensagem recebida.
+ * @param {pino.Logger} logger - A instância do logger.
+ */
+async function handleMessage(sock, m, logger) {
+    // Extrai a primeira mensagem do evento
+    const msg = m.messages[0];
 
-  // --- LÓGICA DE AUTENTICAÇÃO MODIFICADA ---
-  let state;
-  const session = process.env.BAILEYS_SESSION;
+    // Ignora se não houver mensagem ou se for uma atualização de status
+    if (!msg.message || msg.key.fromMe) return;
 
-  if (session?.length) {
-    // Se a sessão existir, decodifica e a usa
-    const creds = JSON.parse(Buffer.from(session, "base64").toString("utf-8"));
-    state = { creds, keys: {} }; // Apenas as credenciais são necessárias
-    logger.info("🔑 Usando sessão existente da variável de ambiente.");
-  } else {
-    // Se não houver sessão, inicia do zero
-    state = { creds: {}, keys: {} };
-    logger.warn("⚠️ Nenhuma sessão encontrada. Iniciando do zero.");
-  }
+    // Extrai o ID do chat e o texto da mensagem
+    const chatId = msg.key.remoteJid;
+    const messageText = msg.message.conversation || msg.message.extendedTextMessage?.text;
 
-  const saveCreds = async () => {
-    // Converte o estado atual para uma string base64
-    const sessionString = Buffer.from(JSON.stringify(state.creds)).toString("base64");
-    logger.info("💾 Nova string de sessão gerada. Salve-a na variável de ambiente BAILEYS_SESSION.");
-  };
-  // --- FIM DA LÓGICA DE AUTENTICAÇÃO ---
-
-  const { version } = await fetchLatestBaileysVersion();
-
-  const sock = baileys.default({
-    auth: state,
-    version,
-    printQRInTerminal: true,
-    logger: logger,
-    syncFullHistory: false,
-  });
-
-  botInstance = sock; // Armazena a instância do bot
-
-  sock.ev.on("creds.update", saveCreds);
-
-  sock.ev.on("messages.upsert", async (msg) => {
-    const message = msg.messages[0];
-
-    // Ignora mensagens sem conteúdo ou enviadas pelo próprio bot
-    if (!message.message || message.key.fromMe) {
-      return;
+    // Ignora se a mensagem não tiver texto
+    if (!messageText) {
+        logger.info({ chatId }, 'Mensagem recebida sem texto (ex: áudio, imagem). Ignorando.');
+        return;
     }
 
-    const sender = message.key.remoteJid;
-    const text = (
-      message.message.conversation ||
-      message.message.extendedTextMessage?.text || // Mensagens de texto normais
-      message.message.buttonsResponseMessage?.selectedButtonId || // Respostas de botões
-      ""
-    ).trim();
+    logger.info({ chatId, message: messageText }, 'Mensagem recebida');
 
-    if (!text) return; // Ignora mensagens vazias (ex: status, chamadas)
+    // Obtém a resposta da nossa base de conhecimento
+    const response = getResponse(messageText);
 
-    logger.info(`[MENSAGEM] De: ${sender} | Texto: "${text}"`);
+    // Envia a resposta
+    await sock.sendMessage(chatId, { text: response });
+    logger.info({ chatId, response }, 'Resposta enviada');
+}
 
-    const isButtonResponse = !!message.message.buttonsResponseMessage;
-    const response = handleMessage(sender, text, isButtonResponse);
+async function startBot() {
+    const logger = pino({ level: 'info' });
+    const { state, saveCreds } = await useMultiFileAuthState('session');
 
-    if (response) {
-      // Lógica para enviar diferentes tipos de mensagem
-      switch (response.type) {
-        case 'text':
-          await sock.sendMessage(sender, { text: response.content });
-          break;
-        case 'image':
-          await sock.sendMessage(sender, { 
-            image: { url: response.content },
-            caption: response.caption 
-          });
-          break;
-        case 'document':
-          await sock.sendMessage(sender, { 
-            document: { url: response.content },
-            mimetype: 'application/pdf',
-            fileName: response.fileName
-          });
-          break;
-        case 'buttons':
-          const buttons = response.buttons.map(btn => ({
-            buttonId: btn.id,
-            buttonText: { displayText: btn.text },
-            type: 1
-          }));
+    const { version } = await fetchLatestBaileysVersion();
+    logger.info(`Usando Baileys versão: ${version.join('.')}`);
 
-          const buttonMessage = {
-            text: response.content,
-            footer: response.footer,
-            buttons: buttons,
-            headerType: 1
-          };
-          await sock.sendMessage(sender, buttonMessage);
-          break;
-      }
-    } else {
-      logger.info(`[RESPOSTA] Nenhuma resposta encontrada para a mensagem de ${sender}. Lógica de fallback acionada.`);
-    }
-  });
-
-  sock.ev.on("connection.update", (update) => {
-    const { connection, lastDisconnect } = update;
-    if (connection === "close") {
-      botInstance = null; // Limpa a instância ao desconectar
-
-      const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-      logger.error(`🔌 Conexão fechada: ${lastDisconnect?.error}, reconectando: ${shouldReconnect}`);
-
-      if (shouldReconnect) {
-        setTimeout(iniciarBot, 5000); // Tenta reconectar após 5 segundos
-      }
-    } else if (update.connection === "open") {
-      console.log("✅ Bot conectado ao WhatsApp!");
-    }
-  });
-  // Retorna uma promessa que resolve quando a conexão é aberta
-  return new Promise((resolve, reject) => {
-    sock.ev.on('connection.update', (update) => {
-      if (update.connection === 'open') {
-        resolve(sock);
-      }
-      // Se a conexão fechar ANTES de abrir, rejeitamos a promessa
-      if (update.connection === 'close') {
-        const shouldReconnect = update.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-        // Rejeita apenas se não for um logout, pois isso indica um erro real de conexão
-        if (shouldReconnect) reject(update.lastDisconnect?.error);
-      }
+    const sock = makeWASocket({
+        version,
+        auth: state,
+        printQRInTerminal: true,
+        logger: logger.child({ level: 'silent' }) // Usamos nosso próprio logger
     });
-  });
+
+    sock.ev.on('creds.update', saveCreds);
+
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect, qr } = update;
+
+        if (qr) {
+            // O Render vai capturar este console.log e exibir nos logs.
+            // Não use qrcode-terminal aqui, pois ele não funciona bem em logs de servidores.
+            console.log('--- INÍCIO DO QR CODE ---');
+            console.log('Copie o texto abaixo e cole em um gerador de QR Code online ou use o terminal para escanear.');
+            console.log(qr);
+            console.log('--- FIM DO QR CODE ---');
+            console.log('📡 Escaneie o QR Code com o seu WhatsApp (Configurações > Aparelhos conectados > Conectar um aparelho).');
+        }
+
+        if (connection === 'open') {
+            logger.info('✅ Conexão com o WhatsApp aberta!');
+        } else if (connection === 'close') {
+            const shouldReconnect = (lastDisconnect.error instanceof Boom) &&
+                                    lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut;
+
+            logger.warn({ error: lastDisconnect.error }, `❌ Conexão fechada. Deve reconectar: ${shouldReconnect}`);
+
+            if (shouldReconnect) {
+                logger.info('Tentando reconectar em 10 segundos...');
+                setTimeout(startBot, 10000); // Tenta reconectar após 10 segundos
+            } else {
+                logger.error('❗ Conexão fechada permanentemente (Logged Out). Você precisa escanear o QR Code novamente. Se estiver no Render, reinicie o serviço e apague o disco de sessão.');
+            }
+        }
+    });
+
+    sock.ev.on('messages.upsert', async (m) => {
+        try {
+            await handleMessage(sock, m, logger);
+        } catch (error) {
+            logger.error({ error }, '❌ Erro ao processar mensagem');
+        }
+    });
 }
 
-async function pararBot() {
-  if (botInstance) {
-    logger.warn('🔌 Desconectando o bot...');
-    // Envia um logout para invalidar a sessão e fechar a conexão
-    await botInstance.logout();
-    botInstance = null;
-    return true;
-  }
-  return false;
-}
+startBot();
 
-async function reiniciarBot() {
-  logger.warn('🔄 Reiniciando o bot...');
-  await pararBot();
-  // Aguarda um pouco para garantir que a desconexão foi processada
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  await iniciarBot();
-  logger.info('✅ Bot reiniciado e tentando conectar.');
-}
-
-// 1. Inicia o servidor web para responder ao Render
-const app = express();
-const PORT = process.env.PORT || 8080;
-
-// Endpoint de status para o Render saber que o servidor está no ar
-app.get("/", (req, res) => res.send("Servidor online. Iniciando conexão com o WhatsApp..."));
-
-// Endpoint de saúde simplificado
-app.get("/health", (req, res) => res.json({ status: "ok" }));
-
-// Endpoint para reiniciar o bot de forma segura
-app.post("/restart", async (req, res) => {
-  const secret = req.query.secret;
-
-  if (!process.env.RESTART_SECRET || secret !== process.env.RESTART_SECRET) {
-    logger.warn(`[SEGURANÇA] Tentativa de reinicialização não autorizada.`);
-    return res.status(401).json({ error: "Não autorizado" });
-  }
-
-  try {
-    await reiniciarBot();
-    res.status(200).json({ message: "O bot está sendo reiniciado." });
-  } catch (error) {
-    logger.error({ err: error }, "❌ Falha ao reiniciar o bot.");
-    res.status(500).json({ error: "Falha ao reiniciar o bot." });
-  }
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Aplicações podem querer registrar isso e/ou sair
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  logger.info(`🚀 Servidor HTTP iniciado na porta ${PORT}.`);
-  // 2. Inicia a conexão com o WhatsApp DEPOIS que o servidor está no ar
-  iniciarBot().catch(err => logger.fatal({ err }, "❌ Falha crítica ao iniciar o bot."));
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    // É recomendado reiniciar o processo em caso de exceções não capturadas
+    process.exit(1);
 });

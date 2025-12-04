@@ -1,4 +1,4 @@
-import { default as makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } from "@whiskeysockets/baileys"
+import { default as makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } from "@adiwajshing/baileys"
 import fs from "fs"
 import qrcode from "qrcode"
 

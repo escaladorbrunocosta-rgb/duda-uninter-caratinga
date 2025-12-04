@@ -12,7 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^7.0.0-rc.9",
+    "@adiwajshing/baileys": "^7.0.0-rc.9",
     "https-proxy-agent": "^7.0.6",
     "qrcode-terminal": "^0.12.0"
   }

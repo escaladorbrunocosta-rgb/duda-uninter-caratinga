@@ -1,162 +1,83 @@
-import fs from 'fs';
-import path from 'path';
+/**
+ * Este é o cérebro do bot. Ele contém toda a lógica para interpretar
+ * as mensagens dos usuários e gerar as respostas apropriadas.
+ */
 
-// Carrega a base de conhecimento do arquivo JSON.
-// Usar `readFileSync` aqui é aceitável, pois é uma operação de inicialização
-// que acontece apenas uma vez, e o bot precisa desses dados para funcionar.
-const knowledgeBasePath = path.resolve(process.cwd(), 'knowledgeBase.json');
-const knowledgeBase = JSON.parse(fs.readFileSync(knowledgeBasePath, 'utf-8'));
+// Objeto para rastrear o estado da conversa de cada usuário.
+// Em um bot real, isso seria armazenado em um banco de dados.
+const userState = new Map();
 
-// Armazena o estado da conversa para cada usuário (ex: contagem de falhas)
-const conversationState = {};
-const MAX_FALLBACKS = 2; // O transbordo ocorrerá na terceira tentativa
-const MEMORY_SIZE = 5; // Número de mensagens anteriores a serem lembradas
-
-// --- OTIMIZAÇÃO: PRÉ-PROCESSAMENTO E INDEXAÇÃO DE PALAVRAS-CHAVE ---
-// Cria um índice invertido para mapear palavras-chave diretamente para as respostas.
-// Isso evita a necessidade de iterar sobre todas as respostas para cada mensagem.
-const keywordIndex = new Map();
-knowledgeBase.responses.forEach((responseItem, index) => {
-  // Adiciona um ID único para cada item de resposta para facilitar a pontuação.
-  responseItem.id = index;
-
-  responseItem.keywords.forEach(keyword => {
-    const normalizedKeyword = keyword.toLowerCase();
-    if (!keywordIndex.has(normalizedKeyword)) keywordIndex.set(normalizedKeyword, []);
-    keywordIndex.get(normalizedKeyword).push(responseItem);
-  });
-});
+// Define as palavras-chave e as respostas correspondentes.
+const responses = {
+    'cursos': 'Olá! 📚 Nossos cursos disponíveis são:\n\n1. Análise e Desenvolvimento de Sistemas\n2. Engenharia de Software\n3. Marketing Digital\n4. Gestão Financeira\n\nDigite o número do curso para saber mais!',
+    'preços': 'Os valores variam por curso. Para qual curso você gostaria de saber o preço?',
+    'contato': 'Você pode falar com um de nossos consultores pelo número (XX) XXXX-XXXX durante o horário comercial.',
+    'horário': 'Nosso horário de atendimento é de segunda a sexta, das 08:00 às 18:00.',
+    '1': 'Ótima escolha! O curso de Análise e Desenvolvimento de Sistemas foca em... (mais detalhes aqui).',
+    '2': 'Excelente! O curso de Engenharia de Software prepara você para... (mais detalhes aqui).',
+};
 
 /**
- * Formata e constrói uma mensagem de menu a partir de um nó da árvore de menu.
- * @param {object} menuNode - O nó do menu contendo texto e opções.
- * @returns {string} A mensagem de menu formatada.
+ * Gera a mensagem de saudação inicial.
+ * @param {string} userName - O nome do usuário.
+ * @returns {string} A mensagem de boas-vindas.
  */
-function buildMenuMessage(menuNode, userName) {
-  let message = menuNode.text;
-  if (menuNode.options) {
-    message += '\n';
-    for (const [key, value] of Object.entries(menuNode.options)) {
-      message += `\n${key}️⃣. ${value}`;
-    }
-    message += '\n\nA qualquer momento, digite "menu" para voltar ao início.';
-  }
-
-  // Adiciona o nome do usuário na saudação principal do menu
-  if (menuNode === knowledgeBase.menu_tree.main) {
-    message = message.replace('Olá!', `Olá, ${userName}!`);
-  }
-  return message;
+function getWelcomeMessage(userName) {
+    return `👋 Olá, ${userName}! Bem-vindo(a) ao atendimento automatizado da Uninter Caratinga.\n\nEu sou a Duda, sua assistente virtual. Como posso te ajudar hoje?\n\nDigite uma das opções abaixo:\n*- Cursos*\n*- Preços*\n*- Contato*\n*- Horário*`;
 }
 
 /**
- * Retorna uma resposta baseada no texto da mensagem recebida.
+ * Gera a mensagem de fallback quando o bot não entende o comando.
+ * @returns {string} A mensagem de fallback.
+ */
+function getFallbackMessage() {
+    return 'Desculpe, não entendi o que você quis dizer. 🤔\n\nPoderia tentar uma das opções abaixo?\n\n*- Cursos*\n*- Preços*\n*- Contato*\n*- Horário*';
+}
+
+/**
+ * Gera a mensagem de transbordo para um atendente humano.
+ * @returns {string} A mensagem de transbordo.
+ */
+function getHandoverMessage() {
+    return 'Entendi. Estou transferindo você para um de nossos atendentes. Por favor, aguarde um momento. 🧑‍💼';
+}
+
+/**
+ * Processa a mensagem do usuário e retorna a resposta adequada.
  * @param {string} chatId - O ID do chat do usuário.
- * @param {string} messageText - O texto da mensagem do usuário.
+ * @param {string} messageText - O texto da mensagem recebida.
  * @param {string} userName - O nome do usuário.
- * @returns {string} A resposta do robô.
+ * @returns {string} A resposta do bot.
  */
 export function getResponse(chatId, messageText, userName) {
-  // --- GERENCIAMENTO DE ESTADO E MEMÓRIA ---
-  if (!conversationState[chatId]) {
-    conversationState[chatId] = { fallbackCount: 0, history: [] };
-  }
-  const state = conversationState[chatId];
+    const normalizedText = messageText.toLowerCase().trim();
 
-  // Adiciona a mensagem atual ao histórico
-  state.history.push(messageText);
-  // Mantém o histórico com o tamanho definido
-  if (state.history.length > MEMORY_SIZE) {
-    state.history.shift(); // Remove a mensagem mais antiga
-  }
-  let lowerCaseText = messageText.toLowerCase().trim();
-
-  // Verifica se a mensagem é um comando (começa com '!')
-  if (lowerCaseText.startsWith('!')) {
-    // Remove o '!' para processar o comando
-    lowerCaseText = lowerCaseText.substring(1);
-  }
-
-  // Verifica se a mensagem é uma saudação ou um pedido de menu
-  const isGreeting = knowledgeBase.greetings.some(greeting => lowerCaseText.includes(greeting));
-  if (isGreeting || lowerCaseText === knowledgeBase.menu_trigger || lowerCaseText === 'inicio' || lowerCaseText === 'voltar') {
-    // Ao voltar para o menu principal, limpa o estado de conversa
-    if (conversationState[chatId]) {
-      delete conversationState[chatId];
-    }
-    return buildMenuMessage(knowledgeBase.menu_tree.main, userName);
-  }
-
-  // --- LÓGICA DE BUSCA OTIMIZADA COM ÍNDICE ---
-  const contextText = state.history.join(' ').toLowerCase();
-  const uniqueWordsInContext = [...new Set(contextText.match(/\b(\w+)\b/g) || [])];
-  const responseScores = new Map();
-
-  // Itera sobre as palavras da mensagem do usuário e usa o índice para encontrar respostas candidatas.
-  for (const word of uniqueWordsInContext) {
-    if (keywordIndex.has(word)) {
-      const candidateResponses = keywordIndex.get(word);
-      candidateResponses.forEach(responseItem => {
-        // Incrementa a pontuação para cada resposta candidata encontrada.
-        responseScores.set(responseItem.id, (responseScores.get(responseItem.id) || 0) + 1);
-      });
-    }
-  }
-
-  // Encontra a resposta com a maior pontuação.
-  let bestMatch = { score: 0, id: -1 };
-  for (const [id, score] of responseScores.entries()) {
-    if (score > bestMatch.score) {
-      bestMatch = { score, id };
-    }
-  }
-
-  // Se uma correspondência válida for encontrada (pontuação > 0), retorna a resposta.
-  if (bestMatch.score > 0) {
-    state.fallbackCount = 0; // Reseta o estado de fallback ao encontrar uma resposta
-    return knowledgeBase.responses[bestMatch.id].answer;
-  }
-  // --- FIM DA LÓGICA DE BUSCA INTELIGENTE ---
-
-  // Se não encontrou por keyword, verifica se é uma opção de menu (ex: "1", "2")
-  // Verifica se o usuário está em um submenu
-  if (/^\d+$/.test(lowerCaseText)) {
-    const currentMenuKey = conversationState[chatId]?.currentMenu;
-    let nextMenuKey = lowerCaseText; // Por padrão, a chave é a própria entrada do usuário.
-
-    // Se está em um menu, constrói a chave do submenu (ex: "2-4")
-    if (currentMenuKey) {
-      const potentialNextKey = `${currentMenuKey}-${lowerCaseText}`;
-      // Verifica se a chave construída existe, senão, usa a entrada direta.
-      if (knowledgeBase.menu_tree[potentialNextKey]) {
-        nextMenuKey = potentialNextKey;
-      }
+    // Verifica se é a primeira mensagem do usuário na sessão atual
+    if (!userState.has(chatId)) {
+        userState.set(chatId, { lastInteraction: Date.now() });
+        return getWelcomeMessage(userName);
     }
 
-    const menuNode = knowledgeBase.menu_tree[nextMenuKey];
-    if (menuNode) {
-      state.fallbackCount = 0; // Reseta o fallback ao navegar no menu
-      // Se o nó encontrado for um novo menu (tem opções), atualiza o estado
-      if (menuNode.options) {
-        conversationState[chatId].currentMenu = nextMenuKey;
-      } else {
-        // Se for uma resposta final, limpa o estado do menu
-        if (conversationState[chatId]) delete conversationState[chatId].currentMenu;
-      }
-      return buildMenuMessage(menuNode, userName);
+    // Atualiza o tempo da última interação
+    userState.set(chatId, { lastInteraction: Date.now() });
+
+    // Lógica para transbordo (atendimento humano)
+    if (normalizedText.includes('falar com atendente') || normalizedText.includes('humano')) {
+        return getHandoverMessage();
     }
-  }
 
-  // --- LÓGICA DE FALLBACK E TRANSBORDO ---
-  // Se nenhuma resposta foi encontrada, incrementa o contador de falhas.
-  state.fallbackCount++;
+    // Procura por uma resposta direta baseada na palavra-chave
+    if (responses[normalizedText]) {
+        return responses[normalizedText];
+    }
 
-  // Se o limite de falhas for atingido, envia a mensagem de transbordo.
-  if (conversationState[chatId].fallbackCount > MAX_FALLBACKS) {
-    delete conversationState[chatId]; // Reseta para não entrar em loop
-    return "Parece que não estou conseguindo te ajudar com essa questão específica. 😥\n\nPara garantir que você seja atendido da melhor forma, por favor, entre em contato com a nossa Central de Mediação Acadêmica (CMA) pelo telefone 0800-702-0500 (opção 2). Eles estão preparados para resolver seu caso.";
-  }
+    // Procura por palavras-chave dentro da frase
+    for (const keyword in responses) {
+        if (normalizedText.includes(keyword)) {
+            return responses[keyword];
+        }
+    }
 
-  // Se ainda não atingiu o limite, retorna a mensagem de fallback padrão.
-  return knowledgeBase.fallback;
+    // Se nenhuma palavra-chave for encontrada, retorna a mensagem de fallback
+    return getFallbackMessage();
 }

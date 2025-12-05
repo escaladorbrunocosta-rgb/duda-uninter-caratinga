@@ -81,7 +81,8 @@ async function startBot() {
             options: { ignore: 'pid,hostname,error' } // Ignora o objeto de erro completo no log formatado
         }
     });
-    const sessionDir = 'session'; // Nome da pasta da sessão
+    // Garante que o caminho para a pasta da sessão seja absoluto
+    const sessionDir = path.resolve('session');
 
     let state, saveCreds;
 
@@ -159,11 +160,11 @@ async function startBot() {
                 // Se o erro for um 500 (Internal Server Error), é provável que a sessão esteja corrompida.
                 // Vamos limpá-la para forçar a geração de um novo QR Code.
                 if (statusCode === 500 && existsSync(sessionDir)) {
-                    logger.warn('Erro 500 detectado. Limpando a sessão para forçar uma nova autenticação...');
+                    logger.warn('⚠️ Erro 500 detectado. Limpando a sessão para forçar uma nova autenticação...');
                     rmSync(sessionDir, { recursive: true, force: true });
                 }
                 logger.info(`Tentando reconectar em ${delay / 1000} segundos... (Tentativa ${reconnectionAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-                setTimeout(startBot, delay);
+                setTimeout(() => startBot(), delay);
             } else {
                 if (reconnectionAttempts >= MAX_RECONNECT_ATTEMPTS) {
                     logger.error(`❗ Atingido o número máximo de tentativas de reconexão. Encerrando.`);
@@ -172,7 +173,7 @@ async function startBot() {
                     if (statusCode === DisconnectReason.loggedOut) {
                         logger.error(`🚫 Logout detectado (código ${statusCode}). A sessão foi invalidada e será removida.`);
                     } else {
-                        logger.error(`❗ Conexão permanente perdida, código: ${statusCode}. A sessão é inválida.`);
+                        logger.error(`❗ Conexão permanente perdida, código: ${statusCode || 'desconhecido'}. A sessão pode ser inválida.`);
                     }
                 }
                 
@@ -181,7 +182,7 @@ async function startBot() {
                     rmSync(sessionDir, { recursive: true, force: true });
                 }
                 // Em um ambiente de produção, queremos que o serviço pare e seja reiniciado pelo gerenciador (como o Render).
-                // Isso força uma reinicialização limpa em vez de um loop de reconexão falho.
+                // Isso força uma reinicialização limpa em vez de um loop de reconexão com falha.
                 logger.info('Encerrando o processo. O serviço de hospedagem deve reiniciar o bot automaticamente. Se estiver rodando localmente, inicie novamente.');
                 process.exit(1); // Encerra o processo com um código de erro.
             }

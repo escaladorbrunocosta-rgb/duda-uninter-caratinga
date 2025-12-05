@@ -8,8 +8,10 @@ import makeWASocket, {
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
 import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs'; // Usa a versão de promises do fs
-import path from 'path'; // Importa o módulo para lidar com caminhos de arquivos
-import qrcode from 'qrcode-terminal'; // Importa a biblioteca para gerar QR Code no terminal
+import path from 'path';
+import qrcodeTerminal from 'qrcode-terminal'; // Renomeado para clareza
+import qrcode from 'qrcode'; // Biblioteca para gerar imagem do QR Code
+import http from 'http'; // Módulo para criar o servidor web
 import { getResponse } from './knowledgeBase.js';
 
 let reconnectionAttempts = 0;
@@ -65,6 +67,8 @@ async function handleMessage(sock, msg, logger) {
 }
 
 async function startBot() {
+    let qrCodeString = '';
+
     // Configuração do Pino para múltiplos transportes (console e arquivo)
     const logger = pino({
         level: 'info',
@@ -143,9 +147,15 @@ async function startBot() {
 
         if (qr) {
             // Só mostra o QR Code se não estivermos usando a sessão da variável de ambiente
+            qrCodeString = qr; // Armazena o QR para o servidor web
             if (!process.env.WHATSAPP_SESSION) {
-                qrcode.generate(qr, { small: true });
-                console.log('📡 Escaneie o QR Code com o seu WhatsApp (Configurações > Aparelhos conectados > Conectar um aparelho).');
+                // Tenta exibir no terminal como fallback
+                qrcodeTerminal.generate(qr, { small: true });
+                
+                // A mensagem principal agora aponta para a URL
+                const port = process.env.PORT || 3000;
+                logger.info(`✅ QR Code recebido! Para escanear, acesse a URL do seu serviço no navegador e adicione /qrcode no final.`);
+                logger.info(`Exemplo: https://seu-bot.onrender.com/qrcode (se a porta for ${port})`);
             }
         }
 
@@ -208,6 +218,34 @@ async function startBot() {
     });
 }
 
+// Inicia o servidor web APENAS se não houver uma sessão salva
+if (!process.env.WHATSAPP_SESSION && !existsSync(path.resolve('session'))) {
+    const port = process.env.PORT || 3000;
+    const server = http.createServer(async (req, res) => {
+        if (req.url === '/qrcode') {
+            res.setHeader('Content-Type', 'image/png');
+            try {
+                // Usa a variável que armazena a string do QR Code
+                const qrCodeData = await qrcode.toBuffer(qrCodeString);
+                res.end(qrCodeData);
+            } catch (err) {
+                console.error('Erro ao gerar imagem do QR Code:', err);
+                res.statusCode = 500;
+                res.end('Erro ao gerar QR Code.');
+            }
+        } else {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'text/plain');
+            res.end('Bot está rodando. Acesse /qrcode para ver o QR Code, se necessário.');
+        }
+    });
+
+    server.listen(port, () => {
+        console.log(`Servidor web iniciado na porta ${port}. Aguardando geração do QR Code...`);
+    });
+}
+
+// Inicia a lógica principal do bot
 startBot();
 
 process.on('unhandledRejection', (reason, promise) => {

@@ -57,9 +57,38 @@ async function handleMessage(sock, msg, logger) {
         // Obtém a resposta da nossa base de conhecimento
         const response = getResponse(chatId, messageText, userName);
 
-        // Envia a resposta
-        await sock.sendMessage(chatId, { text: response });
-        logger.info({ chatId, response }, 'Resposta enviada');
+        // Verifica o tipo de resposta para decidir como enviar
+        if (typeof response === 'string') {
+            // --- Envio de Texto Simples ---
+            await sock.sendMessage(chatId, { text: response });
+            logger.info({ chatId, response }, 'Resposta de texto enviada');
+
+        } else if (typeof response === 'object' && response.type) {
+            // --- Envio de Mídia ---
+            if (response.type === 'image' && response.url) {
+                // Envia imagem a partir de uma URL
+                await sock.sendMessage(chatId, {
+                    image: { url: response.url },
+                    caption: response.caption || '' // Legenda é opcional
+                });
+                logger.info({ chatId, response }, 'Resposta de imagem enviada');
+
+            } else if (response.type === 'document' && response.path) {
+                // Envia documento a partir de um arquivo local
+                const docPath = path.resolve(response.path);
+                if (existsSync(docPath)) {
+                    await sock.sendMessage(chatId, {
+                        document: await fs.readFile(docPath),
+                        mimetype: 'application/pdf', // Ajuste o mimetype conforme o tipo de arquivo
+                        fileName: response.fileName || 'documento.pdf'
+                    });
+                    logger.info({ chatId, response }, 'Resposta de documento enviada');
+                } else {
+                    logger.error({ chatId, path: docPath }, 'Arquivo de documento não encontrado no caminho especificado.');
+                    await sock.sendMessage(chatId, { text: 'Desculpe, não consegui encontrar o documento solicitado no momento.' });
+                }
+            }
+        }
 
         // Limpa a presença (para de "digitar")
         await sock.sendPresenceUpdate('paused', chatId);
@@ -250,12 +279,14 @@ if (!process.env.WHATSAPP_SESSION && !existsSync(path.resolve('session'))) {
 startBot();
 
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    // Aplicações podem querer registrar isso e/ou sair
+    // Usa o logger para registrar o erro, garantindo que ele vá para o arquivo de log
+    pino().error({ reason, promise }, 'Unhandled Rejection detectada.');
+    // Considerar encerrar o processo para forçar uma reinicialização limpa
+    // process.exit(1);
 });
 
 process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-    // É recomendado reiniciar o processo em caso de exceções não capturadas
+    pino().fatal({ error }, 'Uncaught Exception detectada. O bot será encerrado.');
+    // Em caso de exceção não capturada, é mais seguro encerrar o processo.
     process.exit(1);
 });

@@ -8,7 +8,8 @@
         "1": "Cursos e Matrículas",
         "2": "Informações para Alunos",
         "3": "Suporte e Financeiro",
-        "4": "Contatos e Links Úteis"
+        "4": "Contatos e Links Úteis",
+        "5": "Eventos e Notícias"
       }
     },
     "1": {
@@ -35,6 +36,9 @@
     "4": {
       "text": "Aqui estão nossos principais contatos e links:\n\n*   *Telefone Fixo e WhatsApp:* (33) 3322-4001\n*   *Endereço:* Rua Coronel Antônio Salim, 74, Bairro Dário Grossi, Caratinga - MG\n*   *Instagram:* @unintercaratinga\n*   *Todos os links (Linktree):* https://linktr.ee/Uninter_Caratinga\n\nPara outros canais, como Ouvidoria ou Financeiro geral, por favor, seja mais específico."
     },
+    "5": {
+      "text": "Para ficar por dentro de todos os nossos eventos, palestras e notícias, siga nosso Instagram: @unintercaratinga"
+    },
     "2-4": {
       "text": "Entendido! Qual é a sua dúvida específica sobre o FIES?",
       "options": {
@@ -58,6 +62,10 @@
     }
   },
   "responses": [
+    {
+      "keywords": ["bom dia", "boa tarde", "boa noite"],
+      "answer": "Olá! Como posso te ajudar hoje?"
+    },
     {
       "keywords": ["prova", "onde", "aplicada"],
       "answer": "A prova do vestibular é 100% on-line para todas as modalidades de curso (presencial, semipresencial e a distância)."
@@ -235,5 +243,9 @@
       "answer": "Se você estuda em outra instituição e quer vir para a Uninter, pode solicitar a transferência externa aqui: https://www.uninter.com/transferencia-externa/"
     }
   ],
-  "fallback": "Desculpe, não entendi sua solicitação. Por favor, digite \"menu\" para ver as opções disponíveis."
+  "fallback": [
+    "Desculpe, não entendi sua solicitação. Tente usar outras palavras ou digite *menu* para ver as opções.",
+    "Ainda não consegui ajudar. Lembre-se que você pode navegar pelas opções digitando *menu* a qualquer momento.",
+    "Parece que não estou conseguindo te ajudar com isso. Para falar com um de nossos atendentes, por favor, chame no WhatsApp *(33) 3322-4001*."
+  ]
 }

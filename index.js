@@ -4,7 +4,7 @@ import makeWASocket, {
     isJidGroup,
     useMultiFileAuthState, 
     makeCacheableSignalKeyStore
-} from '@whiskeysockets/baileys';
+} from 'baileys'; // Nome do pacote atualizado
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
 import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs'; // Usa a versão de promises do fs
@@ -65,12 +65,28 @@ async function handleMessage(sock, msg, logger) {
 }
 
 async function startBot() {
+    // Configuração do Pino para múltiplos transportes (console e arquivo)
     const logger = pino({
         level: 'info',
         transport: {
-            target: 'pino-pretty',
-            options: { ignore: 'pid,hostname,error' } // Ignora o objeto de erro completo no log formatado
-        }
+            targets: [
+                {
+                    // Alvo 1: Saída bonita para o console
+                    target: 'pino-pretty',
+                    level: 'info',
+                    options: {
+                        ignore: 'pid,hostname', // Mantém o objeto de erro para depuração
+                        colorize: true,
+                    }
+                },
+                {
+                    // Alvo 2: Saída JSON para um arquivo de log
+                    target: 'pino/file',
+                    level: 'info',
+                    options: { destination: './conversations.log', mkdir: true }
+                }
+            ]
+        },
     });
     // Garante que o caminho para a pasta da sessão seja absoluto
     const sessionDir = path.resolve('session');
@@ -148,10 +164,10 @@ async function startBot() {
                 reconnectionAttempts++;
                 const delay = Math.pow(2, reconnectionAttempts) * 1000; // Backoff exponencial
 
-                // Se o erro for um 500 (Internal Server Error), é provável que a sessão esteja corrompida.
-                // Vamos limpá-la para forçar a geração de um novo QR Code.
-                if (statusCode === 500 && existsSync(sessionDir)) {
-                    logger.warn('⚠️ Erro 500 detectado. Limpando a sessão para forçar uma nova autenticação...');
+                // Se o erro for um timeout do QR Code (408) ou um erro interno do servidor (500),
+                // é mais seguro limpar a sessão para forçar uma nova autenticação.
+                if ((statusCode === 500 || statusCode === 408) && existsSync(sessionDir)) {
+                    logger.warn(`⚠️ Erro ${statusCode} detectado. Limpando a sessão para forçar uma nova autenticação...`);
                     rmSync(sessionDir, { recursive: true, force: true });
                 }
                 logger.info(`Tentando reconectar em ${delay / 1000} segundos... (Tentativa ${reconnectionAttempts}/${MAX_RECONNECT_ATTEMPTS})`);

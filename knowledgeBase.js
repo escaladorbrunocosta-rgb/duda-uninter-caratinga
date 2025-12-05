@@ -52,11 +52,12 @@ export function getResponse(chatId, messageText, userName) {
     }
 
     const normalizedText = messageText.toLowerCase().trim();
-    const state = userState.get(chatId) || { menu: 'main' };
+    // Inicializa o estado do usuário com o menu principal e o contador de falhas
+    const state = userState.get(chatId) || { menu: 'main', fallbackCount: 0 };
 
     // Resetar para o menu principal com saudações ou comando de menu
     if (knowledge.greetings.includes(normalizedText) || normalizedText === knowledge.menu_trigger) {
-        userState.set(chatId, { menu: 'main' });
+        userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta o contador
         const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `Olá, ${userName}!`);
         return formatMenu({ ...knowledge.menu_tree.main, text: welcomeMessage });
     }
@@ -70,10 +71,10 @@ export function getResponse(chatId, messageText, userName) {
         if (nextNode) {
             // Se o próximo nó tiver mais opções, atualiza o estado do usuário
             if (nextNode.options) {
-                userState.set(chatId, { menu: nextMenuKey });
+                userState.set(chatId, { menu: nextMenuKey, fallbackCount: 0 }); // Reseta o contador
             } else {
                 // Se for uma resposta final, reseta o estado para o menu principal
-                userState.set(chatId, { menu: 'main' });
+                userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta o contador
             }
             return formatMenu(nextNode);
         }
@@ -98,17 +99,24 @@ export function getResponse(chatId, messageText, userName) {
     // Se encontrou uma resposta com uma pontuação mínima, retorna ela.
     if (bestMatch.score > 0) {
         // Reseta o estado do usuário após dar uma resposta direta
-        userState.set(chatId, { menu: 'main' });
+        userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta o contador
         return bestMatch.answer;
     }
 
     // Se for a primeira interação e não entendeu, mostra o menu principal
     if (!userState.has(chatId)) {
-        userState.set(chatId, { menu: 'main' });
+        userState.set(chatId, { menu: 'main', fallbackCount: 0 });
         const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `Olá, ${userName}!`);
         return formatMenu({ ...knowledge.menu_tree.main, text: welcomeMessage });
     }
 
-    // Se nenhuma lógica acima funcionou, retorna o fallback.
-    return knowledge.fallback;
+    // --- LÓGICA DE FALLBACK PROGRESSIVO ---
+    // Incrementa o contador de falhas do usuário
+    state.fallbackCount++;
+    userState.set(chatId, state);
+
+    // Calcula qual mensagem de fallback usar. Se o contador passar do tamanho da lista, usa a última.
+    const fallbackIndex = Math.min(state.fallbackCount - 1, knowledge.fallback.length - 1);
+    
+    return knowledge.fallback[fallbackIndex];
 }

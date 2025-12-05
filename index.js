@@ -14,6 +14,9 @@ import qrcode from 'qrcode'; // Biblioteca para gerar imagem do QR Code
 import http from 'http'; // Módulo para criar o servidor web
 import { getResponse } from './knowledgeBase.js';
 
+// Variável global para armazenar a string do QR Code
+let qrCodeString = '';
+
 let reconnectionAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
@@ -67,8 +70,6 @@ async function handleMessage(sock, msg, logger) {
 }
 
 async function startBot() {
-    let qrCodeString = '';
-
     // Configuração do Pino para múltiplos transportes (console e arquivo)
     const logger = pino({
         level: 'info',
@@ -225,7 +226,7 @@ if (!process.env.WHATSAPP_SESSION && !existsSync(path.resolve('session'))) {
         if (req.url === '/qrcode') {
             res.setHeader('Content-Type', 'image/png');
             try {
-                // Usa a variável que armazena a string do QR Code
+                // Usa a variável GLOBAL que armazena a string do QR Code
                 const qrCodeData = await qrcode.toBuffer(qrCodeString);
                 res.end(qrCodeData);
             } catch (err) {

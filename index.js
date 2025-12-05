@@ -1,12 +1,3 @@
-// Polyfill para a API de criptografia global esperada pelo Baileys.
-// Isso é necessário em alguns ambientes Node.js onde `globalThis.crypto` não está disponível por padrão.
-// A importação direta para o escopo global é mais robusta em alguns ambientes de produção.
-// Referência: https://github.com/WhiskeySockets/Baileys/issues/962
-import crypto from 'node:crypto';
-if (typeof globalThis.crypto !== 'object' || !globalThis.crypto.subtle) {
-    globalThis.crypto = crypto.webcrypto;
-}
-
 import makeWASocket, {
     DisconnectReason,
     fetchLatestBaileysVersion,

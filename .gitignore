@@ -1,8 +1,8 @@
-# Dependências do Node.js
-node_modules
-
-# Arquivos de sessão do Baileys (contém credenciais)
-session
-
 # Arquivos de log
 *.log
+
+# Dependências do Node.js
+/node_modules
+
+# Pasta da sessão do Baileys (contém credenciais!)
+/session

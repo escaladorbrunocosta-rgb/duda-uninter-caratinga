@@ -3,8 +3,7 @@
     "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "^6.7.2",
     "pino": "^8.21.0",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.34.2"
+    "qrcode-terminal": "^0.12.0"
   },
   "name": "duda-uninter-bot-limpo",
   "version": "1.0.0",

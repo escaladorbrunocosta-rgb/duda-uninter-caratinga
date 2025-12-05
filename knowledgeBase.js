@@ -1,45 +1,42 @@
 /**
  * Este é o cérebro do bot. Ele contém toda a lógica para interpretar
- * as mensagens dos usuários e gerar as respostas apropriadas.
+ * as mensagens dos usuários e gerar as respostas apropriadas, lendo
+ * a base de conhecimento do arquivo knowledgeBase.json.
  */
+import { promises as fs } from 'fs';
+import path from 'path';
+
+// Carrega a base de conhecimento do arquivo JSON.
+// Usamos uma função assíncrona para carregar o JSON no início.
+let knowledge;
+async function loadKnowledgeBase() {
+    const jsonPath = path.join(process.cwd(), 'knowledgeBase.json');
+    const fileContent = await fs.readFile(jsonPath, 'utf-8');
+    knowledge = JSON.parse(fileContent);
+}
+// Chamamos a função para garantir que a base de conhecimento seja carregada.
+loadKnowledgeBase().catch(err => {
+    console.error("❌ Falha ao carregar knowledgeBase.json:", err);
+    process.exit(1); // Encerra o processo se a base de conhecimento não puder ser carregada.
+});
 
 // Objeto para rastrear o estado da conversa de cada usuário.
-// Em um bot real, isso seria armazenado em um banco de dados.
+// Em um bot real, isso seria armazenado em um banco de dados para persistência.
 const userState = new Map();
 
-// Define as palavras-chave e as respostas correspondentes.
-const responses = {
-    'cursos': 'Olá! 📚 Nossos cursos disponíveis são:\n\n1. Análise e Desenvolvimento de Sistemas\n2. Engenharia de Software\n3. Marketing Digital\n4. Gestão Financeira\n\nDigite o número do curso para saber mais!',
-    'preços': 'Os valores variam por curso. Para qual curso você gostaria de saber o preço?',
-    'contato': 'Você pode falar com um de nossos consultores pelo número (XX) XXXX-XXXX durante o horário comercial.',
-    'horário': 'Nosso horário de atendimento é de segunda a sexta, das 08:00 às 18:00.',
-    '1': 'Ótima escolha! O curso de Análise e Desenvolvimento de Sistemas foca em... (mais detalhes aqui).',
-    '2': 'Excelente! O curso de Engenharia de Software prepara você para... (mais detalhes aqui).',
-};
-
 /**
- * Gera a mensagem de saudação inicial.
- * @param {string} userName - O nome do usuário.
- * @returns {string} A mensagem de boas-vindas.
+ * Formata um nó do menu para exibição.
+ * @param {object} menuNode - O nó do menu da base de conhecimento.
+ * @returns {string} A mensagem do menu formatada.
  */
-function getWelcomeMessage(userName) {
-    return `👋 Olá, ${userName}! Bem-vindo(a) ao atendimento automatizado da Uninter Caratinga.\n\nEu sou a Duda, sua assistente virtual. Como posso te ajudar hoje?\n\nDigite uma das opções abaixo:\n*- Cursos*\n*- Preços*\n*- Contato*\n*- Horário*`;
-}
-
-/**
- * Gera a mensagem de fallback quando o bot não entende o comando.
- * @returns {string} A mensagem de fallback.
- */
-function getFallbackMessage() {
-    return 'Desculpe, não entendi o que você quis dizer. 🤔\n\nPoderia tentar uma das opções abaixo?\n\n*- Cursos*\n*- Preços*\n*- Contato*\n*- Horário*';
-}
-
-/**
- * Gera a mensagem de transbordo para um atendente humano.
- * @returns {string} A mensagem de transbordo.
- */
-function getHandoverMessage() {
-    return 'Entendi. Estou transferindo você para um de nossos atendentes. Por favor, aguarde um momento. 🧑‍💼';
+function formatMenu(menuNode) {
+    let message = menuNode.text;
+    if (menuNode.options) {
+        message += '\n\n' + Object.entries(menuNode.options)
+            .map(([key, value]) => `*${key}* - ${value}`)
+            .join('\n');
+    }
+    return message;
 }
 
 /**
@@ -50,34 +47,68 @@ function getHandoverMessage() {
  * @returns {string} A resposta do bot.
  */
 export function getResponse(chatId, messageText, userName) {
+    if (!knowledge) {
+        return "Desculpe, estou inicializando minha base de conhecimento. Tente novamente em um instante.";
+    }
+
     const normalizedText = messageText.toLowerCase().trim();
+    const state = userState.get(chatId) || { menu: 'main' };
 
-    // Verifica se é a primeira mensagem do usuário na sessão atual
-    if (!userState.has(chatId)) {
-        userState.set(chatId, { lastInteraction: Date.now() });
-        return getWelcomeMessage(userName);
+    // Resetar para o menu principal com saudações ou comando de menu
+    if (knowledge.greetings.includes(normalizedText) || normalizedText === knowledge.menu_trigger) {
+        userState.set(chatId, { menu: 'main' });
+        const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `Olá, ${userName}!`);
+        return formatMenu({ ...knowledge.menu_tree.main, text: welcomeMessage });
     }
 
-    // Atualiza o tempo da última interação
-    userState.set(chatId, { lastInteraction: Date.now() });
+    // Lógica de navegação no menu
+    const currentNode = knowledge.menu_tree[state.menu] || knowledge.menu_tree['main'];
+    if (currentNode.options && currentNode.options[normalizedText]) {
+        const nextMenuKey = `${state.menu}-${normalizedText}`;
+        const nextNode = knowledge.menu_tree[nextMenuKey] || knowledge.menu_tree[normalizedText];
 
-    // Lógica para transbordo (atendimento humano)
-    if (normalizedText.includes('falar com atendente') || normalizedText.includes('humano')) {
-        return getHandoverMessage();
-    }
-
-    // Procura por uma resposta direta baseada na palavra-chave
-    if (responses[normalizedText]) {
-        return responses[normalizedText];
-    }
-
-    // Procura por palavras-chave dentro da frase
-    for (const keyword in responses) {
-        if (normalizedText.includes(keyword)) {
-            return responses[keyword];
+        if (nextNode) {
+            // Se o próximo nó tiver mais opções, atualiza o estado do usuário
+            if (nextNode.options) {
+                userState.set(chatId, { menu: nextMenuKey });
+            } else {
+                // Se for uma resposta final, reseta o estado para o menu principal
+                userState.set(chatId, { menu: 'main' });
+            }
+            return formatMenu(nextNode);
         }
     }
 
-    // Se nenhuma palavra-chave for encontrada, retorna a mensagem de fallback
-    return getFallbackMessage();
+    // Lógica de busca por palavras-chave se não for um comando de menu
+    const words = normalizedText.split(/\s+/);
+    let bestMatch = { score: 0, answer: null };
+
+    for (const response of knowledge.responses) {
+        let currentScore = 0;
+        for (const keyword of response.keywords) {
+            if (normalizedText.includes(keyword)) {
+                currentScore++;
+            }
+        }
+        if (currentScore > bestMatch.score) {
+            bestMatch = { score: currentScore, answer: response.answer };
+        }
+    }
+
+    // Se encontrou uma resposta com uma pontuação mínima, retorna ela.
+    if (bestMatch.score > 0) {
+        // Reseta o estado do usuário após dar uma resposta direta
+        userState.set(chatId, { menu: 'main' });
+        return bestMatch.answer;
+    }
+
+    // Se for a primeira interação e não entendeu, mostra o menu principal
+    if (!userState.has(chatId)) {
+        userState.set(chatId, { menu: 'main' });
+        const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `Olá, ${userName}!`);
+        return formatMenu({ ...knowledge.menu_tree.main, text: welcomeMessage });
+    }
+
+    // Se nenhuma lógica acima funcionou, retorna o fallback.
+    return knowledge.fallback;
 }

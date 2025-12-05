@@ -2,12 +2,18 @@
 // Isso é necessário em alguns ambientes Node.js onde `globalThis.crypto` não está disponível por padrão.
 // A importação direta para o escopo global é mais robusta em alguns ambientes de produção.
 // Referência: https://github.com/WhiskeySockets/Baileys/issues/962
-import crypto, { webcrypto } from 'node:crypto';
+import crypto from 'node:crypto';
 if (typeof globalThis.crypto !== 'object' || !globalThis.crypto.subtle) {
     globalThis.crypto = crypto.webcrypto;
 }
 
-import pkg from '@whiskeysockets/baileys';
+import makeWASocket, {
+    DisconnectReason,
+    fetchLatestBaileysVersion,
+    isJidGroup,
+    useMultiFileAuthState, 
+    makeCacheableSignalKeyStore
+} from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
 import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs'; // Usa a versão de promises do fs
@@ -15,53 +21,66 @@ import path from 'path'; // Importa o módulo para lidar com caminhos de arquivo
 import qrcode from 'qrcode-terminal'; // Importa a biblioteca para gerar QR Code no terminal
 import { getResponse } from './knowledgeBase.js';
 
-// Desestruturação para facilitar o acesso
-const {
-    makeWASocket,
-    DisconnectReason,
-    fetchLatestBaileysVersion,
-    useMultiFileAuthState
-} = pkg;
-
 let reconnectionAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
 /**
  * Processa as mensagens recebidas.
  * @param {import('@whiskeysockets/baileys').WASocket} sock - A instância do socket do Baileys.
- * @param {import('@whiskeysockets/baileys').proto.IWebMessageInfo} m - O objeto da mensagem recebida.
+ * @param {import('@whiskeysockets/baileys').proto.IWebMessageInfo} msg - O objeto da mensagem recebida.
  * @param {pino.Logger} logger - A instância do logger.
  */
-async function handleMessage(sock, m, logger) {
-    // Extrai a primeira mensagem do evento
-    const msg = m.messages[0];
+async function handleMessage(sock, msg, logger) {
+    try {
+        const chatId = msg.key.remoteJid;
 
-    // Ignora se não houver mensagem ou se for uma atualização de status
-    if (!msg.message || msg.key.fromMe) return;
+        // Ignora se não houver conteúdo na mensagem, se for de um grupo ou se for uma atualização de status
+        if (!msg.message || msg.key.fromMe || isJidGroup(chatId) || chatId === 'status@broadcast') {
+            return;
+        }
 
-    // Extrai o ID do chat e o texto da mensagem
-    const chatId = msg.key.remoteJid;
-    const messageText = msg.message.conversation || msg.message.extendedTextMessage?.text;
-    const userName = msg.pushName || 'Usuário'; // Obtém o nome do usuário
+        // Extrai o ID do chat e o texto da mensagem de forma mais completa
+        const messageText = msg.message.conversation ||
+                            msg.message.extendedTextMessage?.text ||
+                            msg.message.imageMessage?.caption ||
+                            msg.message.videoMessage?.caption;
 
-    // Ignora se a mensagem não tiver texto
-    if (!messageText) {
-        logger.info({ chatId }, 'Mensagem recebida sem texto (ex: áudio, imagem). Ignorando.');
-        return;
+        const userName = msg.pushName || 'Usuário'; // Obtém o nome do usuário
+
+        // Ignora se a mensagem não tiver texto
+        if (!messageText) {
+            logger.info({ chatId }, 'Mensagem recebida sem texto (ex: áudio, sticker). Ignorando.');
+            return;
+        }
+
+        logger.info({ chatId, userName, message: messageText }, 'Mensagem recebida');
+
+        // Simula que o bot está "digitando" para uma melhor experiência do usuário
+        await sock.sendPresenceUpdate('composing', chatId);
+
+        // Obtém a resposta da nossa base de conhecimento
+        const response = getResponse(chatId, messageText, userName);
+
+        // Envia a resposta
+        await sock.sendMessage(chatId, { text: response });
+        logger.info({ chatId, response }, 'Resposta enviada');
+
+        // Limpa a presença (para de "digitar")
+        await sock.sendPresenceUpdate('paused', chatId);
+
+    } catch (error) {
+        logger.error({ error, messageData: msg }, '❌ Erro ao processar uma mensagem específica.');
     }
-
-    logger.info({ chatId, message: messageText }, 'Mensagem recebida');
-
-    // Obtém a resposta da nossa base de conhecimento
-    const response = getResponse(chatId, messageText, userName);
-
-    // Envia a resposta
-    await sock.sendMessage(chatId, { text: response });
-    logger.info({ chatId, response }, 'Resposta enviada');
 }
 
 async function startBot() {
-    const logger = pino({ level: 'info', transport: { target: 'pino-pretty' } });
+    const logger = pino({
+        level: 'info',
+        transport: {
+            target: 'pino-pretty',
+            options: { ignore: 'pid,hostname,error' } // Ignora o objeto de erro completo no log formatado
+        }
+    });
     const sessionDir = 'session'; // Nome da pasta da sessão
 
     let state, saveCreds;
@@ -93,10 +112,17 @@ async function startBot() {
     const { version } = await fetchLatestBaileysVersion();
     logger.info(`Usando Baileys versão: ${version.join('.')}`);
 
+    // O logger para o Baileys e para a camada de sinal (signal)
+    const baileysLogger = pino({ level: 'silent' });
+
     const sock = makeWASocket({
         version,
-        auth: state,
-        logger: pino({ level: 'silent' }),
+        // Injeta o logger silencioso na camada de sinal para evitar os logs de "Closing session"
+        auth: {
+            creds: state.creds,
+            keys: makeCacheableSignalKeyStore(state.keys, baileysLogger),
+        },
+        logger: baileysLogger,
         // Usar um User-Agent mais padrão pode aumentar a estabilidade da conexão inicial.
         // Este simula o WhatsApp Web rodando em um navegador Chrome no Windows.
         browser: ['Chrome (Windows)', 'Chrome', '114.0.5735.199']
@@ -124,7 +150,7 @@ async function startBot() {
             const shouldReconnect = (lastDisconnect.error instanceof Boom) && statusCode !== DisconnectReason.loggedOut;
             
             const errorMessage = lastDisconnect.error?.output?.payload?.message || lastDisconnect.error?.message;
-            logger.warn({ error: lastDisconnect.error }, `❌ Conexão fechada: "${errorMessage}". Tentando reconectar: ${shouldReconnect}`);
+            logger.warn(`❌ Conexão fechada: "${errorMessage}". Tentando reconectar: ${shouldReconnect}`);
 
             if (shouldReconnect && reconnectionAttempts < MAX_RECONNECT_ATTEMPTS) {
                 reconnectionAttempts++;
@@ -143,7 +169,11 @@ async function startBot() {
                     logger.error(`❗ Atingido o número máximo de tentativas de reconexão. Encerrando.`);
                 } else {
                     // Se a desconexão foi por 'loggedOut', a sessão é inválida.
-                    logger.error(`❗ Conexão permanente perdida, código: ${statusCode}. A sessão é inválida.`);
+                    if (statusCode === DisconnectReason.loggedOut) {
+                        logger.error(`🚫 Logout detectado (código ${statusCode}). A sessão foi invalidada e será removida.`);
+                    } else {
+                        logger.error(`❗ Conexão permanente perdida, código: ${statusCode}. A sessão é inválida.`);
+                    }
                 }
                 
                 if (existsSync(sessionDir)) {
@@ -161,10 +191,10 @@ async function startBot() {
     sock.ev.on('messages.upsert', async (m) => {
         try {
             // Itera sobre todas as mensagens recebidas no evento
-            const messagePromises = m.messages.map(msg => handleMessage(sock, { messages: [msg] }, logger));
-            await Promise.all(messagePromises);
+            for (const msg of m.messages) {
+                await handleMessage(sock, msg, logger);
+            }
         } catch (error) {
-            // Este catch agora lida com erros que podem ocorrer no Promise.all
             logger.error({ error }, '❌ Erro ao processar mensagem');
         }
     });

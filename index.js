@@ -4,12 +4,12 @@ import makeWASocket, {
     isJidGroup,
     useMultiFileAuthState,
     makeCacheableSignalKeyStore
-} from 'baileys'; // Nome do pacote atualizado
-import { Boom } from '@hapi/boom'; 
+} from 'baileys';
+import { Boom } from '@hapi/boom';
 import pino from 'pino';
-import { gunzipSync } from 'zlib'; // Importa a função para descomprimir
-import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs'; // Usa a versão de promises do fs
+import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs';
 import path from 'path';
+import { gunzipSync } from 'zlib';
 import qrcodeTerminal from 'qrcode-terminal'; // Renomeado para clareza
 import qrcode from 'qrcode'; // Biblioteca para gerar imagem do QR Code
 import http from 'http'; // Módulo para criar o servidor web
@@ -30,6 +30,7 @@ const globalLogger = pino({
         ]
     }
 });
+
 // Variável global para armazenar a string do QR Code
 let qrCodeString = '';
 
@@ -126,42 +127,41 @@ async function handleMessage(sock, msg, logger) {
 
 async function startBot() {
     const logger = globalLogger;
-    // Define o diretório da sessão. Usa o disco persistente da Render se disponível,
-    // senão, usa uma pasta local 'session' para desenvolvimento.
-    const sessionDir = process.env.RENDER_DISK_MOUNT_PATH || path.resolve('session');
-
+    const sessionDir = path.resolve('session');
     logger.info(`Usando diretório de sessão: ${sessionDir}`);
 
-    // Prioriza o uso da sessão via variável de ambiente para ambientes de produção (Render, etc.)
-    if (process.env.WHATSAPP_SESSION) {
-        logger.info('Carregando sessão da variável de ambiente...');
+    // Verifica se existem variáveis de ambiente de sessão (SESSION_*)
+    const sessionEnvVars = Object.keys(process.env).filter(key => key.startsWith('SESSION_'));
+
+    if (sessionEnvVars.length > 0) {
+        logger.info(`Carregando sessão a partir de ${sessionEnvVars.length} variáveis de ambiente...`);
+        if (!existsSync(sessionDir)) {
+            mkdirSync(sessionDir);
+        }
+
         try {
-            // 1. Converte a string base64 de volta para um buffer
-            const compressedBuffer = Buffer.from(process.env.WHATSAPP_SESSION, 'base64');
-            // 2. Descomprime o buffer
-            const jsonString = gunzipSync(compressedBuffer).toString('utf-8');
-            // 3. Converte a string JSON para um objeto
-            const sessionData = JSON.parse(jsonString);
-            if (!existsSync(sessionDir)) {
-                mkdirSync(sessionDir);
-            }
-            // Escreve os arquivos de sessão de forma assíncrona
-            const writePromises = Object.entries(sessionData).map(([fileName, fileContent]) =>
-                fs.writeFile(path.join(sessionDir, fileName), JSON.stringify(fileContent, null, 2))
-            );
+            const writePromises = sessionEnvVars.map(async (envVar) => {
+                // Converte 'SESSION_PRE_KEY_1_JSON' de volta para 'pre-key-1.json'
+                const fileName = envVar
+                    .replace('SESSION_', '')
+                    .replace(/_JSON$/, '.json') // Substitui o sufixo _JSON por .json
+                    .replace(/_/g, '-') // Substitui os underscores restantes por hífens
+                    .toLowerCase();
+
+                const base64 = process.env[envVar];
+                const compressed = Buffer.from(base64, 'base64');
+                const decompressed = gunzipSync(compressed);
+
+                await fs.writeFile(path.join(sessionDir, fileName), decompressed);
+            });
             await Promise.all(writePromises);
-            logger.info('Sessão carregada e arquivos recriados na pasta "session".');
+            logger.info('Sessão recriada com sucesso a partir das variáveis de ambiente.');
         } catch (error) {
-            // Log aprimorado para mostrar a mensagem de erro específica do JSON.parse
-            logger.error({
-                errorMessage: error.message,
-                // Opcional: mostra uma parte da string para depuração (cuidado com dados sensíveis)
-                sessionStart: (process.env.WHATSAPP_SESSION || '').substring(0, 50) + '...'
-            }, 'Falha ao carregar sessão da variável de ambiente. Verifique o formato do JSON.');
-            process.exit(1); // Encerra se a sessão do ambiente estiver corrompida
+            logger.error(error, 'Falha ao decodificar a sessão das variáveis de ambiente. Verifique se elas estão corretas.');
+            process.exit(1);
         }
     } else {
-        logger.info('Usando autenticação baseada em arquivo (pasta session)...');
+        logger.info('Nenhuma variável de ambiente de sessão encontrada. Usando autenticação baseada em arquivo local.');
     }
 
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
@@ -170,16 +170,15 @@ async function startBot() {
     logger.info(`Usando Baileys versão: ${version.join('.')}`);
 
     // O logger para o Baileys e para a camada de sinal (signal)
-    const baileysLogger = pino({ level: 'silent' });
 
     const sock = makeWASocket({
         version,
         // Injeta o logger silencioso na camada de sinal para evitar os logs de "Closing session"
         auth: {
             creds: state.creds,
-            keys: makeCacheableSignalKeyStore(state.keys, baileysLogger),
+            keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'silent' })),
         },
-        logger: baileysLogger,
+        logger: pino({ level: 'silent' }),
         // Usar um User-Agent mais padrão pode aumentar a estabilidade da conexão inicial.
         // Este simula o WhatsApp Web rodando em um navegador Chrome no Windows.
         browser: ['Chrome (Windows)', 'Chrome', '114.0.5735.199']
@@ -191,17 +190,12 @@ async function startBot() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            // Só mostra o QR Code se não estivermos usando a sessão da variável de ambiente
-            qrCodeString = qr; // Armazena o QR para o servidor web
-            if (!process.env.WHATSAPP_SESSION) {
-                // Tenta exibir no terminal como fallback
-                qrcodeTerminal.generate(qr, { small: true });
-                
-                // A mensagem principal agora aponta para a URL
-                const port = process.env.PORT || 3000;
-                logger.info(`✅ QR Code gerado. O QR Code no terminal pode aparecer quebrado em alguns ambientes.`);
-                logger.info(`➡️ Para escanear, acesse a URL do seu serviço: http://localhost:${port}/qrcode ou https://seu-bot.onrender.com/qrcode`);
-            }
+            qrCodeString = qr;
+            startWebServer(); // Inicia o servidor web para exibir o QR Code
+            qrcodeTerminal.generate(qr, { small: true }, (qrTerminal) => {
+                logger.info(`\n${qrTerminal}`);
+            });
+            logger.info(`✅ QR Code gerado. Acesse a URL do seu serviço para escanear.`);
         }
 
         if (connection === 'open') {
@@ -222,9 +216,11 @@ async function startBot() {
                 // Se o erro for 401 (não autorizado), 408 (timeout) ou 500 (erro de servidor),
                 // a sessão provavelmente está inválida ou irrecuperável. Limpar a sessão força uma nova autenticação.
                 const criticalErrors = [401, 408, 500];
-                if (criticalErrors.includes(statusCode) && existsSync(sessionDir)) {
-                    logger.warn(`⚠️ Erro ${statusCode} detectado. Limpando a sessão para forçar uma nova autenticação...`);
-                    rmSync(sessionDir, { recursive: true, force: true });
+                if (criticalErrors.includes(statusCode)) {
+                    logger.warn(`⚠️ Erro ${statusCode} detectado. Limpando a sessão local para forçar uma nova autenticação...`);
+                    if (existsSync(sessionDir)) {
+                        rmSync(sessionDir, { recursive: true, force: true });
+                    }
                 }
                 logger.info(`Tentando reconectar em ${delay / 1000} segundos... (Tentativa ${reconnectionAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
                 setTimeout(() => startBot(), delay);
@@ -264,34 +260,39 @@ async function startBot() {
     });
 }
 
-// Inicia o servidor web APENAS se não houver uma sessão via variável de ambiente.
-// A lógica de existir a pasta 'session' é tratada dentro do startBot.
-// Isso garante que o servidor esteja pronto para exibir um novo QR Code se a sessão local for limpa.
-if (!process.env.WHATSAPP_SESSION) {
-    const port = process.env.PORT || 3000;
-    const server = http.createServer(async (req, res) => {
-        if (req.url === '/qrcode') {
-            res.setHeader('Content-Type', 'image/png');
-            try {
-                // Usa a variável GLOBAL que armazena a string do QR Code
-                const qrCodeData = await qrcode.toBuffer(qrCodeString);
-                res.end(qrCodeData);
-            } catch (err) {
-                console.error('Erro ao gerar imagem do QR Code:', err);
-                res.statusCode = 500;
-                res.end('Erro ao gerar QR Code.');
-            }
-        } else {
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'text/plain');
-            res.end('Bot está rodando. Acesse /qrcode para ver o QR Code, se necessário.');
-        }
-    });
+// --- Servidor Web para exibir o QR Code ---
+const port = process.env.PORT || 3000;
+let server; // Declarar o servidor fora para ter referência
 
-    server.listen(port, () => {
-        console.log(`Servidor web iniciado na porta ${port}. Aguardando geração do QR Code...`);
+const createWebServer = () => {
+    return http.createServer(async (req, res) => {
+      if (req.url === '/qrcode' && qrCodeString) {
+        res.setHeader('Content-Type', 'image/png');
+        try {
+          const qrCodeData = await qrcode.toBuffer(qrCodeString);
+          res.end(qrCodeData);
+        } catch (err) {
+          globalLogger.error(err, 'Erro ao gerar imagem do QR Code.');
+          res.statusCode = 500;
+          res.end('Erro ao gerar QR Code.');
+        }
+      } else {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/plain');
+        res.end('Bot está rodando. Acesse /qrcode para ver o QR Code, se necessário.');
+      }
     });
-}
+};
+
+// A função `startWebServer` só será chamada de dentro do `connection.update` quando um QR for gerado.
+const startWebServer = () => {
+    if (!server || !server.listening) {
+        server = createWebServer();
+        server.listen(port, () => {
+            globalLogger.info(`Servidor web iniciado na porta ${port}. Acesse /qrcode para escanear.`);
+        });
+    }
+};
 
 // Inicia a lógica principal do bot
 startBot();

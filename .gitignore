@@ -1,9 +1,22 @@
-# Arquivos de log
-*.log
-logs/
-
 # Pasta de dependências do Node.js
 node_modules/
 
-# Pasta da sessão do Baileys (MUITO IMPORTANTE)
+# Arquivos e pastas de sessão e credenciais (NUNCA ENVIAR PARA O GITHUB)
 session/
+session_web/
+auth_info/
+session.json
+session_packed.txt
+qr.png
+
+# Arquivos de log
+*.log
+logs/
+app.log
+conversas.log
+npm-debug.log*
+yarn-debug.log*
+pino-debug.log*
+
+# Arquivos de ambiente
+.env

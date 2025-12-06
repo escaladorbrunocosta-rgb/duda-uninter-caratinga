@@ -144,8 +144,12 @@ async function startBot() {
             );
             await Promise.all(writePromises);
             logger.info('Sessão carregada e arquivos recriados na pasta "session".');
-        } catch (error) { 
-            logger.error({ error }, 'Falha ao carregar sessão da variável de ambiente. Verifique o formato do JSON.');
+        } catch (error) {
+            // Log aprimorado para mostrar a mensagem de erro específica do JSON.parse
+            logger.error({ 
+                errorMessage: error.message, 
+                errorStack: error.stack 
+            }, 'Falha ao carregar sessão da variável de ambiente. Verifique o formato do JSON.');
             process.exit(1); // Encerra se a sessão do ambiente estiver corrompida
         }
     } else {

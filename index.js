@@ -144,11 +144,13 @@ async function startBot() {
             );
             await Promise.all(writePromises);
             logger.info('Sessão carregada e arquivos recriados na pasta "session".');
-        } catch (error) {
+        } catch (error) { 
             // Log aprimorado para mostrar a mensagem de erro específica do JSON.parse
-            logger.error({ 
-                errorMessage: error.message, 
-                errorStack: error.stack 
+            logger.error({
+                errorMessage: error.message,
+                // Opcional: mostra uma parte da string para depuração (cuidado com dados sensíveis)
+                sessionStart: process.env.WHATSAPP_SESSION.substring(0, 50) + '...',
+                sessionEnd: '...' + process.env.WHATSAPP_SESSION.substring(process.env.WHATSAPP_SESSION.length - 50)
             }, 'Falha ao carregar sessão da variável de ambiente. Verifique o formato do JSON.');
             process.exit(1); // Encerra se a sessão do ambiente estiver corrompida
         }

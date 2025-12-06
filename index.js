@@ -2,11 +2,12 @@ import makeWASocket, {
     DisconnectReason,
     fetchLatestBaileysVersion,
     isJidGroup,
-    useMultiFileAuthState, 
+    useMultiFileAuthState,
     makeCacheableSignalKeyStore
 } from 'baileys'; // Nome do pacote atualizado
-import { Boom } from '@hapi/boom';
+import { Boom } from '@hapi/boom'; 
 import pino from 'pino';
+import { gunzipSync } from 'zlib'; // Importa a função para descomprimir
 import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs'; // Usa a versão de promises do fs
 import path from 'path';
 import qrcodeTerminal from 'qrcode-terminal'; // Renomeado para clareza
@@ -125,16 +126,22 @@ async function handleMessage(sock, msg, logger) {
 
 async function startBot() {
     const logger = globalLogger;
-    // Garante que o caminho para a pasta da sessão seja absoluto
-    const sessionDir = path.resolve('session');
+    // Define o diretório da sessão. Usa o disco persistente da Render se disponível,
+    // senão, usa uma pasta local 'session' para desenvolvimento.
+    const sessionDir = process.env.RENDER_DISK_MOUNT_PATH || path.resolve('session');
 
-    let state, saveCreds;
+    logger.info(`Usando diretório de sessão: ${sessionDir}`);
 
     // Prioriza o uso da sessão via variável de ambiente para ambientes de produção (Render, etc.)
     if (process.env.WHATSAPP_SESSION) {
         logger.info('Carregando sessão da variável de ambiente...');
         try {
-            const sessionData = JSON.parse(process.env.WHATSAPP_SESSION);
+            // 1. Converte a string base64 de volta para um buffer
+            const compressedBuffer = Buffer.from(process.env.WHATSAPP_SESSION, 'base64');
+            // 2. Descomprime o buffer
+            const jsonString = gunzipSync(compressedBuffer).toString('utf-8');
+            // 3. Converte a string JSON para um objeto
+            const sessionData = JSON.parse(jsonString);
             if (!existsSync(sessionDir)) {
                 mkdirSync(sessionDir);
             }
@@ -149,8 +156,7 @@ async function startBot() {
             logger.error({
                 errorMessage: error.message,
                 // Opcional: mostra uma parte da string para depuração (cuidado com dados sensíveis)
-                sessionStart: (process.env.WHATSAPP_SESSION || '').substring(0, 50) + '...',
-                sessionEnd: '...' + (process.env.WHATSAPP_SESSION || '').substring((process.env.WHATSAPP_SESSION || '').length - 50)
+                sessionStart: (process.env.WHATSAPP_SESSION || '').substring(0, 50) + '...'
             }, 'Falha ao carregar sessão da variável de ambiente. Verifique o formato do JSON.');
             process.exit(1); // Encerra se a sessão do ambiente estiver corrompida
         }
@@ -158,7 +164,7 @@ async function startBot() {
         logger.info('Usando autenticação baseada em arquivo (pasta session)...');
     }
 
-    ({ state, saveCreds } = await useMultiFileAuthState(sessionDir));
+    const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
 
     const { version } = await fetchLatestBaileysVersion();
     logger.info(`Usando Baileys versão: ${version.join('.')}`);

@@ -1,5 +1,9 @@
 {
   "greetings": ["oi", "ola", "olá"],
+  "human_handover": {
+    "keywords": ["atendente", "falar com humano", "ajuda humana", "falar com alguem", "falar com pessoa"],
+    "message": "Entendido. Para falar com um de nossos atendentes, por favor, use um dos canais abaixo:\n\n*   *WhatsApp do Polo (Caratinga):* (33) 3322-4001\n*   *Central de Atendimento Geral (0800):* 0800 702 0500\n\nNossa equipe está pronta para te ajudar!"
+  },
   "menu_trigger": "menu",
   "menu_tree": {
     "main": {
@@ -246,6 +250,6 @@
   "fallback": [
     "Desculpe, não entendi sua solicitação. Tente usar outras palavras ou digite *menu* para ver as opções.",
     "Ainda não consegui ajudar. Lembre-se que você pode navegar pelas opções digitando *menu* a qualquer momento.",
-    "Parece que não estou conseguindo te ajudar com isso. Para falar com um de nossos atendentes, por favor, chame no WhatsApp *(33) 3322-4001*."
+    "Parece que não estou conseguindo te ajudar com isso. "
   ]
 }

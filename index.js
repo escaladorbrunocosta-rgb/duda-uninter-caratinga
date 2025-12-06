@@ -14,6 +14,21 @@ import qrcode from 'qrcode'; // Biblioteca para gerar imagem do QR Code
 import http from 'http'; // Módulo para criar o servidor web
 import { getResponse } from './knowledgeBase.js';
 
+// Cria uma instância de logger global para ser usada em handlers de processo
+const globalLogger = pino({
+    level: 'info',
+    transport: {
+        // O Pino pode ter múltiplos "alvos" (transportes) para os logs.
+        targets: [
+            // Alvo 1: Logs gerais e bonitos para o console de desenvolvimento.
+            { target: 'pino-pretty', level: 'info', options: { colorize: true, ignore: 'pid,hostname' } },
+            // Alvo 2: Logs gerais da aplicação em um arquivo (erros, conexões, etc.).
+            { target: 'pino/file', level: 'info', options: { destination: './app.log', mkdir: true } },
+            // Alvo 3: Um arquivo dedicado APENAS para as conversas, em formato JSON para fácil análise.
+            { target: 'pino/file', level: 'info', options: { destination: './conversas.log', mkdir: true } }
+        ]
+    }
+});
 // Variável global para armazenar a string do QR Code
 let qrCodeString = '';
 
@@ -49,7 +64,11 @@ async function handleMessage(sock, msg, logger) {
             return;
         }
 
-        logger.info({ chatId, userName, message: messageText }, 'Mensagem recebida');
+        // Log da mensagem recebida, com um marcador para facilitar a filtragem.
+        // Este log irá para TODOS os transportes, incluindo 'conversas.log'.
+        logger.info({
+            log_type: 'conversation', chatId, userName, direction: 'in', message: messageText
+        }, 'Mensagem recebida');
 
         // Simula que o bot está "digitando" para uma melhor experiência do usuário
         await sock.sendPresenceUpdate('composing', chatId);
@@ -61,7 +80,9 @@ async function handleMessage(sock, msg, logger) {
         if (typeof response === 'string') {
             // --- Envio de Texto Simples ---
             await sock.sendMessage(chatId, { text: response });
-            logger.info({ chatId, response }, 'Resposta de texto enviada');
+            logger.info({
+                log_type: 'conversation', chatId, direction: 'out', response
+            }, 'Resposta de texto enviada');
 
         } else if (typeof response === 'object' && response.type) {
             // --- Envio de Mídia ---
@@ -71,7 +92,9 @@ async function handleMessage(sock, msg, logger) {
                     image: { url: response.url },
                     caption: response.caption || '' // Legenda é opcional
                 });
-                logger.info({ chatId, response }, 'Resposta de imagem enviada');
+                logger.info({
+                    log_type: 'conversation', chatId, direction: 'out', response
+                }, 'Resposta de imagem enviada');
 
             } else if (response.type === 'document' && response.path) {
                 // Envia documento a partir de um arquivo local
@@ -82,7 +105,9 @@ async function handleMessage(sock, msg, logger) {
                         mimetype: 'application/pdf', // Ajuste o mimetype conforme o tipo de arquivo
                         fileName: response.fileName || 'documento.pdf'
                     });
-                    logger.info({ chatId, response }, 'Resposta de documento enviada');
+                    logger.info({
+                        log_type: 'conversation', chatId, direction: 'out', response
+                    }, 'Resposta de documento enviada');
                 } else {
                     logger.error({ chatId, path: docPath }, 'Arquivo de documento não encontrado no caminho especificado.');
                     await sock.sendMessage(chatId, { text: 'Desculpe, não consegui encontrar o documento solicitado no momento.' });
@@ -99,29 +124,7 @@ async function handleMessage(sock, msg, logger) {
 }
 
 async function startBot() {
-    // Configuração do Pino para múltiplos transportes (console e arquivo)
-    const logger = pino({
-        level: 'info',
-        transport: {
-            targets: [
-                {
-                    // Alvo 1: Saída bonita para o console
-                    target: 'pino-pretty',
-                    level: 'info',
-                    options: {
-                        ignore: 'pid,hostname', // Mantém o objeto de erro para depuração
-                        colorize: true,
-                    }
-                },
-                {
-                    // Alvo 2: Saída JSON para um arquivo de log
-                    target: 'pino/file',
-                    level: 'info',
-                    options: { destination: './conversations.log', mkdir: true }
-                }
-            ]
-        },
-    });
+    const logger = globalLogger;
     // Garante que o caminho para a pasta da sessão seja absoluto
     const sessionDir = path.resolve('session');
 
@@ -141,7 +144,7 @@ async function startBot() {
             );
             await Promise.all(writePromises);
             logger.info('Sessão carregada e arquivos recriados na pasta "session".');
-        } catch (error) {
+        } catch (error) { 
             logger.error({ error }, 'Falha ao carregar sessão da variável de ambiente. Verifique o formato do JSON.');
             process.exit(1); // Encerra se a sessão do ambiente estiver corrompida
         }
@@ -184,8 +187,8 @@ async function startBot() {
                 
                 // A mensagem principal agora aponta para a URL
                 const port = process.env.PORT || 3000;
-                logger.info(`✅ QR Code recebido! Para escanear, acesse a URL do seu serviço no navegador e adicione /qrcode no final.`);
-                logger.info(`Exemplo: https://seu-bot.onrender.com/qrcode (se a porta for ${port})`);
+                logger.info(`✅ QR Code gerado. O QR Code no terminal pode aparecer quebrado em alguns ambientes.`);
+                logger.info(`➡️ Para escanear, acesse a URL do seu serviço: http://localhost:${port}/qrcode ou https://seu-bot.onrender.com/qrcode`);
             }
         }
 
@@ -204,9 +207,10 @@ async function startBot() {
                 reconnectionAttempts++;
                 const delay = Math.pow(2, reconnectionAttempts) * 1000; // Backoff exponencial
 
-                // Se o erro for um timeout do QR Code (408) ou um erro interno do servidor (500),
-                // é mais seguro limpar a sessão para forçar uma nova autenticação.
-                if ((statusCode === 500 || statusCode === 408) && existsSync(sessionDir)) {
+                // Se o erro for 401 (não autorizado), 408 (timeout) ou 500 (erro de servidor),
+                // a sessão provavelmente está inválida ou irrecuperável. Limpar a sessão força uma nova autenticação.
+                const criticalErrors = [401, 408, 500];
+                if (criticalErrors.includes(statusCode) && existsSync(sessionDir)) {
                     logger.warn(`⚠️ Erro ${statusCode} detectado. Limpando a sessão para forçar uma nova autenticação...`);
                     rmSync(sessionDir, { recursive: true, force: true });
                 }
@@ -248,8 +252,10 @@ async function startBot() {
     });
 }
 
-// Inicia o servidor web APENAS se não houver uma sessão salva
-if (!process.env.WHATSAPP_SESSION && !existsSync(path.resolve('session'))) {
+// Inicia o servidor web APENAS se não houver uma sessão via variável de ambiente.
+// A lógica de existir a pasta 'session' é tratada dentro do startBot.
+// Isso garante que o servidor esteja pronto para exibir um novo QR Code se a sessão local for limpa.
+if (!process.env.WHATSAPP_SESSION) {
     const port = process.env.PORT || 3000;
     const server = http.createServer(async (req, res) => {
         if (req.url === '/qrcode') {
@@ -280,13 +286,13 @@ startBot();
 
 process.on('unhandledRejection', (reason, promise) => {
     // Usa o logger para registrar o erro, garantindo que ele vá para o arquivo de log
-    pino().error({ reason, promise }, 'Unhandled Rejection detectada.');
+    globalLogger.error({ reason, promise }, 'Unhandled Rejection detectada.');
     // Considerar encerrar o processo para forçar uma reinicialização limpa
     // process.exit(1);
 });
 
 process.on('uncaughtException', (error) => {
-    pino().fatal({ error }, 'Uncaught Exception detectada. O bot será encerrado.');
+    globalLogger.fatal({ error }, 'Uncaught Exception detectada. O bot será encerrado.');
     // Em caso de exceção não capturada, é mais seguro encerrar o processo.
     process.exit(1);
 });

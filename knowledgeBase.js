@@ -25,6 +25,21 @@ loadKnowledgeBase().catch(err => {
 const userState = new Map();
 
 /**
+ * Retorna uma saudação apropriada baseada na hora do dia.
+ * @returns {string} Saudação (Bom dia, Boa tarde, Boa noite).
+ */
+function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+        return "Bom dia";
+    } else if (hour < 18) {
+        return "Boa tarde";
+    } else {
+        return "Boa noite";
+    }
+}
+
+/**
  * Formata um nó do menu para exibição.
  * @param {object} menuNode - O nó do menu da base de conhecimento.
  * @returns {string} A mensagem do menu formatada.
@@ -37,6 +52,19 @@ function formatMenu(menuNode) {
             .join('\n');
     }
     return message;
+}
+
+/**
+ * Seleciona uma resposta de forma inteligente. Se a resposta for um array,
+ * escolhe uma aleatoriamente.
+ * @param {string|string[]} response - A resposta ou array de respostas.
+ * @returns {string} A resposta final.
+ */
+function chooseResponse(response) {
+    if (Array.isArray(response)) {
+        return response[Math.floor(Math.random() * response.length)];
+    }
+    return response;
 }
 
 /**
@@ -53,13 +81,20 @@ export function getResponse(chatId, messageText, userName) {
 
     const normalizedText = messageText.toLowerCase().trim();
     // Inicializa o estado do usuário com o menu principal e o contador de falhas
-    const state = userState.get(chatId) || { menu: 'main', fallbackCount: 0 };
+    const state = userState.get(chatId) || { menu: 'main', fallbackCount: 0, topic: null };
 
     // Resetar para o menu principal com saudações ou comando de menu
     if (knowledge.greetings.includes(normalizedText) || normalizedText === knowledge.menu_trigger) {
         userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta o contador
-        const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `Olá, ${userName}!`);
+        const greeting = getGreeting();
+        const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `${greeting}, ${userName}!`);
         return formatMenu({ ...knowledge.menu_tree.main, text: welcomeMessage });
+    }
+
+    // Lógica de transferência para humano (Handover)
+    if (knowledge.human_handover.keywords.some(kw => normalizedText.includes(kw))) {
+        userState.set(chatId, { menu: 'main', fallbackCount: 0, topic: null }); // Reseta o estado
+        return knowledge.human_handover.message;
     }
 
     // Lógica de navegação no menu
@@ -71,10 +106,10 @@ export function getResponse(chatId, messageText, userName) {
         if (nextNode) {
             // Se o próximo nó tiver mais opções, atualiza o estado do usuário
             if (nextNode.options) {
-                userState.set(chatId, { menu: nextMenuKey, fallbackCount: 0 }); // Reseta o contador
+                userState.set(chatId, { menu: nextMenuKey, fallbackCount: 0, topic: null }); // Reseta o contador e o tópico
             } else {
                 // Se for uma resposta final, reseta o estado para o menu principal
-                userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta o contador
+                userState.set(chatId, { menu: 'main', fallbackCount: 0, topic: null }); // Reseta o contador e o tópico
             }
             return formatMenu(nextNode);
         }
@@ -82,31 +117,42 @@ export function getResponse(chatId, messageText, userName) {
 
     // Lógica de busca por palavras-chave se não for um comando de menu
     const words = normalizedText.split(/\s+/);
-    let bestMatch = { score: 0, answer: null };
+    let bestMatch = { score: 0, answer: null, keywords: [] };
 
     for (const response of knowledge.responses) {
         let currentScore = 0;
+        // Damos um bônus se a pergunta estiver relacionada ao tópico anterior
+        const topicBonus = state.topic && response.keywords.some(kw => state.topic.includes(kw)) ? 1.5 : 0;
+
         for (const keyword of response.keywords) {
             if (normalizedText.includes(keyword)) {
                 currentScore++;
             }
         }
-        if (currentScore > bestMatch.score) {
-            bestMatch = { score: currentScore, answer: response.answer };
+
+        const finalScore = currentScore + topicBonus;
+
+        if (finalScore > bestMatch.score) {
+            bestMatch = { score: finalScore, answer: response.answer, keywords: response.keywords };
         }
     }
 
     // Se encontrou uma resposta com uma pontuação mínima, retorna ela.
     if (bestMatch.score > 0) {
-        // Reseta o estado do usuário após dar uma resposta direta
-        userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta o contador
-        return bestMatch.answer;
+        // ATUALIZA o estado do usuário com o novo tópico da conversa,
+        // em vez de resetar completamente. Isso cria a memória contextual.
+        userState.set(chatId, { 
+            menu: 'main', // Volta ao menu principal para a próxima navegação
+            fallbackCount: 0, // Reseta o contador de falhas
+            topic: bestMatch.keywords // Armazena as palavras-chave da resposta como o novo tópico
+        });
+        return chooseResponse(bestMatch.answer);
     }
 
     // Se for a primeira interação e não entendeu, mostra o menu principal
     if (!userState.has(chatId)) {
         userState.set(chatId, { menu: 'main', fallbackCount: 0 });
-        const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `Olá, ${userName}!`);
+        const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `${getGreeting()}, ${userName}!`);
         return formatMenu({ ...knowledge.menu_tree.main, text: welcomeMessage });
     }
 
@@ -118,5 +164,17 @@ export function getResponse(chatId, messageText, userName) {
     // Calcula qual mensagem de fallback usar. Se o contador passar do tamanho da lista, usa a última.
     const fallbackIndex = Math.min(state.fallbackCount - 1, knowledge.fallback.length - 1);
     
-    return knowledge.fallback[fallbackIndex];
+    // Se chegamos na última mensagem de fallback, aciona a transferência para humano.
+    if (fallbackIndex === knowledge.fallback.length - 1) {
+        return chooseResponse(knowledge.fallback[fallbackIndex]) + knowledge.human_handover.message;
+    }
+    let fallbackResponse = chooseResponse(knowledge.fallback[fallbackIndex]);
+
+    // Lógica de fallback aprimorada: Após 2 tentativas, oferece o menu principal.
+    if (state.fallbackCount > 2) {
+        fallbackResponse += "\n\n" + formatMenu(knowledge.menu_tree.main).replace(/Olá,.*!/, 'Talvez o menu principal possa ajudar:');
+        userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta para evitar loop
+    }
+
+    return fallbackResponse;
 }

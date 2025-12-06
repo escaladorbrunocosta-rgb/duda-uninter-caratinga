@@ -7,9 +7,8 @@ import makeWASocket, {
 } from 'baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
-import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs';
+import { promises as fs, existsSync, mkdirSync, rmSync, readFileSync } from 'fs';
 import path from 'path';
-import { gunzipSync } from 'zlib';
 import qrcodeTerminal from 'qrcode-terminal'; // Renomeado para clareza
 import qrcode from 'qrcode'; // Biblioteca para gerar imagem do QR Code
 import http from 'http'; // Módulo para criar o servidor web
@@ -149,10 +148,9 @@ async function startBot() {
                     .toLowerCase();
 
                 const base64 = process.env[envVar];
-                const compressed = Buffer.from(base64, 'base64');
-                const decompressed = gunzipSync(compressed);
+                const fileContent = Buffer.from(base64, 'base64');
 
-                await fs.writeFile(path.join(sessionDir, fileName), decompressed);
+                await fs.writeFile(path.join(sessionDir, fileName), fileContent);
             });
             await Promise.all(writePromises);
             logger.info('Sessão recriada com sucesso a partir das variáveis de ambiente.');
@@ -184,7 +182,26 @@ async function startBot() {
         browser: ['Chrome (Windows)', 'Chrome', '114.0.5735.199']
     });
 
-    sock.ev.on('creds.update', saveCreds);
+    // Modificação para salvar credenciais e exibir para o ambiente de produção
+    sock.ev.on('creds.update', async () => {
+        await saveCreds(); // Salva os arquivos na pasta 'session'
+    
+        // Lógica para exibir as variáveis de ambiente para produção
+        try {
+            const files = await fs.readdir(sessionDir);
+            logger.info('================================================================');
+            logger.info('Copie as variáveis de ambiente abaixo e cole no seu serviço de hospedagem (Render, Heroku, etc.)');
+            logger.info('================================================================');
+            for (const file of files) {
+                const filePath = path.join(sessionDir, file);
+                const fileContent = readFileSync(filePath);
+                const base64 = fileContent.toString('base64');
+                const envVarName = `SESSION_${file.replace(/\.json$/, '').replace(/-/g, '_').toUpperCase()}_JSON`;
+                console.log(`${envVarName}="${base64}"`);
+            }
+            logger.info('================================================================');
+        } catch (error) { logger.error(error, 'Falha ao ler a pasta de sessão para gerar as variáveis de ambiente.'); }
+    });
 
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update;
@@ -204,18 +221,18 @@ async function startBot() {
         } else if (connection === 'close') {
             // A reconexão deve ocorrer em qualquer erro, exceto 'loggedOut' (desconectado manualmente).
             const statusCode = lastDisconnect.error?.output?.statusCode;
-            const shouldReconnect = (lastDisconnect.error instanceof Boom) && statusCode !== DisconnectReason.loggedOut;
-            
-            const errorMessage = lastDisconnect.error?.output?.payload?.message || lastDisconnect.error?.message;
-            logger.warn(`❌ Conexão fechada: "${errorMessage}". Tentando reconectar: ${shouldReconnect}`);
+            const shouldReconnect = (lastDisconnect.error instanceof Boom) && ![DisconnectReason.loggedOut, 401].includes(statusCode);
 
+            const errorMessage = lastDisconnect.error?.output?.payload?.message || lastDisconnect.error?.message;
+            logger.warn(`❌ Conexão fechada: "${errorMessage}" (código: ${statusCode}). Tentando reconectar: ${shouldReconnect}`);
+ 
             if (shouldReconnect && reconnectionAttempts < MAX_RECONNECT_ATTEMPTS) {
                 reconnectionAttempts++;
                 const delay = Math.pow(2, reconnectionAttempts) * 1000; // Backoff exponencial
 
-                // Se o erro for 401 (não autorizado), 408 (timeout) ou 500 (erro de servidor),
+                // Se o erro for 408 (timeout) ou 500 (erro de servidor),
                 // a sessão provavelmente está inválida ou irrecuperável. Limpar a sessão força uma nova autenticação.
-                const criticalErrors = [401, 408, 500];
+                const criticalErrors = [408, 500];
                 if (criticalErrors.includes(statusCode)) {
                     logger.warn(`⚠️ Erro ${statusCode} detectado. Limpando a sessão local para forçar uma nova autenticação...`);
                     if (existsSync(sessionDir)) {
@@ -228,14 +245,14 @@ async function startBot() {
                 if (reconnectionAttempts >= MAX_RECONNECT_ATTEMPTS) {
                     logger.error(`❗ Atingido o número máximo de tentativas de reconexão. Encerrando.`);
                 } else {
-                    // Se a desconexão foi por 'loggedOut', a sessão é inválida.
-                    if (statusCode === DisconnectReason.loggedOut) {
+                    // Se a desconexão foi por 'loggedOut' ou '401', a sessão é inválida.
+                    if (statusCode === DisconnectReason.loggedOut || statusCode === 401) {
                         logger.error(`🚫 Logout detectado (código ${statusCode}). A sessão foi invalidada e será removida.`);
                     } else {
                         logger.error(`❗ Conexão permanente perdida, código: ${statusCode || 'desconhecido'}. A sessão pode ser inválida.`);
                     }
                 }
-                
+
                 if (existsSync(sessionDir)) {
                     logger.info('Limpando sessão antiga para gerar um novo QR Code na próxima inicialização...');
                     rmSync(sessionDir, { recursive: true, force: true });

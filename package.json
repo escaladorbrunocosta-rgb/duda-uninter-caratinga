@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "baileys": "latest",
+    "@whiskeysockets/baileys": "^6.7.5",
+    "axios": "^1.7.2",
     "pino": "^8.21.0",
     "qrcode": "^1.5.3",
     "qrcode-terminal": "^0.12.0"
@@ -11,7 +12,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node --import=./crypto-polyfill.js index.js | pino-pretty",
-    "test": "echo \"No tests available\""
+    "test": "echo \"No tests available\"",
+    "pack-session": "node --import=./crypto-polyfill.js pack-session.js"
   },
   "keywords": ["whatsapp", "bot", "baileys"],
   "author": "escaladorbrunocosta",

@@ -9,7 +9,7 @@ import path from 'path';
 // Carrega a base de conhecimento do arquivo JSON.
 // Usamos uma função assíncrona para carregar o JSON no início.
 let knowledge;
-async function loadKnowledgeBase() {
+export async function loadKnowledgeBase() {
     const jsonPath = path.join(process.cwd(), 'knowledgeBase.json');
     const fileContent = await fs.readFile(jsonPath, 'utf-8');
     knowledge = JSON.parse(fileContent);

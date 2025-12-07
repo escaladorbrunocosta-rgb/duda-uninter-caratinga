@@ -7,3 +7,6 @@ session/
 # Ignora arquivos de log
 *.log
 npm-debug.log*
+
+# Ignora arquivos de ambiente local
+.env

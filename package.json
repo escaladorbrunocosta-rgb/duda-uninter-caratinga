@@ -1,29 +1,35 @@
 {
+  "name": "duda-uninter-bot-limpo",
+  "version": "1.0.0",
+  "description": "Um bot de WhatsApp construído com Node.js e Baileys.",
+  "main": "index.js",
+  "type": "module",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "^6.7.5",
     "axios": "^1.7.2",
     "pino": "^8.21.0",
-    "qrcode": "^1.5.3",
     "qrcode-terminal": "^0.12.0"
   },
-  "name": "duda-uninter-bot-limpo",
-  "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "start": "node --import=./crypto-polyfill.js index.js | pino-pretty",
+    "start": "node --import=./crypto-polyfill.js index.js",
+    "dev": "node --import=./crypto-polyfill.js index.js | pino-pretty",
     "test": "echo \"No tests available\"",
-    "pack-session": "node --import=./crypto-polyfill.js pack-session.js"
+    "pack-session": "node --import=./crypto-polyfill.js pack-session.js",
+    "update-session:render": "node -r dotenv/config --import=./crypto-polyfill.js update-render-env.js"
   },
-  "keywords": ["whatsapp", "bot", "baileys"],
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "baileys"
+  ],
   "author": "escaladorbrunocosta",
   "license": "ISC",
-  "type": "module",
-  "description": "Um bot de WhatsApp construído com Node.js e Baileys.",
   "engines": {
     "node": "20.x"
   },
   "devDependencies": {
+    "dotenv": "^16.4.5",
     "pino-pretty": "^11.2.1"
   }
 }

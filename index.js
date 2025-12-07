@@ -11,6 +11,7 @@ import qrcodeTerminal from 'qrcode-terminal'; // Renomeado para clareza
 import { getResponse, loadKnowledgeBase } from './knowledgeBase.js';
 import { config } from './config.js';
 import { useSessionAuthState } from './session-auth.js';
+import { sendSessionInvalidNotification } from './notifications.js';
 
 // Cria uma instância de logger global para ser usada em handlers de processo
 const globalLogger = pino({
@@ -157,7 +158,7 @@ async function startBot() {
 
     sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', (update) => {
+    sock.ev.on('connection.update', async (update) => {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
@@ -178,13 +179,18 @@ async function startBot() {
                 reconnectionAttempts++;
                 const delay = Math.pow(2, reconnectionAttempts) * 1000;
                 logger.info(`Tentando reconectar em ${delay / 1000}s (tentativa ${reconnectionAttempts})...`);
-                setTimeout(startBot, delay);
+                setTimeout(startBot, delay); // Tenta reconectar
             } else {
                 logger.error(`🚫 Desconexão permanente (código: ${statusCode}). Encerrando.`);
+                // Se for um erro de logout, envia a notificação antes de encerrar.
+                if (statusCode === DisconnectReason.loggedOut || statusCode === 401) {
+                    logger.warn('Enviando notificação de sessão inválida...');
+                    await sendSessionInvalidNotification();
+                }
                 if (existsSync(sessionDir)) {
                     rmSync(sessionDir, { recursive: true, force: true });
                 }
-                process.exit(1);
+                process.exit(1); // Encerra o processo
             }
         }
     });

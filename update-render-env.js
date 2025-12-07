@@ -8,6 +8,8 @@
  *    RENDER_API_KEY="sua_api_key" RENDER_SERVICE_ID="srv-seu_service_id" node update-render-env.js
  */
 
+import 'dotenv/config'; // Carrega as variáveis do arquivo .env
+
 import makeWASocket, {
     fetchLatestBaileysVersion,
     DisconnectReason,
@@ -65,7 +67,14 @@ function generateSessionString() {
 
             if (qr) {
                 console.clear();
-                console.log('📱 Escaneie o QR Code abaixo com seu WhatsApp:');
+                console.log('\n\n================================================================================');
+                console.log('   INSTRUÇÕES PARA GERAR O QR CODE');
+                console.log('================================================================================');
+                console.log('\nSe o QR code abaixo aparecer "quebrado", use a string de texto para gerá-lo.');
+                console.log('1. Copie a linha de texto que começa com "COPIE ISTO:".');
+                console.log('2. Cole em um gerador de QR Code online (como o QR Code Monkey) para criar a imagem.');
+                console.log('\n\x1b[32m%s\x1b[0m', `COPIE ISTO: ${qr}`); // Imprime a string do QR code em verde
+                console.log('\nOu tente escanear o QR code abaixo se estiver em um terminal compatível:\n');
                 qrcodeTerminal.generate(qr, { small: true });
             }
 

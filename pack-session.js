@@ -91,8 +91,8 @@ async function generateAndPackSession() {
             // Se o erro for de logout (dispositivo desconectado), limpa a sessão para forçar um novo QR Code.
             if (statusCode === DisconnectReason.loggedOut || statusCode === 401) {
                 console.warn('⚠️ Erro de autenticação (401). A sessão foi invalidada.');
-                clearState(); // Limpa a sessão da memória
-                console.log('Sessão limpa. Por favor, execute o script novamente para gerar um novo QR Code.');
+                await clearState(); // Limpa a sessão da memória e remove os arquivos.
+                console.log('Sessão local limpa. Por favor, execute o script novamente para gerar um novo QR Code.');
                 process.exit(1); // Encerra com erro para indicar falha de autenticação.
             } else {
                 // Para outros erros, apenas encerra para que o usuário possa tentar novamente.

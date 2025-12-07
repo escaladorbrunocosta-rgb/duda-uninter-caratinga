@@ -44,13 +44,16 @@ async function generateAndPackSession() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            console.log('\n\n==================================================================');
-            console.log('PASSO 1: IGNORE o QR Code quebrado que aparecerá abaixo.');
-            console.log('PASSO 2: COPIE a linha de texto em VERDE que começa com "QR_CODE_STRING:".');
-            console.log('PASSO 3: COLE o texto copiado em um gerador de QR Code online para escanear.');
-            console.log('==================================================================\n');
-            console.log('\x1b[32m%s\x1b[0m', `QR_CODE_STRING: ${qr}`); // Imprime a string em verde
-            console.log('\n'); // Adiciona espaço antes do QR quebrado
+            // Limpa o console para focar no que é importante
+            console.clear();
+            console.log('\n\n\n================================================================================');
+            console.log('   INSTRUÇÕES PARA GERAR O QR CODE NO RENDER');
+            console.log('================================================================================');
+            console.log('\n1. Ignore o QR Code "quebrado" que pode aparecer mais abaixo.');
+            console.log('2. Copie a linha de texto em VERDE que está logo abaixo.');
+            console.log('3. Cole esse texto em um site como o "QR Code Monkey" para gerar a imagem.\n');
+            console.log('\x1b[32m%s\x1b[0m', `COPIE ISTO: ${qr}`); // Imprime a string em verde com um prefixo claro
+            console.log('\n================================================================================\n\n\n');
             qrcodeTerminal.generate(qr, { small: true });
         }
         if (connection === 'open') {

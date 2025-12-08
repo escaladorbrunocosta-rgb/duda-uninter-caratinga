@@ -9,6 +9,7 @@
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "axios": "^1.7.2",
     "express": "^5.2.1",
+    "node-cron": "^4.2.1",
     "pino": "^8.17.2",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0"

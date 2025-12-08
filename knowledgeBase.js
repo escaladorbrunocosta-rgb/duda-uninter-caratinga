@@ -5,6 +5,7 @@
  */
 import { promises as fs } from 'fs';
 import path from 'path';
+import { getWeather } from './services.js'; // Importa a nova habilidade
 
 // Carrega a base de conhecimento do arquivo JSON.
 // Usamos uma função assíncrona para carregar o JSON no início.
@@ -72,14 +73,22 @@ function chooseResponse(response) {
  * @param {string} chatId - O ID do chat do usuário.
  * @param {string} messageText - O texto da mensagem recebida.
  * @param {string} userName - O nome do usuário.
- * @returns {string} A resposta do bot.
+ * @returns {Promise<string>} A resposta do bot.
  */
-export function getResponse(chatId, messageText, userName) {
+export async function getResponse(chatId, messageText, userName) { // A função agora é async
     if (!knowledge) {
         return "Desculpe, estou inicializando minha base de conhecimento. Tente novamente em um instante.";
     }
 
     const normalizedText = messageText.toLowerCase().trim();
+
+    // --- Lógica de Comando para Habilidade Social (API Externa) ---
+    if (normalizedText.startsWith('!clima')) {
+        const city = normalizedText.substring(7).trim();
+        if (!city) return 'Por favor, informe uma cidade. Exemplo: `!clima São Paulo`';
+        return await getWeather(city); // Retorna a promessa do serviço
+    }
+
     // Inicializa o estado do usuário com o menu principal e o contador de falhas
     const state = userState.get(chatId) || { menu: 'main', fallbackCount: 0, topic: null };
 

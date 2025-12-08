@@ -98,7 +98,7 @@ async function handleMessage(sock, msg, logger) {
         await sock.sendPresenceUpdate('composing', chatId);
 
         // Obtém a resposta da nossa base de conhecimento
-        const response = getResponse(chatId, messageText, userName);
+        const response = await getResponse(chatId, messageText, userName); // Adiciona await
 
         // Verifica o tipo de resposta para decidir como enviar
         if (typeof response === 'string') {

@@ -1,9 +1,19 @@
-# Arquivos de log
-*.log
-error_log.txt
+# Arquivo para ignorar arquivos e pastas no Git.
 
-# Pasta de dependências do Node.js
+# Dependências do Node.js
+# Esta pasta é recriada com `npm install` e não deve ser versionada.
 /node_modules
 
-# Pasta de autenticação local. NUNCA versionar!
-/auth_info_multi
+# Arquivos de log
+# Logs são específicos do ambiente e não devem ir para o repositório.
+*.log
+logs.txt
+nohup.out
+
+# Arquivos de ambiente
+# Contêm chaves de API e outras informações sensíveis. CRIE UM .env.example se precisar.
+.env
+
+# Pasta de autenticação do Baileys
+# Contém as credenciais da sessão do WhatsApp. NUNCA ENVIE ISSO PARA O GITHUB.
+/auth_info_multi/

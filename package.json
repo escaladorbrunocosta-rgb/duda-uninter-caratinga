@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Bot de WhatsApp para Uninter Caratinga",
   "main": "index.js",
-  "type": "module", 
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -18,9 +18,11 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^6.7.5",
+    "@whiskeysockets/baileys": "^6.7.21",
+    "pg": "^8.16.3",
     "pino": "^9.2.0",
     "pino-pretty": "^11.2.1",
+    "postgres-baileys": "^1.5.0",
     "qrcode-terminal": "^0.12.0"
   }
 }

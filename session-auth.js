@@ -27,23 +27,25 @@ const useSessionAuthState = async (sessionAsString, isProduction) => {
 
     if (isProduction) {
         // --- LÓGICA DE PRODUÇÃO ---
+        logger.info('Ambiente de produção detectado.');
         if (sessionAsString) {
             logger.info('Decodificando sessão da variável de ambiente SESSION_DATA...');
             try {
                 const parsedSession = JSON.parse(sessionAsString, BufferJSON.reviver);
                 creds = parsedSession.creds;
                 keys = parsedSession.keys || {};
+                logger.info('Sessão decodificada com sucesso.');
             } catch (error) {
                 logger.fatal({ err: error }, 'Falha ao parsear a string da sessão. A string pode estar mal formatada.');
                 throw new Error('A variável de ambiente SESSION_DATA está corrompida.');
             }
         } else {
-            logger.fatal('A variável de ambiente SESSION_DATA não foi encontrada ou está vazia. O bot não pode iniciar em modo de produção sem uma sessão válida.');
+            logger.fatal('A variável de ambiente SESSION_DATA não foi encontrada. O bot não pode iniciar em produção sem uma sessão.');
             throw new Error('SESSION_DATA is missing in the production environment.');
         }
     } else {
         // --- LÓGICA DE DESENVOLVIMENTO ---
-        logger.info('Usando armazenamento de sessão local (MultiFileAuthState).');
+        logger.info('Ambiente de desenvolvimento detectado. Usando armazenamento de sessão local.');
         if (!existsSync(SESSION_DIR)) {
             mkdirSync(SESSION_DIR, { recursive: true });
         }

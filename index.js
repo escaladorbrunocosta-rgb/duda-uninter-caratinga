@@ -27,7 +27,10 @@ async function connectToWhatsApp() {
   const { version, isLatest } = await fetchLatestBaileysVersion();
   console.log(`▶️  Usando a versão do Baileys: ${version.join('.')}, é a mais recente: ${isLatest}`);
 
-  const { state, saveCreds } = await useSessionAuthState(process.env.SESSION_DATA, process.env.NODE_ENV === 'production');
+  // Centraliza a verificação do ambiente de produção
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  const { state, saveCreds } = await useSessionAuthState(process.env.SESSION_DATA, isProduction);
 
   const sock = makeWASocket({
     // A opção printQRInTerminal foi removida para usar um método manual mais robusto.
@@ -43,7 +46,7 @@ async function connectToWhatsApp() {
   sock.ev.on('connection.update', (update) => {
     const { connection, lastDisconnect, qr } = update;
 
-    if (qr) {
+    if (qr && !isProduction) { // Só mostra o QR Code se NÃO estiver em produção
       console.log('▶️  QR Code recebido. Escaneie com seu WhatsApp abaixo:');
       qrcode.generate(qr, { small: true });
     }

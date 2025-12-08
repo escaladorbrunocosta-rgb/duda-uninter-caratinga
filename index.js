@@ -156,7 +156,7 @@ async function startBot() {
 
     // Em produção, usa a sessão da variável de ambiente. Em dev, usa o armazenamento local.
     const { state, saveCreds } = await useSessionAuthState(
-        isProduction ? process.env.SESSION_DATA : null,
+        process.env.SESSION_DATA,
         isProduction // Passa o status de produção corretamente
     );
 
@@ -180,6 +180,9 @@ async function startBot() {
             if (isProduction) {
                 logger.error('QR Code recebido em ambiente de produção. A variável de ambiente SESSION_DATA está ausente ou inválida. Encerrando.');
                 process.exit(1); // Encerra para evitar loops no Render
+            } else {
+                logger.info('Escaneie o QR Code com seu WhatsApp para conectar.');
+                qrcodeTerminal.generate(qr, { small: true });
             }
         }
 
@@ -188,7 +191,11 @@ async function startBot() {
             reconnectionAttempts = 0;
         } else if (connection === 'close') {
             const statusCode = lastDisconnect.error?.output?.statusCode;
-            const shouldReconnect = (lastDisconnect.error instanceof Boom) && ![DisconnectReason.loggedOut, 401].includes(statusCode);
+            // A reconexão só deve acontecer em erros de rede, não em erros de autenticação.
+            const shouldReconnect = (lastDisconnect.error instanceof Boom) &&
+                                    statusCode !== DisconnectReason.loggedOut &&
+                                    statusCode !== DisconnectReason.connectionReplaced &&
+                                    statusCode !== 401;
 
             logger.warn({ statusCode, shouldReconnect }, `❌ Conexão fechada.`);
 
@@ -204,12 +211,14 @@ async function startBot() {
                 }
                 logger.error(`🚫 Desconexão permanente (código: ${statusCode}). Encerrando.`);
                 // Se for um erro de logout, envia a notificação antes de encerrar.
-                if (statusCode === DisconnectReason.loggedOut || statusCode === 401) {
+                if (statusCode === DisconnectReason.loggedOut || statusCode === DisconnectReason.connectionReplaced) {
                     logger.warn('Enviando notificação de sessão inválida...');
                     await sendSessionInvalidNotification();
-                }
-                if (existsSync(sessionDir)) {
-                    rmSync(sessionDir, { recursive: true, force: true });
+                    // Limpa a sessão local para forçar a geração de um novo QR na próxima execução
+                    if (existsSync(sessionDir)) {
+                        logger.info('Limpando diretório de sessão local...');
+                        rmSync(sessionDir, { recursive: true, force: true });
+                    }
                 }
                 process.exit(1); // Encerra o processo
             }

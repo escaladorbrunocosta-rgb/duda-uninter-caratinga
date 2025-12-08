@@ -1,101 +1,103 @@
 /**
  * Lógica de autenticação para o Baileys que gerencia a sessão.
- * - Em ambiente de desenvolvimento (local), usa `useMultiFileAuthState` para salvar a sessão em arquivos na pasta `session`.
- * - Em ambiente de produção (Render), lê a sessão de uma string JSON (da variável de ambiente `WHATSAPP_SESSION`).
+ * - Em ambiente de DESENVOLVIMENTO (local), salva a sessão em arquivos na pasta `auth_info_multi`.
+ * - Em ambiente de PRODUÇÃO (Render), lê a sessão de uma string JSON (da variável de ambiente `SESSION_DATA`).
  */
 import {
     proto,
     initAuthCreds,
     BufferJSON
 } from '@whiskeysockets/baileys';
-import { promises as fs, existsSync, mkdirSync } from 'fs';
+import { promises as fs, existsSync, mkdirSync, rmSync } from 'fs';
 import path from 'path';
 import pino from 'pino';
-import qrcodeTerminal from 'qrcode-terminal';
 
-const logger = pino().child({ level: 'silent', stream: 'store' });
-const SESSION_DIR = path.join(process.cwd(), 'session');
+const logger = pino().child({ stream: 'store' });
+const SESSION_DIR = path.join(process.cwd(), 'auth_info_multi');
 
 /**
- * Converte a string da sessão (de uma variável de ambiente) em um formato que o Baileys entende.
- * @param {string} sessionAsString - A string JSON da sessão.
- * @returns O objeto de estado de autenticação.
+ * Gerencia o estado de autenticação, adaptando-se ao ambiente.
+ * @param {string} sessionAsString - A string JSON da sessão (usada em produção).
+ * @param {boolean} isProduction - Flag que indica se está em ambiente de produção.
+ * @returns {Promise<{state: object, saveCreds: Function}>} O objeto de estado de autenticação e a função para salvar credenciais.
  */
-const useSessionAuthState = async (sessionAsString, isProduction = false) => {
-    const readData = async (file) => {
-        try {
-            const data = await fs.readFile(path.join(SESSION_DIR, `${file}.json`), { encoding: 'utf-8' });
-            return JSON.parse(data, BufferJSON.reviver);
-        } catch (error) {
-            return null;
-        }
-    };
-
-    const writeData = (data, file) => {
-        return fs.writeFile(path.join(SESSION_DIR, `${file}.json`), JSON.stringify(data, BufferJSON.replacer, 2));
-    };
-
-    const clearState = () => {
-        // Lógica para limpar o estado se necessário (não usada por padrão)
-    };
+const useSessionAuthState = async (sessionAsString, isProduction) => {
     let creds;
     let keys = {};
 
-    // Se estiver em produção e a string da sessão existir, parseia ela.
-    if (isProduction && sessionAsString) {
-        const parsedSession = JSON.parse(sessionAsString, BufferJSON.reviver);
-        creds = parsedSession.creds;
-        keys = parsedSession.keys;
+    if (isProduction) {
+        // --- LÓGICA DE PRODUÇÃO ---
+        if (sessionAsString) {
+            logger.info('Usando sessão da variável de ambiente.');
+            try {
+                const parsedSession = JSON.parse(sessionAsString, BufferJSON.reviver);
+                creds = parsedSession.creds;
+                keys = parsedSession.keys || {};
+            } catch (error) {
+                logger.fatal({ err: error }, 'Falha ao parsear a string da sessão. A string pode estar mal formatada.');
+                throw new Error('A variável de ambiente SESSION_DATA está corrompida.');
+            }
+        } else {
+            logger.fatal('Variável de ambiente SESSION_DATA não encontrada em ambiente de produção.');
+            throw new Error('Sessão não fornecida para o ambiente de produção.');
+        }
     } else {
-        // Em desenvolvimento, cria o diretório de sessão se não existir.
+        // --- LÓGICA DE DESENVOLVIMENTO ---
+        logger.info('Usando armazenamento de sessão local (MultiFileAuthState).');
         if (!existsSync(SESSION_DIR)) {
             mkdirSync(SESSION_DIR, { recursive: true });
         }
+
+        const readData = async (file) => {
+            try {
+                const data = await fs.readFile(path.join(SESSION_DIR, `${file}.json`), { encoding: 'utf-8' });
+                return JSON.parse(data, BufferJSON.reviver);
+            } catch (error) {
+                return null;
+            }
+        };
         creds = (await readData('creds')) || initAuthCreds();
     }
 
-    const saveState = () => {
-        // Em produção, não fazemos nada, pois a sessão é efêmera.
-        if (isProduction) return;
+    const saveCreds = async () => {
+        // Em produção, a sessão é efêmera e não deve ser salva no disco.
+        if (isProduction) {
+            return;
+        }
 
-        // Em desenvolvimento, salva os dados nos arquivos.
+        const writeData = (data, file) => {
+            return fs.writeFile(path.join(SESSION_DIR, `${file}.json`), JSON.stringify(data, BufferJSON.replacer, 2));
+        };
+
         return Promise.all([
             writeData(creds, 'creds'),
             writeData(keys, 'keys'),
         ]);
     };
 
+    // O objeto de estado que o Baileys espera
     return {
         state: {
             creds,
             keys: {
                 get: (type, jids) => {
-                    const key = type;
                     return jids.reduce((dict, jid) => {
-                        const value = keys[key]?.[jid];
+                        const value = keys[type]?.[jid];
                         if (value) {
-                            if (type === 'app-state-sync-key') {
-                                dict[jid] = proto.Message.AppStateSyncKeyData.fromObject(value);
-                            } else {
-                                dict[jid] = value;
-                            }
+                            dict[jid] = value;
                         }
                         return dict;
                     }, {});
                 },
                 set: (data) => {
                     for (const key in data) {
-                        const Ckey = key;
-                        if (!keys[Ckey]) {
-                            keys[Ckey] = {};
-                        }
-                        Object.assign(keys[Ckey], data[key]);
+                        keys[key] = { ...(keys[key] || {}), ...data[key] };
                     }
-                    saveState();
+                    saveCreds();
                 },
             },
         },
-        saveCreds: saveState,
+        saveCreds,
     };
 };
 

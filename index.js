@@ -14,7 +14,7 @@ import { useSessionAuthState } from './session-auth.js';
 import { sendSessionInvalidNotification } from './notifications.js';
 
 // Determina se o ambiente é de produção (ex: Render)
-const isProduction = process.env.NODE_ENV === 'production' || !!process.env.RENDER;
+const isProduction = !!process.env.RENDER || process.env.NODE_ENV === 'production';
 
 // Cria uma instância de logger global para ser usada em handlers de processo
 const globalLogger = pino({

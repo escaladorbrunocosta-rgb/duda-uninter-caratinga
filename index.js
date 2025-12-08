@@ -212,13 +212,14 @@ async function startBot() {
                 logger.error(`🚫 Desconexão permanente (código: ${statusCode}). Encerrando.`);
                 // Se for um erro de logout, envia a notificação antes de encerrar.
                 if (statusCode === DisconnectReason.loggedOut || statusCode === DisconnectReason.connectionReplaced) {
-                    logger.warn('Enviando notificação de sessão inválida...');
-                    await sendSessionInvalidNotification();
+                    logger.warn('Sessão inválida (logout). A variável de ambiente SESSION_DATA precisa ser atualizada.');
                     // Limpa a sessão local para forçar a geração de um novo QR na próxima execução
                     if (existsSync(sessionDir)) {
                         logger.info('Limpando diretório de sessão local...');
                         rmSync(sessionDir, { recursive: true, force: true });
                     }
+                    // Em produção, a notificação é mais útil para o desenvolvedor
+                    await sendSessionInvalidNotification();
                 }
                 process.exit(1); // Encerra o processo
             }

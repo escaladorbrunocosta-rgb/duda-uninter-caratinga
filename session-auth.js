@@ -28,7 +28,7 @@ const useSessionAuthState = async (sessionAsString, isProduction) => {
     if (isProduction) {
         // --- LÓGICA DE PRODUÇÃO ---
         if (sessionAsString) {
-            logger.info('Usando sessão da variável de ambiente.');
+            logger.info('Decodificando sessão da variável de ambiente SESSION_DATA...');
             try {
                 const parsedSession = JSON.parse(sessionAsString, BufferJSON.reviver);
                 creds = parsedSession.creds;
@@ -38,8 +38,8 @@ const useSessionAuthState = async (sessionAsString, isProduction) => {
                 throw new Error('A variável de ambiente SESSION_DATA está corrompida.');
             }
         } else {
-            logger.fatal('Variável de ambiente SESSION_DATA não encontrada em ambiente de produção.');
-            throw new Error('Sessão não fornecida para o ambiente de produção.');
+            logger.fatal('A variável de ambiente SESSION_DATA não foi encontrada ou está vazia. O bot não pode iniciar em modo de produção sem uma sessão válida.');
+            throw new Error('SESSION_DATA is missing in the production environment.');
         }
     } else {
         // --- LÓGICA DE DESENVOLVIMENTO ---

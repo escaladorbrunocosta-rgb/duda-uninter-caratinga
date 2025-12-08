@@ -14,8 +14,9 @@
     "qrcode-terminal": "^0.12.0"
   },
   "scripts": {
-    "start": "node --import=./crypto-polyfill.js index.js",
+    "start": "NODE_ENV=production node --import=./crypto-polyfill.js index.js",
     "dev": "node --import=./crypto-polyfill.js index.js | pino-pretty",
+    "dev:clean": "rm -rf auth_info_multi && npm run dev",
     "test": "echo \"No tests available\"",
     "pack-session": "node --import=./crypto-polyfill.js pack-session.js",
     "update-session:render": "node -r dotenv/config --import=./crypto-polyfill.js update-render-env.js"

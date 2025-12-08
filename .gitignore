@@ -1,5 +1,9 @@
-# Ignora a pasta de módulos do Node.js
-node_modules/
+# Arquivos de log
+*.log
+error_log.txt
 
-# Ignora a pasta de autenticação do Baileys (MUITO IMPORTANTE)
-auth_info_multi/
+# Pasta de dependências do Node.js
+/node_modules
+
+# Pasta de autenticação local. NUNCA versionar!
+/auth_info_multi

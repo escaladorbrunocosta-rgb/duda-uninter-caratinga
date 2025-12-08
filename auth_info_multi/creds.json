@@ -2,146 +2,75 @@
   "noiseKey": {
     "private": {
       "type": "Buffer",
-      "data": "iNVp8q7Jb2+Lhg5r4kidLP0fmYMbLzNOJGvYUiR6HVY="
+      "data": "iLABTWrbBtgmo35/c/CXq7H7ffpaqXlpoYu4dHNnfEs="
     },
     "public": {
       "type": "Buffer",
-      "data": "iOY45TcGm6ZJTamMOo01xGueD8WJiCXcoHkr16OuNi4="
+      "data": "mJG5xyVVe7gLC/LyqOVw3h7dRgXFmwaOGJipu+2wmD4="
     }
   },
   "pairingEphemeralKeyPair": {
     "private": {
       "type": "Buffer",
-      "data": "MAphyxFUW0z28fm3UVI5QjyWPQGn9JDg/4C8HqnvXEs="
+      "data": "AD0tCh5wunaFIw5nyr2DeN09BW5Os2lhJRu/o9vyXkE="
     },
     "public": {
       "type": "Buffer",
-      "data": "KCRiNdH3bi+J6LtFNlo9YgZTFxoEobjcLYph303q02c="
+      "data": "D3Ze6SjubGBiSubawoQClBtkNMF0vXMZEcoIXWPSU3Q="
     }
   },
   "signedIdentityKey": {
     "private": {
       "type": "Buffer",
-      "data": "MCqHyx42/CD+nMmyxpKNfikCky982n33918r5TBr43E="
+      "data": "MCZLv3MHdZSAQsjaKPz++nr6MokF2XIntoRCLVjr+0E="
     },
     "public": {
       "type": "Buffer",
-      "data": "pRODO58SPoOhTTrx4OZmmiLCvjuXIavLBxQZMsYLZFA="
+      "data": "pIq+HN5FkdQ80wgC2VZq9hkKzMxz7FAju/KTvTmZwUU="
     }
   },
   "signedPreKey": {
     "keyPair": {
       "private": {
         "type": "Buffer",
-        "data": "sPyq19D0Uv9VIUKYTJuCwSoRjCUC0n71HA2KbWfS1Uc="
+        "data": "AA2YbVg4LjXAZMArFg0mn1kc/YL0gu9UQkduUHbfUlc="
       },
       "public": {
         "type": "Buffer",
-        "data": "/GhJPAZz/p5gF8EK7yUkrAzUoXJOsNiRhAezdx7mwQ8="
+        "data": "ZxFgreISm+FLtA5JbhDRdhzsxCUEDDC94TM8+xwzyDQ="
       }
     },
     "signature": {
       "type": "Buffer",
-      "data": "NdTAPoHWixmahrM3x4CS9HONZd47hnn/5Etwy+9KMJ8uCGWAkcYGJFfgAMjOZk2EA0+2ceSQ5pQcuFFfiXEviA=="
+      "data": "8z7eHC2FD31saMwbtgJ3l3Sy8TEHuecAyQDEivIAzQbQ2+aGCY+nkYdfCrxgc+RwjRXvC+/1LHZ6ckifRVe/gw=="
     },
     "keyId": 1
   },
-  "registrationId": 44,
-  "advSecretKey": "yHfbKTFLicszp5a/386/ffnM8iaXOyk6SeQnmZPr/pg=",
-  "processedHistoryMessages": [
-    {
-      "key": {
-        "remoteJid": "553399725952@s.whatsapp.net",
-        "fromMe": false,
-        "id": "A5090E71B7158AB825F5264BBE7C2D91",
-        "participant": "",
-        "addressingMode": "pn"
-      },
-      "messageTimestamp": 1765191418
-    },
-    {
-      "key": {
-        "remoteJid": "553399725952@s.whatsapp.net",
-        "fromMe": false,
-        "id": "A55D8B07686068E8563FC3E7F2563A49",
-        "participant": "",
-        "addressingMode": "pn"
-      },
-      "messageTimestamp": 1765191418
-    },
-    {
-      "key": {
-        "remoteJid": "553399725952@s.whatsapp.net",
-        "fromMe": false,
-        "id": "A54D802DCD521217FC72BEB6CD311A77",
-        "participant": "",
-        "addressingMode": "pn"
-      },
-      "messageTimestamp": 1765191422
-    },
-    {
-      "key": {
-        "remoteJid": "553399725952@s.whatsapp.net",
-        "fromMe": false,
-        "id": "A5D2AC936927106DDCA86D58CD3EB7C2",
-        "participant": "",
-        "addressingMode": "pn"
-      },
-      "messageTimestamp": 1765191423
-    },
-    {
-      "key": {
-        "remoteJid": "553399725952@s.whatsapp.net",
-        "fromMe": false,
-        "id": "A52EACD8F5F0BCA4CF7951D3539A596B",
-        "participant": "",
-        "addressingMode": "pn"
-      },
-      "messageTimestamp": 1765191448
-    },
-    {
-      "key": {
-        "remoteJid": "553399725952@s.whatsapp.net",
-        "fromMe": false,
-        "id": "A5FEB753A8FC7927938F63211A08223A",
-        "participant": "",
-        "addressingMode": "pn"
-      },
-      "messageTimestamp": 1765191471
-    },
-    {
-      "key": {
-        "remoteJid": "553399725952@s.whatsapp.net",
-        "fromMe": false,
-        "id": "A5B52249780F15581AFA3226E26FD487",
-        "participant": "",
-        "addressingMode": "pn"
-      },
-      "messageTimestamp": 1765191502
-    }
-  ],
-  "nextPreKeyId": 818,
-  "firstUnuploadedPreKeyId": 818,
-  "accountSyncCounter": 2,
+  "registrationId": 142,
+  "advSecretKey": "evKJZocF7iR8cm7DL1nJfop3F+h4hWX0bdOF2xxHIGc=",
+  "processedHistoryMessages": [],
+  "nextPreKeyId": 32,
+  "firstUnuploadedPreKeyId": 32,
+  "accountSyncCounter": 0,
   "accountSettings": {
     "unarchiveChats": false
   },
   "registered": false,
   "account": {
-    "details": "COLxrNUDEO3d2skGGDwgASgA",
+    "details": "COLxrNUDEObP28kGGEQgASgA",
     "accountSignatureKey": "uQh22U1nnrZ9won7uhDQln/vcOzy2vUXNxJg0JoE4WM=",
-    "accountSignature": "mv+oumDQ8/Ek1rUkMlQZXH2JwToq47Q2hFr9nWZsR90vKUnbUkPvfd7MRW20zFOu3Cus2MOzRUDRqOpy+0yNDw==",
-    "deviceSignature": "gItTA10zDIYPbaqMuvVX47oU4G5w5P5rPCALJMlFTIk9I6+Er3JybXk2oTu4EuwOQsZ7KO6Fiep+OI76sYLhiQ=="
+    "accountSignature": "aU2t5InDWkWOsKlQ7CTNNG+kAUmURKhb6d4DzBxiJNZPcljGtIsgl6S+qI/Fd1fWixVcFy84U6ieF62YrycvCg==",
+    "deviceSignature": "+7AZ+BhJNwdFf+t2oOOPIc6MiugcgLVfp611Yyv/R8RrhW2f0AZwAGlku7ma5p8N+5MczS0bTRtpLKXoudmAiA=="
   },
   "me": {
-    "id": "553399725952:50@s.whatsapp.net",
+    "id": "553399725952:56@s.whatsapp.net",
     "name": "Polo Uninter Caratinga",
-    "lid": "76076856438904:50@lid"
+    "lid": "76076856438904:56@lid"
   },
   "signalIdentities": [
     {
       "identifier": {
-        "name": "76076856438904:50@lid",
+        "name": "553399725952:56@s.whatsapp.net",
         "deviceId": 0
       },
       "identifierKey": {
@@ -155,7 +84,7 @@
     "type": "Buffer",
     "data": "CBIIAggI"
   },
-  "lastAccountSyncTimestamp": 1765191514,
+  "lastAccountSyncTimestamp": 1765205994,
   "lastPropHash": "4OOe1t",
-  "myAppStateKeyId": "AAAAAL5G"
+  "myAppStateKeyId": "AAAAAL5U"
 }

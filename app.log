@@ -1,0 +1,120 @@
+{"level":30,"time":1765012783842,"pid":12354,"hostname":"cs-273356214996-default","msg":"Usando autenticação baseada em arquivo (pasta session)..."}
+{"level":30,"time":1765012784128,"pid":12354,"hostname":"cs-273356214996-default","msg":"Usando Baileys versão: 2.3000.1027934701"}
+{"level":30,"time":1765012785674,"pid":12354,"hostname":"cs-273356214996-default","msg":"✅ Conexão com o WhatsApp aberta!"}
+{"level":30,"time":1765018997991,"pid":29986,"hostname":"cs-273356214996-default","msg":"Usando autenticação baseada em arquivo (pasta session)..."}
+{"level":30,"time":1765018998215,"pid":29986,"hostname":"cs-273356214996-default","msg":"Usando Baileys versão: 2.3000.1027934701"}
+{"level":30,"time":1765018998976,"pid":29986,"hostname":"cs-273356214996-default","msg":"✅ Conexão com o WhatsApp aberta!"}
+{"level":30,"time":1765020662484,"pid":35007,"hostname":"cs-273356214996-default","msg":"Usando diretório de sessão: /home/escaladorbrunocosta/duda-uninter-bot-limpo/session"}
+{"level":30,"time":1765020662485,"pid":35007,"hostname":"cs-273356214996-default","msg":"Usando autenticação baseada em arquivo (pasta session)..."}
+{"level":30,"time":1765020662707,"pid":35007,"hostname":"cs-273356214996-default","msg":"Usando Baileys versão: 2.3000.1027934701"}
+{"level":30,"time":1765020663427,"pid":35007,"hostname":"cs-273356214996-default","msg":"✅ Conexão com o WhatsApp aberta!"}
+{"level":30,"time":1765021909817,"pid":39057,"hostname":"cs-273356214996-default","msg":"Usando diretório de sessão: /home/escaladorbrunocosta/duda-uninter-bot-limpo/session"}
+{"level":30,"time":1765021909819,"pid":39057,"hostname":"cs-273356214996-default","msg":"Nenhuma variável de ambiente de sessão encontrada. Usando autenticação baseada em arquivo local."}
+{"level":30,"time":1765021910081,"pid":39057,"hostname":"cs-273356214996-default","msg":"Usando Baileys versão: 2.3000.1027934701"}
+{"level":30,"time":1765021911113,"pid":39057,"hostname":"cs-273356214996-default","msg":"\n▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\n█ ▄▄▄▄▄ █▀ ▄▀▄▀███▄▄▄██▀▄  █ ▄▄▄ █▀▀▀▄▄█▄▄ ▄▄▄▄▄ ██ ▄▄▄▄▄ █\n█ █   █ █▀ █▀▀█▄▄▄█▀█▄██  ▀████▀ ▄██▀▀▄▄▄█  ▀▄ ▄ ██ █   █ █\n█ █▄▄▄█ █▀▀▀█▀█ ▄█▄▀▄  ▀▀ █ ▄▄▄ ▄▄█▀█▀▄█▄▄▄  █▀▀▄██ █▄▄▄█ █\n█▄▄▄▄▄▄▄█▄▀ █▄█ ▀▄█ ▀ █▄█ █ █▄█ ▀▄█ ▀▄█▄█▄▀ █▄█▄▀▄█▄▄▄▄▄▄▄█\n█ ▄▄▄▄█▄▄▄  █▀▄██▄▄  ▄▄▀▀ ▄▄    ▀█▀█▀ ▀▄██  ▄███▀▀ █ ▀▄▀▄▀█\n█▀ ▀ ██▄ █   ▀▄ ▄▀▀ ▀▀▀ ▄▀▀▄▄ ▀▄▀█ ▀  █▄ ▀▄ █▄▄▄█  ▀▄▀▀▀▄▀█\n█▀▄ ▄ ▀▄█▀█▄▄▄▄▄▀▄▀ ▀█▀▄▀▀█▄ █▀█▄▀▄▄   ▄▀▀   ███▀  █▄██ █▄█\n█▄▀█▀▄▄▄▄▄ ▀▄▀▀▀ ▀▀ ▄▄ ▀ █▀█▀█▀  ▀ ▀▄ ▀▀ ▀ ▀▀▀█ █▄█▀▄█  ▄▀█\n█ █ ▄▀▀▄▀▀▄▄▀█▄▀█▄▀▄▀█▀█ ▀▄█▀  ▀▀▀▀▄   ███▀▀ ███ ▀ ██▀▄█▀▀█\n██▄█▀▄▀▄▀██  ▄▀█▄██▀█▄ ▄ █▀▄█ ▀▄▀ ▀▄▀█▀ ▀▀██ █▄▀ ▄ ▄▀  ▀▄██\n██▄▀██▄▄▀  ▄ █▀█▄▀▄▄▄█▀█▀▄  ▄▀  ▄▀▄█  ████  ▄▀▄█▄▀ ██▀▀█ ▀█\n█▄█▀▀▄▄▄▀▀▀ ▄███▄ ▀█▄█▀▀▀█▀  ▄█▄▄▄▄▀ ▀  ▄ ██▀ ▀▀  ▄█▄██ ▀██\n████▄█▀▄█▀▄▀▀▀ ▀▄█▄ █▄▄▀▀ ▀█▀█▀ ▄ ▄ ▄  █ █▄  ███   ▄▀█▄▀▄ █\n██▀▀▀ ▄▄▄ █▄█▀█▀ ▄▄█ ▀▄██ █ ▄▄▄    ███▄▀█████▀███ ▄▄▄ █ ▄██\n█▄▄▄  █▄█ █ █  ███▄▀ ▄▄██▀▀ █▄█ ▄▀▄▄ ▄▄██▀  ▄█ ▄▀ █▄█ ▄▀▄██\n█▄█ ▀  ▄  ▀  █  ▄▄▀▄█▀  █ ▄▄ ▄▄ █ ▄ ▄█▄   ██ ▀ ▄ ▄▄     ▄▀█\n█▄ ▄▄ ▄▄▀█  █▀ ▀▄█  ▀█▀▀▀ █ ██▀ ▄▀▀█▄ ▀█▀█▀ ▄▀███▀▀▀███ ▀ █\n█ █▄▀▄▄▄  █▄▀▄██  ▄ ▄▀▄▄▄▄▄▄ ▀▀ ▄█ ▄▄▀▀██▀ ▀▄  ▄▄▄ █ ▀▀▀███\n█▄██▄▄█▄▄█▄█▀▀▀▄▀█▄ ▀▀▀█▄ ▄▄▀██▄ ███ ▄ █▀▀▀▀▄██▄▀▄▀█ ▄▄▄▄ █\n██▀▄█▄ ▄▄▀▀▄▄▀ ▀▀█▄█▀ ▄▀▄ ▄ ▀█ ▄▀▄ █  ▄ ▀█▀▄▄▄ █▄▄▄█▄██ ▄▄█\n██▀█▀▄ ▄▀▄██▄  ▀▄█ ▄▄▄▀▀ ▀█▀▄▄▄ ▀█▀█ ▄ ███▄▀ ▀▄▄▀███▄█▄▀▀▀█\n█   ▄ ▄▄██   █▄█▀▄▀ ▀█▀ ▄█▀▀ █▄▄▀▀█▀▄▄█▄ ▀ ▀  █ ▀▀▄█▄█▀ ▄▀█\n█▄▄ █▀ ▄█▄ █▄▄▀█▄▄▀ ▀█▀▄ ▀▄▄▀▄▀▀ ▀█▄  ▀▄██ ▀▄██▄▀▀▄ ▄█ █ ▄█\n█ ▀ ▀▀▄▄████ ▄▀▀ █   ▀▄ ███ ▄▀▀▄▀▄█▀█▀ ▀▀▀█▀▄▀ ▀▀█▀▀█▄▀▀ ▀█\n███████▄█ ▄▀█▄▄▄█▄   █▀█ ▀▀ ▄▄▄ ▄█▄█ ▄ █▀█   █▄▄▀ ▄▄▄ ▄█▄ █\n█ ▄▄▄▄▄ █▄ ▀▄▀█▀ █  █▄▀▄▄▄█ █▄█ ▀   ▄  ▄  ▄▄█▀ ▄▀ █▄█ ▀ ▄▀█\n█ █   █ █  ▀█ ▄█▄▀▀▄▄█▀▀▀▄▄ ▄▄ ▄▀▀▄█  █▄█▀  ▄██▄▄  ▄▄ █▀▄██\n█ █▄▄▄█ █ ▀███▀▄▄   ▄█▀ ▀██ ██▀█▄█▄▀██ ▄▀▀  █ ▀ ▄ ▀▄▄▀▄ ███\n█▄▄▄▄▄▄▄█▄▄▄██▄▄██▄▄▄▄▄██▄▄████▄▄▄▄▄▄▄▄███▄█▄███▄██▄▄█▄█▄██\n"}
+{"level":30,"time":1765021911114,"pid":39057,"hostname":"cs-273356214996-default","msg":"✅ QR Code gerado. Acesse a URL do seu serviço para escanear."}
+{"level":30,"time":1765021911114,"pid":39057,"hostname":"cs-273356214996-default","msg":"Servidor web iniciado na porta 3000. Acesse /qrcode para escanear."}
+{"level":40,"time":1765021936985,"pid":39057,"hostname":"cs-273356214996-default","msg":"❌ Conexão fechada: \"Stream Errored (restart required)\". Tentando reconectar: true"}
+{"level":30,"time":1765021936985,"pid":39057,"hostname":"cs-273356214996-default","msg":"Tentando reconectar em 2 segundos... (Tentativa 1/5)"}
+{"level":30,"time":1765021938987,"pid":39057,"hostname":"cs-273356214996-default","msg":"Usando diretório de sessão: /home/escaladorbrunocosta/duda-uninter-bot-limpo/session"}
+{"level":30,"time":1765021938987,"pid":39057,"hostname":"cs-273356214996-default","msg":"Nenhuma variável de ambiente de sessão encontrada. Usando autenticação baseada em arquivo local."}
+{"level":30,"time":1765021939039,"pid":39057,"hostname":"cs-273356214996-default","msg":"Usando Baileys versão: 2.3000.1027934701"}
+{"level":30,"time":1765021942868,"pid":39057,"hostname":"cs-273356214996-default","msg":"✅ Conexão com o WhatsApp aberta!"}
+{"level":30,"time":1765021945376,"pid":39057,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765021950211,"pid":39057,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765021961674,"pid":39057,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765021962430,"pid":39057,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765021964627,"pid":39057,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765021965651,"pid":39057,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765036498038,"pid":10424,"hostname":"cs-273356214996-default","msg":"Usando diretório de sessão: /home/escaladorbrunocosta/duda-uninter-bot-limpo/session"}
+{"level":40,"time":1765036498039,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":40,"time":1765036498039,"pid":10424,"hostname":"cs-273356214996-default","msg":"⚠️  Variável de ambiente BAILEYS_SESSION não encontrada!"}
+{"level":40,"time":1765036498039,"pid":10424,"hostname":"cs-273356214996-default","msg":"O bot irá gerar um novo QR Code. Para produção, você DEVE configurar esta variável no seu serviço de hospedagem (Render)."}
+{"level":40,"time":1765036498039,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036498350,"pid":10424,"hostname":"cs-273356214996-default","msg":"Usando Baileys versão: 2.3000.1027934701"}
+{"level":30,"time":1765036498857,"pid":10424,"hostname":"cs-273356214996-default","msg":"\n▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\n█ ▄▄▄▄▄ █▀█▀█ ▀ █▀▀ ▄▀▄█▄▄▄█▀▄▀▄▄▀▀▀▀▀▄▀▀█ ▄▄█▄▄ ██ ▄▄▄▄▄ █\n█ █   █ █▀▀▀▄█▀█▄▄  ▄██▄▀▀▀█▄▄▄█ █▄▀▀ ▀ ▄▄▀▄▄▄ ▄ ██ █   █ █\n█ █▄▄▄█ █▀█ ▄▄█▀▄█  ▄ ▄█▀ █ ▄▄▄ ▄█▀██▀▄▀█   ▄▀▀▀▄██ █▄▄▄█ █\n█▄▄▄▄▄▄▄█▄█▄█ ▀▄▀▄█▄▀ █ █ █ █▄█ ▀▄█ ▀▄█▄█▄█ ▀ ▀ ▀▄█▄▄▄▄▄▄▄█\n█   ▄▄▀▄ ▄▀█ ▀ ▀██▀▄ ▄██▄▀ ▄    ▀█▀██ ▀▄▀▀ ▀▄▀▄▄ ▀ █▄█▄▀▄▀█\n██▀▄▀ █▄▄█▀█▀▄▄ █ ▀ ▀▀▀ ▀▀▀▄▄  ▄██▄██▀█▀ ▄█  ▀ ▀▄▄█▀ ▀▀▀ ██\n██▀█▀▄█▄▀    ▀▄▄▄█▀  █▀▄▀▀▀▄▀▀▀█ ▀██  ▀█▀▀█ ▄▀██▀ ▄▄▀█▀ █▄█\n█▄▄█▄ ▀▄ █▀▄▄▄▀▀ ▄▀ █▀▀▀▀█ ▄▀██ ▄   ▀▄ █▀▀ ▀██▀ ▄ ▄   █▀ ██\n█▄█▄▀▄█▄▀ ▄▄▀  █▄█ ▄▄▄▀▀ ▀ ▀▀   ▄▀▀▄█ ▄▄██▄▀▄▀▄▄▀  ▄▄█▄█ ██\n█▄▀█  ▄▄ █▀▀▀▀▀███ ▄██▀█▀ ▀██▄▄ ▀▀█ ▀▀▄▄ █ ▀  ▄ ▀▀█▀ ▀  ▄▀█\n█ ▀▄ █▄▄ ▀▄███▀█▄▀▄▄▄█▀█▀▄  ▀▀ ▀▄▀▀█ ▄ ███▀  █▄█▄▀▀▄ █▀▄▀ █\n█ ▄█▀▀▀▄▄█▄▀  █▀▄ █ ▄█▀█▀█▀ ▀▄▀ █▄█  ▄█▄▄▄▀▄█  ▀  █  ▄  ▀██\n█▀▄▄▄▄▄▄██▀███ █ ▄▄ █▄█▀▀▀▀▀▀█ ▀▄ ▄ █▄ █▀█   ▀█▄▀ ▀▄███ ▄▄█\n██▀█▄ ▄▄▄ ▀▀▀██ ▄ ▄█ ▀▄█ ▀▄ ▄▄▄ ▄▄▄▀ ▄ █ ▀▀▀▀▀  ▄ ▄▄▄ ▀ ▄▀█\n██▄▀▀ █▄█ ▀  ▄▄▄█▄▄▀ █▄█▀▀▀ █▄█  ▀▄▄█▄▀▄▀██ █▀██▄ █▄█ ▀ ▀ █\n█▄ ██  ▄ ▄ █▀ █▀ ▄██ ██▄  █  ▄▄▄  ▄▀█▀ ▄▄ ███▄██▀▄▄ ▄▄▀  ██\n██▄█▄▄ ▄▀▀▀▀  ▀▀▀▄ ▄▄▄▄▀  ▄ ▀▄▀ ▄▀▀█▄▄▄█▀▀▀ ▄██▄▀▀▄▀▀▄▄ █▄█\n█▄▀ ▀█▀▄▄▄▄█▄▀▄▄▄█▄██▄▀█ ▀█▄▀ ▀ ▀▀ ▄▀▄▄ █▀▀▄▄▄ ▀██▄█ ▀ ▀ ▀█\n███▀▀█▄▄▀▀▄▀▀▄  ▀█▀▄▀▀▀▀▄ █ ▀█▀▄ █▄█▄  ▄▄█▀▀▄██▄▀ ▀▀██▀▄█▀█\n█▄▄█ ▀ ▄█▄▄▀▀  █▀█▀▀▀  ▀▄ █▄▀█▄ ▀█▀█▄▀ ▄██▀▄█  ▀██▄█▄█  ▄▄█\n█ ▄▀▄▄█▄ ▀  █▀▄█▄▄ ▄▄▄█▀▀ █▀▄▄██▀█▀█▄ ▀█▀▀▄  █▄█▀ █▄█▄▀▄▀██\n█▄▀▄█ ▀▄▄ ▄█  █▄ ▄▀ ▄█▀ ▀ █▀▄█  ██▀▀███▄█▀ █▄▀ ▄█▄▄▀ ▄▀  ▀█\n█▀▀▄▀█▀▄ ▀▀  █▀▀██▀ ▀█▀▄▄▀█ █▄ █▄▀██▄ ▄█▀█ ▀▄██▄█ ▄█▄▄▄█ ██\n█ ▀ ▀▀▄▄▀  █ ▀ █▀▀▀▀ ▀▄▀ ▀▀▄▀▀   █▄▀▄▄ ▄▄▀ ▀▄█▄▄▀▀▀▀██▀▀ ██\n███████▄█   ▄ ▄▀█▄▀▄ ▄▀▀▀ █ ▄▄▄ ▄▀▄█  ▀▄▀█▀▀ ████ ▄▄▄ ▄▀▀▀█\n█ ▄▄▄▄▄ █▄▄▄█▄▀ ▀█   ▄██  █ █▄█  ▀█▄████   ▀▀▀ █▀ █▄█ ▀▀▄██\n█ █   █ █ ▄██ ▄▄▄▀ ▄▄█▀█▀▄▀    ▄███▄ ▄ ███▀▀█▀██▄ ▄ ▄ ███▄█\n█ █▄▄▄█ █ ▄▀▄ █▀▄ ▄▄▄█  ▀█ ▄█▀▀██▄█▀▀▄█▀▄▄▄▄ ▄ ▀▄▄▀▄▀▀▄ ███\n█▄▄▄▄▄▄▄█▄▄█▄█▄▄██▄▄████▄█▄█▄▄█▄▄▄▄▄▄▄█████▄▄█▄█▄▄██▄█▄█▄██\n"}
+{"level":30,"time":1765036498857,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ QR Code gerado. Acesse a URL do seu serviço para escanear."}
+{"level":30,"time":1765036498857,"pid":10424,"hostname":"cs-273356214996-default","msg":"Servidor web iniciado na porta 3000. Acesse /qrcode para escanear."}
+{"level":30,"time":1765036554708,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036554708,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036554708,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036554709,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":40,"time":1765036555015,"pid":10424,"hostname":"cs-273356214996-default","msg":"❌ Conexão fechada: \"Stream Errored (restart required)\" (código: 515). Tentando reconectar: true"}
+{"level":30,"time":1765036555015,"pid":10424,"hostname":"cs-273356214996-default","msg":"Tentando reconectar em 2 segundos... (Tentativa 1/5)"}
+{"level":30,"time":1765036557017,"pid":10424,"hostname":"cs-273356214996-default","msg":"Usando diretório de sessão: /home/escaladorbrunocosta/duda-uninter-bot-limpo/session"}
+{"level":40,"time":1765036557018,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":40,"time":1765036557018,"pid":10424,"hostname":"cs-273356214996-default","msg":"⚠️  Variável de ambiente BAILEYS_SESSION não encontrada!"}
+{"level":40,"time":1765036557018,"pid":10424,"hostname":"cs-273356214996-default","msg":"O bot irá gerar um novo QR Code. Para produção, você DEVE configurar esta variável no seu serviço de hospedagem (Render)."}
+{"level":40,"time":1765036557018,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036557075,"pid":10424,"hostname":"cs-273356214996-default","msg":"Usando Baileys versão: 2.3000.1027934701"}
+{"level":30,"time":1765036557730,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036557730,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036557730,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036557731,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036557732,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036557732,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036557732,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036557732,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036558503,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036558503,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036558503,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036559994,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036560190,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ Conexão com o WhatsApp aberta!"}
+{"level":30,"time":1765036560272,"pid":10424,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":50,"time":1765036560428,"pid":10424,"hostname":"cs-273356214996-default","err":{"type":"Error","message":"ENOENT: no such file or directory, open '/home/escaladorbrunocosta/duda-uninter-bot-limpo/session/pre-key-68.json'","stack":"Error: ENOENT: no such file or directory, open '/home/escaladorbrunocosta/duda-uninter-bot-limpo/session/pre-key-68.json'\n    at async open (node:internal/fs/promises:639:25)\n    at async Object.readFile (node:internal/fs/promises:1246:14)\n    at async EventEmitter.<anonymous> (file:///home/escaladorbrunocosta/duda-uninter-bot-limpo/index.js:194:37)","errno":-2,"code":"ENOENT","syscall":"open","path":"/home/escaladorbrunocosta/duda-uninter-bot-limpo/session/pre-key-68.json"},"msg":"Falha ao ler a pasta de sessão para gerar as variáveis de ambiente."}
+{"level":30,"time":1765036560513,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036560513,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036560513,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036561254,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036562836,"pid":10424,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765036563061,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036563061,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036563061,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036564333,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036570687,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036570688,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036570688,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036571813,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036575039,"pid":10424,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765036575140,"pid":10424,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765036575825,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036575825,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036575826,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036579819,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036579824,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036579824,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036579824,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036584305,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036584311,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036584311,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036584311,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036589049,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036589955,"pid":10424,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765036590044,"pid":10424,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":30,"time":1765036590117,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036590117,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036590117,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036594594,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036594745,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036594745,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036594745,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036599032,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036599036,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036599036,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036599036,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036604985,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036612909,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036612910,"pid":10424,"hostname":"cs-273356214996-default","msg":"✅ SESSÃO GERADA! Copie o conteúdo abaixo (uma única linha de texto) e cole no Render."}
+{"level":30,"time":1765036612910,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036616848,"pid":10424,"hostname":"cs-273356214996-default","msg":"================================================================"}
+{"level":30,"time":1765036617178,"pid":10424,"hostname":"cs-273356214996-default","chatId":"553399725952@s.whatsapp.net","msg":"Mensagem recebida sem texto (ex: áudio, sticker). Ignorando."}
+{"level":40,"time":1765037053786,"pid":12229,"hostname":"cs-273356214996-default","msg":"Limpando sessão antiga..."}
+{"level":50,"time":1765037053918,"pid":12229,"hostname":"cs-273356214996-default","reason":{},"promise":{},"msg":"Unhandled Rejection detectada."}
+{"level":40,"time":1765037189219,"pid":12721,"hostname":"cs-273356214996-default","msg":"Limpando sessão antiga..."}
+{"level":40,"time":1765037325201,"pid":13186,"hostname":"cs-273356214996-default","msg":"Limpando sessão antiga..."}
+{"level":40,"time":1765037340675,"pid":13246,"hostname":"cs-273356214996-default","msg":"Limpando sessão antiga..."}
+{"level":40,"time":1765037353594,"pid":13302,"hostname":"cs-273356214996-default","msg":"Limpando sessão antiga..."}
+{"level":40,"time":1765037450633,"pid":13655,"hostname":"cs-273356214996-default","msg":"Limpando sessão antiga..."}
+{"level":40,"time":1765037551991,"pid":14026,"hostname":"cs-273356214996-default","msg":"Limpando sessão antiga..."}
+{"level":50,"time":1765037556169,"pid":14026,"hostname":"cs-273356214996-default","error":{"data":{"reason":"405","location":"rva"},"isBoom":true,"isServer":false,"output":{"statusCode":405,"payload":{"statusCode":405,"error":"Method Not Allowed","message":"Connection Failure"},"headers":{}}},"msg":"A conexão foi fechada durante a geração da sessão."}
+{"level":50,"time":1765037556169,"pid":14026,"hostname":"cs-273356214996-default","reason":{},"promise":{},"msg":"Unhandled Rejection detectada."}

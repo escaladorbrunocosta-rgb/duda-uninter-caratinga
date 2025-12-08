@@ -1,0 +1,19 @@
+# =================================================================
+# ARQUIVO: render.yaml
+# DESCRIÇÃO: Arquivo de configuração "Infrastructure as Code" para o Render.
+# =================================================================
+
+services:
+  - type: worker # Usamos 'worker' pois o bot não precisa de uma porta web.
+    name: duda-uninter-bot
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION # Garante que o Render use a versão correta do Node.js
+        value: 20
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_DATA # Cole a string da sessão aqui no painel do Render.
+        sync: false
+    plan: free # Especifica o uso do plano gratuito do Render.

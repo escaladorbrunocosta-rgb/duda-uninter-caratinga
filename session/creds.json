@@ -1,0 +1,82 @@
+{
+  "noiseKey": {
+    "private": {
+      "type": "Buffer",
+      "data": "iBYZyCNJweojKG9Q97m6uzj/LTm39HOx4Rj80B+7/ms="
+    },
+    "public": {
+      "type": "Buffer",
+      "data": "R9J/u2HLtSewc+yK6VTXRraiqR6Qzech5L1x1Z214x4="
+    }
+  },
+  "pairingEphemeralKeyPair": {
+    "private": {
+      "type": "Buffer",
+      "data": "eKSeAAzu3Yva30pw0LlEJYYY4o4kzqqGnCiyx9IQTU0="
+    },
+    "public": {
+      "type": "Buffer",
+      "data": "0bavBTd+XbHHpKtpP2QDLydzDWWMH/hOgt2PApkW0hc="
+    }
+  },
+  "signedIdentityKey": {
+    "private": {
+      "type": "Buffer",
+      "data": "AMqI/XDo9eBcf5NtuvXkeoTYlMH06m5NHxDx05jdNU0="
+    },
+    "public": {
+      "type": "Buffer",
+      "data": "0UWyXQRy6+mnTF7u/atuioraaVjODrEwu17BHBlBZhg="
+    }
+  },
+  "signedPreKey": {
+    "keyPair": {
+      "private": {
+        "type": "Buffer",
+        "data": "2JZSsOmov7Xc7PlQ3tIxBD8tgtQIbFWBSdC87msdUms="
+      },
+      "public": {
+        "type": "Buffer",
+        "data": "S70q781RcMe0ZW6T9jjhWW9O7lRSNTYQA40bmRO6K2s="
+      }
+    },
+    "signature": {
+      "type": "Buffer",
+      "data": "rTGss/4EngSClfC1V9fxUsu1nRFkm1E8Jq050akMlLTx6a+nteBLTeUHCKwu063uwpta3vWp+Ktej41qRo01Dg=="
+    },
+    "keyId": 1
+  },
+  "registrationId": 8,
+  "advSecretKey": "7+/EB3MqlUsvmeBPoX61D3+BADk1pzTxq7TL615ZmZg=",
+  "processedHistoryMessages": [],
+  "nextPreKeyId": 1,
+  "firstUnuploadedPreKeyId": 1,
+  "accountSyncCounter": 0,
+  "accountSettings": {
+    "unarchiveChats": false
+  },
+  "registered": false,
+  "account": {
+    "details": "COLxrNUDEJu60ckGGDYgASgA",
+    "accountSignatureKey": "uQh22U1nnrZ9won7uhDQln/vcOzy2vUXNxJg0JoE4WM=",
+    "accountSignature": "UE+TKrCpoavXurTnEedm/8TORvSdWTBfItSF7x2Pf/sDnJLfLJokgeGcerMGT8lBPYRihZ5bIQGY0xSz5+tuDA==",
+    "deviceSignature": "StfwM7tNTELrPmj7C3EhLCCQ4u5/F5p7f8NutO7ewHsZw3YHbaPMGJdfpEfmud/k09Tul45fMKYsFfPRAYMCBg=="
+  },
+  "me": {
+    "id": "553399725952:44@s.whatsapp.net",
+    "name": "Polo Uninter Caratinga"
+  },
+  "signalIdentities": [
+    {
+      "identifier": {
+        "name": "553399725952:44@s.whatsapp.net",
+        "deviceId": 0
+      },
+      "identifierKey": {
+        "type": "Buffer",
+        "data": "BbkIdtlNZ562fcKJ+7oQ0JZ/73Ds8tr1FzcSYNCaBOFj"
+      }
+    }
+  ],
+  "platform": "smba"
+}

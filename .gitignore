@@ -1,12 +1,5 @@
-# Ignora a pasta de dependências do Node.js
+# Ignora a pasta de módulos do Node.js
 node_modules/
 
-# Ignora a pasta da sessão do WhatsApp para não expor credenciais
-session/
-
-# Ignora arquivos de log
-*.log
-npm-debug.log*
-
-# Ignora arquivos de ambiente local
-.env
+# Ignora a pasta de autenticação do Baileys (MUITO IMPORTANTE)
+auth_info_multi/

@@ -10,8 +10,8 @@ import makeWASocket, {
   makeCacheableSignalKeyStore, // Importação adicionada
 } from '@whiskeysockets/baileys';
 import pino from 'pino';
-import fs from 'fs';
-import { usePostgreSQLAuthState } from 'postgres-baileys'; // Substituído
+import qrcode from 'qrcode-terminal'; // Importação corrigida
+import { usePostgreSQLAuthState } from 'postgres-baileys';
 import { Pool } from 'pg'; // Importação adicionada
 import { getResponse, loadKnowledgeBase } from './knowledgeBase.js';
 
@@ -83,7 +83,7 @@ async function connectToWhatsApp() {
   // --- Gerenciamento de Eventos da Conexão ---
   sock.ev.on('creds.update', saveCreds);
 
-  sock.ev.on('connection.update', (update) => {
+  sock.ev.on('connection.update', async (update) => { // <--- CORREÇÃO: Adicionado 'async'
     const { connection, lastDisconnect } = update;
 
     if (connection === 'close') {

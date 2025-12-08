@@ -1,42 +1,83 @@
 /**
  * Script para automatizar a atualização da variável de ambiente WHATSAPP_SESSION no Render.
+ * Ele tentará ler as credenciais do arquivo .env, mas se não encontrar, pedirá interativamente.
  *
  * Como usar:
  * 1. Obtenha seu Service ID e uma API Key no painel do Render.
- * 2. Instale o axios: `npm install axios`
- * 3. Execute o script passando as credenciais como variáveis de ambiente:
- *    RENDER_API_KEY="sua_api_key" RENDER_SERVICE_ID="srv-seu_service_id" node update-render-env.js
+ * 2. Instale as dependências: `npm install @whiskeysockets/baileys @hapi/boom pino qrcode-terminal axios dotenv`
+ * 3. Crie um arquivo .env com suas credenciais (opcional, mas recomendado):
+ *    RENDER_API_KEY="sua_api_key"
+ *    RENDER_SERVICE_ID="srv-seu_service_id"
+ * 4. Execute o script: `node update-render-env.js`
  */
-
-import 'dotenv/config'; // Carrega as variáveis do arquivo .env
 
 import makeWASocket, {
     fetchLatestBaileysVersion,
     DisconnectReason,
-    BufferJSON
+    BufferJSON,
+    useInMemoryAuthState
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
 import qrcodeTerminal from 'qrcode-terminal';
 import axios from 'axios';
+import readline from 'readline';
+import fs from 'fs/promises';
+import dotenv from 'dotenv';
 
-const RENDER_API_KEY = process.env.RENDER_API_KEY;
-const RENDER_SERVICE_ID = process.env.RENDER_SERVICE_ID;
+// Carrega as variáveis de ambiente do arquivo .env
+dotenv.config();
 
-if (!RENDER_API_KEY || !RENDER_SERVICE_ID) {
-    console.error('❌ Erro: As variáveis de ambiente RENDER_API_KEY e RENDER_SERVICE_ID são obrigatórias.');
-    console.log('Uso: RENDER_API_KEY="sua_key" RENDER_SERVICE_ID="seu_id" node update-render-env.js');
-    process.exit(1);
+let RENDER_API_KEY = process.env.RENDER_API_KEY;
+let RENDER_SERVICE_ID = process.env.RENDER_SERVICE_ID;
+
+/**
+ * Cria uma interface para ler input do usuário no terminal.
+ * @param {string} query A pergunta a ser feita ao usuário.
+ * @returns {Promise<string>} A resposta do usuário.
+ */
+function askQuestion(query) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+
+    return new Promise(resolve => rl.question(query, ans => {
+        rl.close();
+        resolve(ans);
+    }));
 }
 
-const renderAPI = axios.create({
-    baseURL: 'https://api.render.com/v1',
-    headers: {
-        'Authorization': `Bearer ${RENDER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-    },
-});
+/**
+ * Função auxiliar para solicitar uma credencial ao usuário até que ela seja válida.
+ * @param {string} prompt - A mensagem para o usuário.
+ * @param {string} prefix - O prefixo que a entrada válida deve ter.
+ * @param {string} errorMessage - A mensagem de erro para uma entrada inválida.
+ * @returns {Promise<string>} A credencial validada.
+ */
+async function askForValidatedCredential(prompt, prefix, errorMessage) {
+    let credential = '';
+    let isValid = false;
+    while (!isValid) {
+        credential = await askQuestion(prompt);
+        isValid = credential.startsWith(prefix);
+        if (!isValid) {
+            console.error(errorMessage);
+        }
+    }
+    return credential;
+}
+
+async function ensureCredentials() {
+    if (!RENDER_API_KEY) {
+        console.warn('⚠️  RENDER_API_KEY não encontrada no ambiente.');
+        RENDER_API_KEY = await askForValidatedCredential('🔑 Por favor, cole sua Render API Key (deve começar com "rnd_") e pressione Enter: ', 'rnd_', '❌ Chave de API inválida. Você a encontra em "Account Settings" > "API Keys" no painel do Render.');
+    }
+    if (!RENDER_SERVICE_ID) {
+        console.warn('⚠️  RENDER_SERVICE_ID não encontrado no ambiente.');
+        RENDER_SERVICE_ID = await askForValidatedCredential('🆔 Por favor, cole seu Render Service ID (deve começar com "srv-") e pressione Enter: ', 'srv-', '❌ ID inválido. O Service ID deve começar com "srv-". Você o encontra na URL do seu painel do Render.');
+    }
+}
 
 /**
  * Gera uma nova sessão do WhatsApp e retorna a string em Base64.
@@ -44,38 +85,53 @@ const renderAPI = axios.create({
  */
 function generateSessionString() {
     return new Promise(async (resolve, reject) => {
+        let connectionAttempts = 0;
+        const MAX_ATTEMPTS = 3; // Define um limite de tentativas de reconexão
+
         console.log('ℹ️  Iniciando a geração da sessão do WhatsApp...');
 
         // Usamos um armazenamento em memória, pois não precisamos salvar em disco.
-        const { state, saveCreds } = { state: { creds: {} }, saveCreds: () => {} };
+        const { state, saveCreds } = await useInMemoryAuthState();
 
         const { version } = await fetchLatestBaileysVersion();
         const sock = makeWASocket({
             version,
             logger: pino({ level: 'silent' }),
             auth: state,
-            browser: ['DudaBot (Updater)', 'Chrome', '1.0']
+            browser: ['DudaBot (Updater)', 'Chrome', '1.0'],
+            // Adiciona suporte para o código de pareamento
+            printQRInTerminal: false
         });
 
-        sock.ev.on('creds.update', (newCreds) => {
-            // Atualiza as credenciais em memória
-            state.creds = { ...state.creds, ...newCreds };
-        });
+        // Se o socket não tiver um ID de registro e o pareamento for suportado, pergunta ao usuário.
+        if (!sock.authState.creds.registered) {
+            const usePairingCode = (await askQuestion('❔ Você gostaria de usar um Código de Pareamento (sim/não)? ')).toLowerCase() === 'sim';
+            if (usePairingCode) {
+                const phoneNumber = await askQuestion('📞 Por favor, digite o número do seu WhatsApp (com código do país, ex: 55119...): ');
+                const code = await sock.requestPairingCode(phoneNumber);
+                console.log(`\n\n================================================\nSeu código de pareamento é: \x1b[32m${code}\x1b[0m\n================================================\n`);
+            }
+        }
+
+        // A função saveCreds, retornada por useInMemoryAuthState, lida com o salvamento das credenciais em memória.
+        sock.ev.on('creds.update', saveCreds);
 
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
 
             if (qr) {
                 console.clear();
-                console.log('\n\n================================================================================');
-                console.log('   INSTRUÇÕES PARA GERAR O QR CODE');
-                console.log('================================================================================');
-                console.log('\nSe o QR code abaixo aparecer "quebrado", use a string de texto para gerá-lo.');
-                console.log('1. Copie a linha de texto que começa com "COPIE ISTO:".');
-                console.log('2. Cole em um gerador de QR Code online (como o QR Code Monkey) para criar a imagem.');
-                console.log('\n\x1b[32m%s\x1b[0m', `COPIE ISTO: ${qr}`); // Imprime a string do QR code em verde
-                console.log('\nOu tente escanear o QR code abaixo se estiver em um terminal compatível:\n');
-                qrcodeTerminal.generate(qr, { small: true });
+                console.log('\n📱 Escaneie o QR Code abaixo com o seu WhatsApp:');
+                console.log('   (Vá para WhatsApp > Aparelhos Conectados > Conectar um aparelho)');
+                qrcodeTerminal.generate(qr, { small: true }, (qrString) => {
+                    console.log('\n\n================================================================================');
+                    console.log('   INSTRUÇÕES PARA GERAR O QR CODE (se não conseguir escanear)');
+                    console.log('================================================================================');
+                    console.log('\nSe o QR code acima aparecer "quebrado", use a string de texto para gerá-lo.');
+                    console.log('1. Copie a linha de texto que começa com "COPIE ISTO:".');
+                    console.log('2. Cole em um gerador de QR Code online para criar a imagem.');
+                    console.log('\n\x1b[32m%s\x1b[0m', `COPIE ISTO: ${qrString}`); // Imprime a string do QR code em verde
+                });
             }
 
             if (connection === 'open') {
@@ -93,12 +149,18 @@ function generateSessionString() {
                 const error = lastDisconnect?.error;
                 const statusCode = (error instanceof Boom) ? error.output.statusCode : 500;
 
-                if (statusCode !== DisconnectReason.loggedOut) {
-                    console.error(`❌ Conexão fechada inesperadamente. Tentando reconectar...`);
-                    // A biblioteca tentará reconectar automaticamente.
-                } else {
+                if (statusCode === DisconnectReason.loggedOut) {
                     console.error('❌ Erro de logout. A sessão foi invalidada.');
-                    reject(new Error('Logout do WhatsApp.'));
+                    return reject(new Error('Logout do WhatsApp. A sessão foi desconectada remotamente.'));
+                } else if (connectionAttempts < MAX_ATTEMPTS) {
+                    connectionAttempts++;
+                    console.error(`❌ Conexão fechada (código: ${statusCode}). Tentando reconectar... (${connectionAttempts}/${MAX_ATTEMPTS})`);
+                    // A biblioteca Baileys tenta reconectar automaticamente por padrão.
+                    // Apenas registramos a tentativa.
+                } else {
+                    const errorMessage = `Falha ao conectar ao WhatsApp após ${MAX_ATTEMPTS} tentativas. Verifique sua conexão com a internet ou se há um firewall bloqueando a porta.`;
+                    console.error(`❌ ${errorMessage}`);
+                    return reject(new Error(errorMessage));
                 }
             }
         });
@@ -109,7 +171,7 @@ function generateSessionString() {
  * Atualiza a variável de ambiente no Render.
  * @param {string} sessionBase64 A nova string da sessão.
  */
-async function updateRenderEnvVar(sessionBase64) {
+async function updateRenderEnvVar(renderAPI, sessionBase64) {
     try {
         console.log(`\n☁️  Buscando variáveis de ambiente do serviço ${RENDER_SERVICE_ID}...`);
         
@@ -153,8 +215,33 @@ async function updateRenderEnvVar(sessionBase64) {
 
 async function main() {
     try {
+        const saveOption = (await askQuestion('❓ Onde você deseja salvar a sessão? Digite "render" ou "local": ')).toLowerCase();
+
         const session = await generateSessionString();
-        await updateRenderEnvVar(session);
+
+        if (saveOption === 'local') {
+            const fileName = 'whatsapp_session.txt';
+            await fs.writeFile(fileName, session);
+            console.log(`\n✅ Sessão salva com sucesso no arquivo local: \x1b[32m${fileName}\x1b[0m`);
+            console.log('   Você pode copiar o conteúdo deste arquivo e colá-lo manualmente na variável de ambiente WHATSAPP_SESSION no Render.');
+        } else if (saveOption === 'render') {
+            await ensureCredentials();
+
+            const renderAPI = axios.create({
+                baseURL: 'https://api.render.com/v1',
+                headers: {
+                    'Authorization': `Bearer ${RENDER_API_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            });
+
+            await updateRenderEnvVar(renderAPI, session);
+        } else {
+            console.error('\n❌ Opção inválida. Por favor, execute novamente e escolha "render" ou "local".');
+            process.exit(1);
+        }
+
         process.exit(0);
     } catch (error) {
         console.error('\n❌ O processo falhou. Por favor, tente novamente.');

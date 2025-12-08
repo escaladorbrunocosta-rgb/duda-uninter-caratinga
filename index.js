@@ -5,7 +5,7 @@ import makeWASocket, {
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import pino from 'pino';
-import { existsSync, rmSync } from 'fs';
+import { existsSync, rmSync, promises as fs } from 'fs';
 import path from 'path';
 import qrcodeTerminal from 'qrcode-terminal'; // Renomeado para clareza
 import { getResponse, loadKnowledgeBase } from './knowledgeBase.js';
@@ -13,15 +13,28 @@ import { config } from './config.js';
 import { useSessionAuthState } from './session-auth.js';
 import { sendSessionInvalidNotification } from './notifications.js';
 
+// Determina se o ambiente é de produção (ex: Render)
+const isProduction = process.env.NODE_ENV === 'production' || !!process.env.RENDER;
+
 // Cria uma instância de logger global para ser usada em handlers de processo
 const globalLogger = pino({
     level: 'info',
     transport: {
-        // O Pino pode ter múltiplos "alvos" (transportes) para os logs.
+        // Pino pode ter múltiplos "alvos" (transportes) para os logs.
         targets: [
-            // Alvo 1: Logs gerais e bonitos para o console de desenvolvimento.
-            { target: 'pino-pretty', level: 'info', options: { colorize: true, ignore: 'pid,hostname' } },
-        ]
+            // Alvo 1: Logs para o console. Em produção (Render), será JSON. Em dev, será formatado.
+            {
+                target: isProduction ? 'pino/file' : 'pino-pretty', // 'pino/file' para stdout em JSON
+                level: 'info',
+                options: isProduction ? {} : { colorize: true, ignore: 'pid,hostname' }
+            },
+            // Alvo 2: Salva um log separado apenas com as conversas.
+            {
+                target: 'pino/file',
+                level: 'info',
+                options: { destination: 'conversas.log', mkdir: true, append: true }
+            }
+        ].filter(Boolean) // Filtra alvos nulos se necessário
     }
 });
 
@@ -112,7 +125,7 @@ async function handleMessage(sock, msg, logger) {
                 const docPath = path.resolve(response.path);
                 if (existsSync(docPath)) {
                     await sock.sendMessage(chatId, {
-                        document: await fs.readFile(docPath),
+                        document: await fs.readFile(docPath), // CORREÇÃO: fs.readFile importado
                         mimetype: 'application/pdf', // Ajuste o mimetype conforme o tipo de arquivo
                         fileName: response.fileName || 'documento.pdf'
                     });
@@ -138,13 +151,15 @@ async function handleMessage(sock, msg, logger) {
  * Modo 'START': Roda no Render para iniciar o bot.
  */
 async function startBot() {
-    const logger = globalLogger;
-    const sessionDir = path.resolve('session');
+    const logger = globalLogger.child({ service: 'bot-main' });
+    const sessionDir = path.resolve('auth_info_multi');
 
-    // Usa o novo hook de autenticação que lê da variável de ambiente
-    // O segundo argumento 'true' indica que estamos em produção e não devemos gerar QR Code no terminal.
-    const { state, saveCreds } = await useSessionAuthState(process.env.WHATSAPP_SESSION, true);
-    
+    // Em produção, usa a sessão da variável de ambiente. Em dev, usa o armazenamento local.
+    const { state, saveCreds } = await useSessionAuthState(
+        isProduction ? process.env.SESSION_DATA : null,
+        isProduction // Passa o status de produção corretamente
+    );
+
     const { version } = await fetchLatestBaileysVersion();
     logger.info(`Usando Baileys versão: ${version.join('.')}`);
 
@@ -162,8 +177,10 @@ async function startBot() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            logger.warn('QR Code recebido em ambiente de produção. Isso não deveria acontecer se a WHATSAPP_SESSION estivesse configurada. O bot será encerrado.');
-            process.exit(1); // Encerra para evitar loops
+            if (isProduction) {
+                logger.error('QR Code recebido em ambiente de produção. A variável de ambiente SESSION_DATA está ausente ou inválida. Encerrando.');
+                process.exit(1); // Encerra para evitar loops no Render
+            }
         }
 
         if (connection === 'open') {
@@ -173,14 +190,18 @@ async function startBot() {
             const statusCode = lastDisconnect.error?.output?.statusCode;
             const shouldReconnect = (lastDisconnect.error instanceof Boom) && ![DisconnectReason.loggedOut, 401].includes(statusCode);
 
-            logger.warn(`❌ Conexão fechada (código: ${statusCode}). Reconectar: ${shouldReconnect}`);
+            logger.warn({ statusCode, shouldReconnect }, `❌ Conexão fechada.`);
 
             if (shouldReconnect && reconnectionAttempts < config.MAX_RECONNECT_ATTEMPTS) {
                 reconnectionAttempts++;
+                // Usa "exponential backoff" para evitar sobrecarregar o servidor ao tentar reconectar.
                 const delay = Math.pow(2, reconnectionAttempts) * 1000;
                 logger.info(`Tentando reconectar em ${delay / 1000}s (tentativa ${reconnectionAttempts})...`);
-                setTimeout(startBot, delay); // Tenta reconectar
+                setTimeout(startBot, delay);
             } else {
+                if (reconnectionAttempts >= config.MAX_RECONNECT_ATTEMPTS) {
+                    logger.error(`Número máximo de tentativas de reconexão (${config.MAX_RECONNECT_ATTEMPTS}) atingido.`);
+                }
                 logger.error(`🚫 Desconexão permanente (código: ${statusCode}). Encerrando.`);
                 // Se for um erro de logout, envia a notificação antes de encerrar.
                 if (statusCode === DisconnectReason.loggedOut || statusCode === 401) {
@@ -204,7 +225,12 @@ async function startBot() {
 
 // --- Lógica de Inicialização ---
 (async () => {
-    globalLogger.info('Iniciando bot...');
+    globalLogger.info({
+        isProduction,
+        nodeVersion: process.version
+    }, 'Iniciando bot...');
+
+    await loadKnowledgeBase();
     await startBot();
 })();
 

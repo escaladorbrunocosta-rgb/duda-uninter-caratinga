@@ -6,10 +6,10 @@
   "type": "module",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^6.7.5",
+    "@whiskeysockets/baileys": "latest",
     "axios": "^1.7.2",
-    "pino": "^8.21.0",
-    "qrcode-terminal": "^0.12.0"
+    "qrcode-terminal": "^0.12.0",
+    "pino": "^8.17.2"
   },
   "scripts": {
     "start": "node --import=./crypto-polyfill.js index.js",

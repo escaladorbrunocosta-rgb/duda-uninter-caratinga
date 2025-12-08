@@ -168,6 +168,7 @@ async function startBot() {
         auth: state,
         logger: pino({ level: 'silent' }),
         browser: ['DudaBot', 'Chrome', '1.0'],
+        printQRInTerminal: false, // Desativa a impressão automática do QR no terminal
         shouldIgnoreJid: jid => isJidGroup(jid),
     });
 
@@ -177,13 +178,10 @@ async function startBot() {
         const { connection, lastDisconnect, qr } = update;
 
         if (qr) {
-            if (isProduction) {
-                logger.error('QR Code recebido em ambiente de produção. A variável de ambiente SESSION_DATA está ausente ou inválida. Encerrando.');
-                process.exit(1); // Encerra para evitar loops no Render
-            } else {
-                logger.info('Escaneie o QR Code com seu WhatsApp para conectar.');
-                qrcodeTerminal.generate(qr, { small: true });
-            }
+            // Em vez de usar qrcode-terminal ou sair, imprimimos o QR bruto em uma linha HTML.
+            // Isso permite copiar o valor do log do Render e gerar o QR Code manualmente.
+            logger.info('QR Code recebido. Imprimindo como HTML para captura manual.');
+            console.log(`QR_CODE_HTML: <div style="color:red; font-weight:bold;">QR_CODE: ${qr}</div>`);
         }
 
         if (connection === 'open') {

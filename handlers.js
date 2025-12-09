@@ -5,7 +5,7 @@
 
 import { Boom } from '@hapi/boom';
 import { DisconnectReason } from '@whiskeysockets/baileys';
-// import { getResponse } from './knowledgeBase.js'; // Descomente quando o arquivo existir
+import { getResponse } from './knowledgeBase.js';
 
 /**
  * Registra todos os handlers de eventos para a instância do socket.
@@ -19,10 +19,8 @@ export function registerEventHandlers(sock, removeCreds) {
 
     // Lógica para obter o QR Code em formato de texto (para Render.com)
     if (qr) {
-      console.log('=================================================');
+      // Imprime APENAS a linha HTML com o QR Code bruto, conforme solicitado.
       console.log('QR_CODE_HTML: <div style="color:red; font-weight:bold;">QR_CODE: ' + qr + '</div>');
-      console.log('=================================================');
-      console.log('Copie o texto do QR Code acima e use um gerador online para escanear.');
     }
 
     if (connection === 'close') {
@@ -70,15 +68,8 @@ export function registerEventHandlers(sock, removeCreds) {
 
     console.log(`💬 Mensagem recebida de ${userName} (${chatId}): "${messageText}"`);
 
-    // --- Lógica de Resposta (Exemplo) ---
-    // Substitua pela sua lógica real de obtenção de resposta.
-    // const response = await getResponse(chatId, messageText, userName);
-    let response = `Olá, ${userName}! Recebi sua mensagem: "${messageText}". Em breve minha IA estará funcionando.`;
-
-    // Simulação de uma busca na base de conhecimento
-    if (messageText.toLowerCase() === 'oi') {
-      response = `Olá, ${userName}! Como posso ajudar?`;
-    }
+    // Obtém a resposta da base de conhecimento
+    const response = await getResponse(chatId, messageText, userName);
 
     // Envia a resposta para o usuário
     try {

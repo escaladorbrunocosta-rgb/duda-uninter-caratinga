@@ -4,6 +4,7 @@ import makeWASocket, {
   isJidBroadcast,
   fetchLatestBaileysVersion,
   useMultiFileAuthState,
+  BufferJSON,
 } from '@whiskeysockets/baileys';
 import pino from 'pino';
 import http from 'http';
@@ -50,7 +51,24 @@ loadKnowledgeBase().catch(err => {
 
 // Função principal para iniciar a conexão com o WhatsApp
 async function startConnection() {
-  const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+  let state, saveCreds;
+
+  // Lógica para usar a variável de ambiente no Render (produção)
+  if (process.env.SESSION_DATA) {
+    console.log('ℹ️ Encontrada variável de ambiente SESSION_DATA. Usando para autenticação.');
+    const sessionData = JSON.parse(process.env.SESSION_DATA, BufferJSON.reviver);
+    // Não precisamos salvar credenciais em produção, pois a variável de ambiente é a fonte da verdade.
+    // Se a sessão expirar, uma nova variável precisa ser gerada e configurada.
+    state = {
+      creds: sessionData.creds,
+      keys: sessionData.keys,
+    };
+    saveCreds = () => Promise.resolve(); // Função vazia para não tentar escrever no sistema de arquivos do Render
+  } else {
+    // Lógica para usar a pasta local (desenvolvimento)
+    console.log('ℹ️ Usando autenticação local da pasta "auth_info_multi".');
+    ({ state, saveCreds } = await useMultiFileAuthState(AUTH_DIR));
+  }
   const { version, isLatest } = await fetchLatestBaileysVersion();
 
   console.log(`Usando Baileys v${version.join('.')}, é a mais recente: ${isLatest}`);

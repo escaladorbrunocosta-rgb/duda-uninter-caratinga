@@ -18,16 +18,36 @@ const AUTH_DIR = 'auth_info_multi';
 async function generateSessionString() {
   try {
     console.log('▶️  Lendo arquivos de sessão da pasta:', AUTH_DIR);
-    const creds = JSON.parse(await fs.readFile(path.join(AUTH_DIR, 'creds.json'), 'utf-8'), BufferJSON.reviver);
-    const keys = JSON.parse(await fs.readFile(path.join(AUTH_DIR, 'keys.json'), 'utf-8'), BufferJSON.reviver);
+    const files = await fs.readdir(AUTH_DIR);
+    const credsFile = files.find(file => file === 'creds.json');
+
+    if (!credsFile) {
+      throw new Error('Arquivo "creds.json" não encontrado. A sessão foi gerada corretamente?');
+    }
+
+    const creds = JSON.parse(await fs.readFile(path.join(AUTH_DIR, credsFile), 'utf-8'), BufferJSON.reviver);
+
+    const keys = {};
+    for (const file of files) {
+      if (file !== 'creds.json') {
+        const filePath = path.join(AUTH_DIR, file);
+        const data = JSON.parse(await fs.readFile(filePath, 'utf-8'), BufferJSON.reviver);
+        
+        // O nome do arquivo é a chave (ex: 'pre-key-1'), e o conteúdo é o valor
+        const key = file.replace('.json', '');
+        keys[key] = data;
+      }
+    }
 
     const sessionData = { creds, keys };
-    const sessionString = JSON.stringify(sessionData, BufferJSON.replacer, 0); // Minificado
+    // Usamos 2 espaços para indentação para facilitar a visualização, mas o Render aceita sem problemas.
+    // Se preferir minificado, troque o 2 por 0.
+    const sessionString = JSON.stringify(sessionData, BufferJSON.replacer, 2);
 
-    console.log('\n✅ String de sessão gerada com sucesso! Copie a linha abaixo:\n');
+    console.log('\n✅ String de sessão gerada com sucesso! Copie o bloco de texto abaixo:\n');
     console.log(sessionString);
   } catch (error) {
-    console.error('❌ Erro ao gerar a string de sessão. Verifique se a pasta "auth_info_multi" existe e contém os arquivos "creds.json" e "keys.json".', error);
+    console.error('❌ Erro ao gerar a string de sessão. Verifique se a pasta "auth_info_multi" existe, não está vazia e foi gerada corretamente.', error);
   }
 }
 

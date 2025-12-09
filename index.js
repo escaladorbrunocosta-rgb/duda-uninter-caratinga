@@ -17,15 +17,24 @@ import { getResponse, loadKnowledgeBase } from './knowledgeBase.js';
 
 console.log('✅ Script iniciado. Carregando dependências...');
 
-// --- Configuração do Banco de Dados (para Render) ---
-const isProduction = process.env.NODE_ENV === 'production';
+// --- Detecção Robusta de Ambiente e Configuração ---
+
+// Função para verificar se um módulo pode ser resolvido.
+// Isso nos permite detectar se 'pino-pretty' está disponível.
+const isModuleAvailable = (path) => {
+  try {
+    require.resolve(path);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+const isProduction = !isModuleAvailable('pino-pretty');
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ...(isProduction && {
-    ssl: {
-      rejectUnauthorized: false, // Necessário para conexões SSL no Render
-    },
-  }),
+  ssl: isProduction ? { rejectUnauthorized: false } : false, // SSL apenas em produção
 });
 
 // --- Função Principal de Conexão ---
@@ -38,10 +47,12 @@ async function connectToWhatsApp() {
   console.log('▶️  Carregando sessão do banco de dados...');
   const { state, saveCreds, removeCreds } = await usePostgreSQLAuthState(pool, 'duda-uninter-bot');
 
-  // Configuração do logger: pino-pretty para desenvolvimento, 'silent' para produção
+  // Configuração do logger que se adapta automaticamente ao ambiente.
+  // Se 'pino-pretty' estiver instalado (desenvolvimento), ele será usado.
+  // Caso contrário (produção), ele será ignorado.
   const logger = pino({
     level: 'silent',
-    ...(!isProduction && { transport: { target: 'pino-pretty' } }),
+    ...(isModuleAvailable('pino-pretty') && { transport: { target: 'pino-pretty' } }),
   });
 
   const sock = makeWASocket({

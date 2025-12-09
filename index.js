@@ -22,7 +22,7 @@ const server = http.createServer((req, res) => {
   }));
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor HTTP iniciado na porta ${PORT} para health checks do Render.`);
 });
 // --- FIM DA CONFIGURAÇÃO DO SERVIDOR ---

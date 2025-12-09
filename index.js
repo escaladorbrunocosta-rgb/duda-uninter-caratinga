@@ -17,24 +17,10 @@ import { getResponse, loadKnowledgeBase } from './knowledgeBase.js';
 
 console.log('✅ Script iniciado. Carregando dependências...');
 
-// --- Detecção Robusta de Ambiente e Configuração ---
-
-// Função para verificar se um módulo pode ser resolvido.
-// Isso nos permite detectar se 'pino-pretty' está disponível.
-const isModuleAvailable = (path) => {
-  try {
-    require.resolve(path);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
-
-const isProduction = !isModuleAvailable('pino-pretty');
-
+// --- Configuração do Banco de Dados ---
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: isProduction ? { rejectUnauthorized: false } : false, // SSL apenas em produção
+  ssl: { rejectUnauthorized: false }, // SSL é necessário para o Render
 });
 
 // --- Função Principal de Conexão ---
@@ -47,13 +33,9 @@ async function connectToWhatsApp() {
   console.log('▶️  Carregando sessão do banco de dados...');
   const { state, saveCreds, removeCreds } = await usePostgreSQLAuthState(pool, 'duda-uninter-bot');
 
-  // Configuração do logger que se adapta automaticamente ao ambiente.
-  // Se 'pino-pretty' estiver instalado (desenvolvimento), ele será usado.
-  // Caso contrário (produção), ele será ignorado.
-  const logger = pino({
-    level: 'silent',
-    ...(isModuleAvailable('pino-pretty') && { transport: { target: 'pino-pretty' } }),
-  });
+  // Logger padrão do Pino. Em produção, ele gerará JSON.
+  // Em desenvolvimento, usaremos o script 'dev' para formatar a saída.
+  const logger = pino({ level: 'silent' });
 
   const sock = makeWASocket({
     printQRInTerminal: false, // Desativa o QR Code no terminal
@@ -67,7 +49,7 @@ async function connectToWhatsApp() {
   });
 
   // --- Lógica de Código de Pareamento (para Render) ---
-  if (!sock.authState.creds.registered && !isProduction) {
+  if (!sock.authState.creds.registered && process.env.NODE_ENV !== 'production') {
     console.log('▶️  QR Code recebido. Escaneie com seu WhatsApp abaixo:');
     sock.ev.on('connection.update', (update) => {
       const { qr } = update;
@@ -75,7 +57,7 @@ async function connectToWhatsApp() {
         qrcode.generate(qr, { small: true });
       }
     });
-  } else if (!sock.authState.creds.registered && isProduction) {
+  } else if (!sock.authState.creds.registered && process.env.NODE_ENV === 'production') {
     const phoneNumber = process.env.BOT_PHONE_NUMBER;
     if (!phoneNumber) {
       console.error('❌ ERRO: BOT_PHONE_NUMBER não definido nas variáveis de ambiente do Render.');

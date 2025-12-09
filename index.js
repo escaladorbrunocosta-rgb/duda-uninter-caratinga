@@ -1,170 +1,107 @@
-import { Boom } from '@hapi/boom';
-import makeWASocket, {
-  DisconnectReason,
-  isJidBroadcast,
-  fetchLatestBaileysVersion,
-  useMultiFileAuthState,
-  BufferJSON,
-} from '@whiskeysockets/baileys';
+// =================================================================
+// ARQUIVO: index.js
+// DESCRIÇÃO: Ponto de entrada principal para o Bot de WhatsApp.
+// =================================================================
+
+import { promises as fs } from 'fs';
+import path from 'path';
 import pino from 'pino';
-import http from 'http';
+import qrcode from 'qrcode';
+import makeWASocket, {
+  useMultiFileAuthState,
+  DisconnectReason,
+  fetchLatestBaileysVersion,
+} from '@whiskeysockets/baileys';
+import { Boom } from '@hapi/boom';
 
-// --- CONFIGURAÇÃO DO SERVIDOR HTTP PARA O RENDER.COM ---
-import { getResponse, loadKnowledgeBase } from './knowledgeBase.js';
+const AUTH_DIR = 'auth_info_multi';
+const HTML_OUTPUT_FILE = 'qrcode.html';
 
-// --- CONFIGURAÇÃO DO SERVIDOR HTTP PARA O RENDER.COM ---
-const PORT = process.env.PORT || 3000;
+const logger = pino({ level: 'info' });
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({
-    status: 'ok',
-    message: 'Bot is running'
-  }));
-});
+/**
+ * Gera um arquivo HTML completo contendo o QR Code como uma imagem Base64.
+ * @param {string} qrString - A string do QR Code recebida do Baileys.
+ */
+async function generateQrHtml(qrString) {
+  try {
+    console.log('✅ QR Code recebido. Gerando arquivo HTML...');
+    // Converte a string do QR para uma URL de dados Base64
+    const base64Image = await qrcode.toDataURL(qrString);
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Servidor HTTP iniciado na porta ${PORT} para health checks do Render.`);
-});
-// --- FIM DA CONFIGURAÇÃO DO SERVIDOR ---
+    // Monta o conteúdo do arquivo HTML
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-g">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code de Conexão</title>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0; }
+        img { max-width: 90%; max-height: 90%; }
+    </style>
+</head>
+<body>
+    <img src="${base64Image}" alt="Escaneie este QR Code no seu WhatsApp">
+</body>
+</html>
+    `.trim();
 
-// Diretório para armazenar a autenticação
-const AUTH_DIR = './auth_info_multi';
+    await fs.writeFile(HTML_OUTPUT_FILE, htmlContent);
+    console.log(`✅ Resultado FINAL gerado: ${HTML_OUTPUT_FILE}`);
+    console.log('   Abra este arquivo em um navegador para escanear o QR Code.');
 
-// Configuração do Logger Pino para não imprimir o QR Code no terminal
-const logger = pino({
-  level: 'info',
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      ignore: 'pid,hostname',
-    },
-  },
-});
-
-// Carrega a base de conhecimento no início.
-loadKnowledgeBase().catch(err => {
-    console.error("❌ Falha fatal ao carregar knowledgeBase.json:", err);
-    process.exit(1);
-});
-
-// Função principal para iniciar a conexão com o WhatsApp
-async function startConnection() {
-  let state, saveCreds;
-
-  // Lógica para usar a variável de ambiente no Render (produção)
-  if (process.env.SESSION_DATA) {
-    console.log('ℹ️ Encontrada variável de ambiente SESSION_DATA. Usando para autenticação.');
-    const sessionData = JSON.parse(process.env.SESSION_DATA, BufferJSON.reviver);
-    // Não precisamos salvar credenciais em produção, pois a variável de ambiente é a fonte da verdade.
-    // Se a sessão expirar, uma nova variável precisa ser gerada e configurada.
-    state = {
-      creds: sessionData.creds,
-      keys: sessionData.keys,
-    };
-    saveCreds = () => Promise.resolve(); // Função vazia para não tentar escrever no sistema de arquivos do Render
-  } else {
-    // Lógica para usar a pasta local (desenvolvimento)
-    console.log('ℹ️ Usando autenticação local da pasta "auth_info_multi".');
-    ({ state, saveCreds } = await useMultiFileAuthState(AUTH_DIR));
+  } catch (err) {
+    console.error('❌ Erro ao gerar o arquivo HTML com o QR Code:', err);
   }
-  const { version, isLatest } = await fetchLatestBaileysVersion();
+}
 
-  console.log(`Usando Baileys v${version.join('.')}, é a mais recente: ${isLatest}`);
+async function connectToWhatsApp() {
+  const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+  const { version, isLatest } = await fetchLatestBaileysVersion();
+  console.log(`▶️  Usando Baileys v${version.join('.')}, é a mais recente: ${isLatest}`);
 
   const sock = makeWASocket({
     version,
-    auth: state,
     logger,
-    printQRInTerminal: false, // Mude para 'false' para controlarmos a exibição manualmente
-    browser: ['DudaBot', 'Chrome', '1.0'],
-    syncFullHistory: true,
-    shouldIgnoreJid: (jid) => jid.includes('@broadcast'),
+    printQRInTerminal: true, // Mantemos a impressão no terminal como fallback
+    auth: state,
   });
 
-  // Listener para eventos de conexão
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
 
     if (qr) {
-      console.log('📲 NOVO QR CODE. Escaneie para gerar uma nova sessão de autenticação.');
-      console.log(qr);
+      console.log('▶️  Aguardando QR...');
+      // Gera o arquivo HTML com o QR Code
+      await generateQrHtml(qr);
     }
 
     if (connection === 'close') {
-      const shouldReconnect = (lastDisconnect?.error instanceof Boom)
-        && lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut;
+      const shouldReconnect = (lastDisconnect.error instanceof Boom)
+        ? lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
+        : false;
 
-      console.log('❌ Conexão fechada. Motivo:', lastDisconnect?.error, 'Reconectando:', shouldReconnect);
+      console.log(`❌ Conexão fechada. Código: ${lastDisconnect.error?.output?.statusCode}`);
+      console.log(`🔄 Deve reconectar? ${shouldReconnect}`);
+
+      if (lastDisconnect.error?.output?.statusCode === DisconnectReason.loggedOut) {
+        console.log(`🚫 Logout detectado. Delete a pasta ${AUTH_DIR} e gere um novo QR.`);
+        // Opcional: remover a pasta automaticamente
+        // await fs.rm(AUTH_DIR, { recursive: true, force: true });
+      }
 
       if (shouldReconnect) {
-        await startConnection();
-      } else {
-        console.error('🚫 Logout detectado (código 401). A sessão foi invalidada.');
-        console.error('Isso significa que você precisa gerar uma nova sessão.');
-        console.error('1. Apague a pasta "auth_info_multi".');
-        console.error('2. Reinicie o bot para gerar um novo QR Code.');
-        // Em um ambiente de produção, queremos que o processo pare para sinalizar o erro.
-        if (process.env.NODE_ENV === 'production') {
-          process.exit(1);
-        }
+        connectToWhatsApp();
       }
     } else if (connection === 'open') {
       console.log('✅ BOT CONECTADO AO WHATSAPP!');
     }
   });
 
-  // Listener para salvar credenciais
   sock.ev.on('creds.update', saveCreds);
-
-  // Listener para novas mensagens (aqui você implementará a lógica do knowledgeBase.json)
-  sock.ev.on('messages.upsert', async ({ messages }) => {
-    for (const msg of messages) {
-      // Extrai o texto da mensagem, considerando conversas normais e respostas a outras mensagens.
-      const messageText = msg.message?.conversation || msg.message?.extendedTextMessage?.text;
-
-      // Ignora mensagens sem conteúdo de texto, de status, ou enviadas pelo próprio bot.
-      if (!msg.message || msg.key.fromMe || !messageText) {
-        continue; // Pula para a próxima mensagem no loop
-      }
-
-      const chatId = msg.key.remoteJid;
-      const trimmedText = messageText.trim();
-      const userName = msg.pushName || 'Usuário';
-
-      console.log(`💬 Mensagem recebida de ${userName} (${chatId}): "${trimmedText}"`);
-
-      const response = await getResponse(chatId, trimmedText, userName);
-
-      try {
-        await sock.sendMessage(chatId, { text: response });
-      } catch (error) {
-        console.error(`❌ Falha ao enviar mensagem para ${chatId}:`, error);
-      }
-    }
-  });
 }
 
-// Inicia o bot
-startConnection().catch(err => console.error("Erro ao iniciar o bot:", err));
-
-
-// --- Lógica de graceful shutdown ---
-const cleanup = (signal) => {
-  console.log(`\nRecebido ${signal}. Desligando graciosamente...`);
-  // Aqui você pode adicionar lógicas para fechar conexões com o banco de dados, etc.
-  server.close(() => {
-    console.log('Servidor HTTP fechado.');
-    process.exit(0);
-  });
-
-  // Força o encerramento se o desligamento gracioso demorar muito
-  setTimeout(() => {
-    console.error('Desligamento gracioso demorou muito, forçando encerramento.');
-    process.exit(1);
-  }, 10000);
-};
-
-process.on('SIGINT', () => cleanup('SIGINT'));
-process.on('SIGTERM', () => cleanup('SIGTERM'));
+// Inicia a conexão
+connectToWhatsApp();

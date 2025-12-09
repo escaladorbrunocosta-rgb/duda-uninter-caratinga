@@ -1,17 +1,14 @@
-# Dependências do Node.js
-/node_modules
-
-# Arquivos de ambiente com senhas e chaves
-.env
-
-# Dados do banco de dados PostgreSQL (se rodando localmente)
-/postgres_data
-
-# Logs
+# Arquivos de Log e Cache
+logs.txt
 *.log
 npm-debug.log*
-pino-debug.log*
+.npm/
 
-# Arquivos de sistema operacional
-.DS_Store
-Thumbs.db
+# Dependências do Node.js (serão reinstaladas com 'npm install')
+node_modules/
+
+# Arquivos de sessão e autenticação (NUNCA comitar isso!)
+auth_info_multi/
+
+# Arquivos gerados dinamicamente
+qrcode.html

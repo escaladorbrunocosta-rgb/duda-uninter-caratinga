@@ -22,7 +22,7 @@ async function generateSessionString() {
     const credsFile = files.find(file => file === 'creds.json');
 
     if (!credsFile) {
-      throw new Error('Arquivo "creds.json" não encontrado. A sessão foi gerada corretamente?');
+      throw new Error('Arquivo "creds.json" não encontrado na pasta "auth_info_multi". Certifique-se de que o bot foi iniciado e o QR Code escaneado com sucesso antes de executar este script.');
     }
 
     const creds = JSON.parse(await fs.readFile(path.join(AUTH_DIR, credsFile), 'utf-8'), BufferJSON.reviver);
@@ -47,7 +47,12 @@ async function generateSessionString() {
     console.log('\n✅ String de sessão gerada com sucesso! Copie o bloco de texto abaixo:\n');
     console.log(sessionString);
   } catch (error) {
-    console.error('❌ Erro ao gerar a string de sessão. Verifique se a pasta "auth_info_multi" existe, não está vazia e foi gerada corretamente.', error);
+    if (error.code === 'ENOENT') {
+      console.error('❌ Erro: O diretório "%s" não foi encontrado.', AUTH_DIR);
+      console.error('   Certifique-se de iniciar o bot (`npm start`) e escanear o QR Code primeiro.');
+    } else {
+      console.error('❌ Erro ao gerar a string de sessão:', error.message);
+    }
   }
 }
 

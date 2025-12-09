@@ -4,9 +4,6 @@
 # Arquivos de ambiente com senhas e chaves
 .env
 
-# Dados de autenticação do Baileys
-/auth_info_multi
-
 # Dados do banco de dados PostgreSQL (se rodando localmente)
 /postgres_data
 

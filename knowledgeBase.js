@@ -15,11 +15,6 @@ export async function loadKnowledgeBase() {
     const fileContent = await fs.readFile(jsonPath, 'utf-8');
     knowledge = JSON.parse(fileContent);
 }
-// Chamamos a função para garantir que a base de conhecimento seja carregada.
-loadKnowledgeBase().catch(err => {
-    console.error("❌ Falha ao carregar knowledgeBase.json:", err);
-    process.exit(1); // Encerra o processo se a base de conhecimento não puder ser carregada.
-});
 
 // Objeto para rastrear o estado da conversa de cada usuário.
 // Em um bot real, isso seria armazenado em um banco de dados para persistência.
@@ -174,14 +169,15 @@ export async function getResponse(chatId, messageText, userName) { // A função
     const fallbackIndex = Math.min(state.fallbackCount - 1, knowledge.fallback.length - 1);
     
     // Se chegamos na última mensagem de fallback, aciona a transferência para humano.
-    if (fallbackIndex === knowledge.fallback.length - 1) {
-        return chooseResponse(knowledge.fallback[fallbackIndex]) + knowledge.human_handover.message;
+    if (state.fallbackCount >= knowledge.fallback.length) {
+        userState.set(chatId, { menu: 'main', fallbackCount: 0, topic: null }); // Reseta o estado
+        return chooseResponse(knowledge.fallback[knowledge.fallback.length - 1]) + "\n\n" + knowledge.human_handover.message;
     }
+
     let fallbackResponse = chooseResponse(knowledge.fallback[fallbackIndex]);
 
-    // Lógica de fallback aprimorada: Após 2 tentativas, oferece o menu principal.
-    if (state.fallbackCount > 2) {
-        fallbackResponse += "\n\n" + formatMenu(knowledge.menu_tree.main).replace(/Olá,.*!/, 'Talvez o menu principal possa ajudar:');
+    if (state.fallbackCount === 2) { // Na segunda falha, oferece o menu
+        fallbackResponse += "\n\n" + formatMenu(knowledge.menu_tree.main).replace(/Olá!/, 'Talvez o menu principal possa ajudar:');
         userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta para evitar loop
     }
 

@@ -59,7 +59,7 @@ async function startConnection() {
     version,
     auth: state,
     logger,
-    printQRInTerminal: false, // Garante que o QR não seja impresso no terminal pela biblioteca
+    printQRInTerminal: false, // Mude para 'false' para controlarmos a exibição manualmente
     browser: ['DudaBot', 'Chrome', '1.0'],
     syncFullHistory: true,
     shouldIgnoreJid: (jid) => jid.includes('@broadcast'),
@@ -70,8 +70,8 @@ async function startConnection() {
     const { connection, lastDisconnect, qr } = update;
 
     if (qr) {
-      // Imprime APENAS a linha de HTML com o conteúdo do QR Code.
-      console.log(`<div style="color:red; font-weight:bold;">QR_CODE: ${qr}</div>`);
+      console.log('📲 NOVO QR CODE. Escaneie para gerar uma nova sessão de autenticação.');
+      console.log(qr);
     }
 
     if (connection === 'close') {
@@ -83,9 +83,14 @@ async function startConnection() {
       if (shouldReconnect) {
         await startConnection();
       } else {
-        console.error('🚫 Logout detectado. Não foi possível reconectar. Delete a pasta de autenticação e reinicie.');
-        // Em caso de logout, o Render pode reiniciar o serviço, mas ele não vai reconectar.
-        // O ideal é apagar a pasta auth_info_multi e fazer o deploy novamente.
+        console.error('🚫 Logout detectado (código 401). A sessão foi invalidada.');
+        console.error('Isso significa que você precisa gerar uma nova sessão.');
+        console.error('1. Apague a pasta "auth_info_multi".');
+        console.error('2. Reinicie o bot para gerar um novo QR Code.');
+        // Em um ambiente de produção, queremos que o processo pare para sinalizar o erro.
+        if (process.env.NODE_ENV === 'production') {
+          process.exit(1);
+        }
       }
     } else if (connection === 'open') {
       console.log('✅ BOT CONECTADO AO WHATSAPP!');
@@ -97,25 +102,28 @@ async function startConnection() {
 
   // Listener para novas mensagens (aqui você implementará a lógica do knowledgeBase.json)
   sock.ev.on('messages.upsert', async ({ messages }) => {
-    const msg = messages[0];
+    for (const msg of messages) {
+      // Extrai o texto da mensagem, considerando conversas normais e respostas a outras mensagens.
+      const messageText = msg.message?.conversation || msg.message?.extendedTextMessage?.text;
 
-    // Ignora mensagens sem conteúdo, de status, ou enviadas pelo próprio bot
-    if (!msg.message || msg.key.fromMe || !msg.message.conversation) {
-      return;
-    }
+      // Ignora mensagens sem conteúdo de texto, de status, ou enviadas pelo próprio bot.
+      if (!msg.message || msg.key.fromMe || !messageText) {
+        continue; // Pula para a próxima mensagem no loop
+      }
 
-    const chatId = msg.key.remoteJid;
-    const messageText = msg.message.conversation.trim();
-    const userName = msg.pushName || 'Usuário';
+      const chatId = msg.key.remoteJid;
+      const trimmedText = messageText.trim();
+      const userName = msg.pushName || 'Usuário';
 
-    console.log(`💬 Mensagem recebida de ${userName} (${chatId}): "${messageText}"`);
+      console.log(`💬 Mensagem recebida de ${userName} (${chatId}): "${trimmedText}"`);
 
-    const response = await getResponse(chatId, messageText, userName);
+      const response = await getResponse(chatId, trimmedText, userName);
 
-    try {
-      await sock.sendMessage(chatId, { text: response });
-    } catch (error) {
-      console.error(`❌ Falha ao enviar mensagem para ${chatId}:`, error);
+      try {
+        await sock.sendMessage(chatId, { text: response });
+      } catch (error) {
+        console.error(`❌ Falha ao enviar mensagem para ${chatId}:`, error);
+      }
     }
   });
 }

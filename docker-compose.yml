@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    container_name: duda-uninter-db
+    restart: always
+    environment:
+      POSTGRES_USER: botuser
+      POSTGRES_PASSWORD: botpassword
+      POSTGRES_DB: dudabot
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data

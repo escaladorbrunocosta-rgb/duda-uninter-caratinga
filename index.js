@@ -1,5 +1,6 @@
 // =================================================================
 // ARQUIVO: index.js
+// Módulo principal do bot (lógica de conexão e eventos)
 // =================================================================
 
 // --- Módulos e Dependências ---
@@ -11,7 +12,6 @@ import makeWASocket, {
 } from '@whiskeysockets/baileys';
 import pino from 'pino';
 import qrcode from 'qrcode-terminal'; // Importação corrigida
-import { usePostgreSQLAuthState } from 'postgres-baileys';
 import { Pool } from 'pg'; // Importação adicionada
 import { getResponse, loadKnowledgeBase } from './knowledgeBase.js';
 
@@ -24,8 +24,11 @@ const pool = new Pool({
 });
 
 // --- Função Principal de Conexão ---
-async function connectToWhatsApp() {
+export async function connectToWhatsApp(isProduction = false) {
   console.log('▶️  Iniciando a função connectToWhatsApp...');
+
+  // Importa a dependência dinamicamente para evitar que ela seja carregada desnecessariamente
+  const { usePostgreSQLAuthState } = await import('postgres-baileys');
 
   const { version, isLatest } = await fetchLatestBaileysVersion();
   console.log(`▶️  Usando a versão do Baileys: ${version.join('.')}, é a mais recente: ${isLatest}`);
@@ -35,7 +38,7 @@ async function connectToWhatsApp() {
 
   // Logger padrão do Pino. Em produção, ele gerará JSON.
   // Em desenvolvimento, usaremos o script 'dev' para formatar a saída.
-  const logger = pino({ level: 'silent' });
+  const logger = pino({ level: isProduction ? 'info' : 'debug' });
 
   const sock = makeWASocket({
     printQRInTerminal: false, // Desativa o QR Code no terminal
@@ -49,7 +52,7 @@ async function connectToWhatsApp() {
   });
 
   // --- Lógica de Código de Pareamento (para Render) ---
-  if (!sock.authState.creds.registered && process.env.NODE_ENV !== 'production') {
+  if (!sock.authState.creds.registered && !isProduction) {
     console.log('▶️  QR Code recebido. Escaneie com seu WhatsApp abaixo:');
     sock.ev.on('connection.update', (update) => {
       const { qr } = update;
@@ -57,7 +60,7 @@ async function connectToWhatsApp() {
         qrcode.generate(qr, { small: true });
       }
     });
-  } else if (!sock.authState.creds.registered && process.env.NODE_ENV === 'production') {
+  } else if (!sock.authState.creds.registered && isProduction) {
     const phoneNumber = process.env.BOT_PHONE_NUMBER;
     if (!phoneNumber) {
       console.error('❌ ERRO: BOT_PHONE_NUMBER não definido nas variáveis de ambiente do Render.');
@@ -136,14 +139,3 @@ async function connectToWhatsApp() {
 
   console.log('▶️  Configuração dos eventos do socket concluída.');
 }
-
-// --- Ponto de Entrada do Script ---
-console.log('▶️  Chamando a função principal para iniciar a conexão...');
-// Carrega a base de conhecimento antes de iniciar a conexão
-loadKnowledgeBase()
-  .then(() => {
-    connectToWhatsApp().catch((err) => {
-      console.error('❌ Erro fatal ao iniciar o bot:', err);
-    });
-  })
-  .catch((err) => console.error('❌ Falha crítica ao carregar a base de conhecimento:', err));

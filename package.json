@@ -5,9 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
-    "dev": "node index.js | pino-pretty",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node start-prod.js",
+    "dev": "node start-dev.js | pino-pretty",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "npm cache clean --force"
   },
   "keywords": [
     "whatsapp",

@@ -1,0 +1,238 @@
+// =================================================================
+// ARQUIVO: index.js
+// DESCRIÇÃO: Bot WhatsApp Baileys com QR Code destacado no terminal
+// =================================================================
+
+import dotenv from 'dotenv';
+dotenv.config();
+
+import makeWASocket, {
+  useMultiFileAuthState,
+  DisconnectReason,
+  fetchLatestBaileysVersion,
+  BufferJSON,
+} from '@whiskeysockets/baileys';
+
+import qrcode from 'qrcode-terminal';
+import { Boom } from '@hapi/boom';
+import logger from './logger.js';
+
+// ===========================
+// FUNÇÃO: Mostrar QR no Terminal (bem destacado)
+// ===========================
+function printBigQR(qr) {
+  console.clear();
+  console.log("\n\n");
+  console.log("===========================================================");
+  console.log("==============    ESCANEIE O QR CODE ABAIXO    ============");
+  console.log("===========================================================\n");
+
+  qrcode.generate(qr, { small: false });
+
+  console.log("\n===========================================================");
+  console.log("====================    AGUARDANDO...    ==================");
+  console.log("===========================================================\n\n");
+}
+
+// ===========================
+// FUNÇÃO PRINCIPAL DE CONEXÃO
+// ===========================
+async function connectToWhatsApp() {
+  let state, saveCreds;
+
+  // 1. Se houver SESSION_DATA (modo Render), usa JSON. Senão, usa arquivos locais.
+  if (process.env.SESSION_DATA) {
+    logger.info("Carregando sessão da variável de ambiente...");
+
+    const sessionData = JSON.parse(process.env.SESSION_DATA, BufferJSON.reviver);
+    saveCreds = async () => {};
+
+    state = {
+      creds: sessionData.creds,
+      keys: {
+        get: (type, ids) => sessionData.keys[type]?.get(ids),
+        set: (data) => {
+          Object.assign(sessionData.keys, data);
+        }
+      }
+    };
+
+  } else {
+    logger.info("Usando autenticação local (auth_info_multi)...");
+    ({ state, saveCreds } = await useMultiFileAuthState("auth_info_multi"));
+  }
+
+  const { version, isLatest } = await fetchLatestBaileysVersion();
+  logger.info(`Baileys versão: ${version.join('.')} (mais recente: ${isLatest})`);
+
+  const sock = makeWASocket({
+    version,
+    logger,
+    printQRInTerminal: false, // desativa QR padrão
+    auth: state,
+    browser: ["DudaBot", "Chrome", "1.0"],
+  });
+
+  // ===========================
+  // MONITORAR EVENTOS DE CONEXÃO
+  // ===========================
+  sock.ev.on("connection.update", async (update) => {
+    const { connection, lastDisconnect, qr } = update;
+
+    if (qr) {
+      printBigQR(qr); // MOSTRA O QR MUITO DESTAQUE
+    }
+
+    if (connection === "open") {
+      console.clear();
+      logger.info("🎉 BOT CONECTADO AO WHATSAPP COM SUCESSO!");
+    }
+
+    if (connection === "close") {
+      const statusCode = lastDisconnect?.error?.output?.statusCode;
+
+      logger.error(`Conexão fechada. Código: ${statusCode}`);
+
+      if (statusCode === DisconnectReason.loggedOut) {
+        logger.fatal("Sessão expirada. Será necessário gerar novo QR ou nova SESSION_DATA.");
+        return;
+      }
+
+      logger.warn("Reconectando automaticamente...");
+      connectToWhatsApp();
+    }
+  });
+
+  sock.ev.on("creds.update", saveCreds);
+
+  // ====================
+  // RECEBIMENTO DE MENSAGENS
+  // ====================
+  
+  // ===========================================
+  
+  // RESPOSTAS AUTOMÁTICAS DA DUDA
+  
+  // ===========================================
+  
+  sock.ev.on("messages.upsert", async ({ messages }) => {
+const msg = messages[0];
+if (!msg.message) return;
+const from = msg.key.remoteJid;
+if (from.endsWith("@g.us")) {
+console.log("Mensagem ignorada (grupo)");
+return;
+}
+const msg = messages[0];    const from = msg.key.remoteJid;    if (from.endsWith('@g.us')) {        console.log('Mensagem ignorada (grupo)');        return;    }
+  try {
+    const msg = messages[0];
+    if (!msg || !msg.message) return;
+
+    const from = msg.key.remoteJid;
+    const isGroup = from.endsWith("@g.us");
+    if (isGroup) return;
+
+    const text = msg.message.conversation 
+      || msg.message.extendedTextMessage?.text 
+      || msg.message?.editedMessage?.message?.conversation;
+
+    if (!text) return;
+
+    logger.info(`Mensagem recebida de ${from}: ${text}`);
+
+    const lower = text.toLowerCase().trim();
+
+    if (lower === "oi" || lower === "olá" || lower === "bom dia" || lower === "boa tarde" || lower === "boa noite") {
+      await sock.sendMessage(from, { text: "Olá! Eu sou a Duda 🤖. Como posso ajudar você hoje?" });
+    }
+
+  } catch (e) {
+    logger.error("Erro no handler de mensagens", e);
+  }
+});
+  const msg = messages[0];
+  if (!msg || !msg.message) return;
+  const from = msg.key.remoteJid;
+  const isGroup = from.endsWith("@g.us");
+  if (isGroup) return;
+  const text = msg.message.conversation || msg.message.extendedTextMessage?.text;
+  if (!text) return;
+  logger.info(`Mensagem recebida de ${from}: ${text}`);
+  if (text.toLowerCase() === "oi" || text.toLowerCase() === "olá") {
+    await sock.sendMessage(from, { text: "Olá! Eu sou a Duda 🤖. Como posso ajudar você hoje?" });
+  }
+});
+    const msg = messages[0];
+    if (!msg.message) return;
+
+    const from = msg.key.remoteJid;
+
+    // 🚫 BLOQUEIO ABSOLUTO DE GRUPOS
+    if (from.endsWith("@g.us")) {
+      logger.warn(`Mensagem ignorada (grupo detectado): ${from}`);
+      return;
+    }
+
+    const text = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
+    if (!text) return;
+
+    logger.info(`Mensagem recebida de ${from}: ${text}`);
+
+    const user = text.trim().toLowerCase();
+
+    if (user === "oi" || user === "olá") {
+      await sock.sendMessage(from, { text: "Olá! Eu sou a Duda 🤖. Como posso ajudar você hoje?" });
+    }
+  });
+    
+    }
+
+    
+    if (user.includes("mensalidade")) {
+      
+      return await sock.sendMessage(from, {
+        
+        text: "💳 *Informações sobre mensalidade*\n\n• Pagamento via boleto ou cartão\n• Descontos para pagamento antecipado\n• 2ª via direto no portal do aluno\n\nQuer que eu gere o link para você?",
+      
+      });
+    
+    }
+
+    
+    if (user.includes("matrícula") || user.includes("matricula")) {
+      
+      return await sock.sendMessage(from, {
+        
+        text: "📝 *Informações sobre matrícula*\n\nTemos vagas abertas! Posso te enviar:\n1️⃣ Cursos disponíveis\n2️⃣ Documentação necessária\n3️⃣ Formas de ingresso\n\nO que deseja?",
+      
+      });
+    
+    }
+
+    
+    if (user.includes("ead") || user.includes("curso")) {
+      
+      return await sock.sendMessage(from, {
+        
+        text: "🎓 *Cursos EAD Uninter*\n\nTemos graduação, pós e cursos livres.\nQuer ver lista completa ou falar com um atendente?",
+      
+      });
+    
+    }
+
+    
+    return await sock.sendMessage(from, {
+      
+      text: "🤖 Não entendi exatamente… mas posso ajudar com:\n\n• Matrícula\n• Mensalidade\n• Cursos\n• Polo Caratinga\n\nDigite uma palavra-chave (ex: *matrícula*).",
+    
+    });
+  
+  });
+    }
+  });
+}
+
+// ===========================
+// INICIAR BOT
+// ===========================
+connectToWhatsApp();

@@ -9,6 +9,10 @@ node_modules/
 
 # Arquivos de sessão e autenticação (NUNCA comitar isso!)
 auth_info_multi/
+session.json
 
 # Arquivos gerados dinamicamente
 qrcode.html
+
+# Arquivo de variáveis de ambiente de desenvolvimento
+.env

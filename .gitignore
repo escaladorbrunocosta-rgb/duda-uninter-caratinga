@@ -1,18 +1,14 @@
-# Arquivos de Log e Cache
-logs.txt
+# Arquivo gerado para ignorar arquivos e pastas desnecessários ou sensíveis.
+
+# Dependências
+/node_modules
+
+# Arquivos de sessão do Baileys (contêm credenciais)
+/auth_info_multi/
+
+# Arquivos de ambiente (contêm segredos)
+.env
+
+# Logs
 *.log
 npm-debug.log*
-.npm/
-
-# Dependências do Node.js (serão reinstaladas com 'npm install')
-node_modules/
-
-# Arquivos de sessão e autenticação (NUNCA comitar isso!)
-auth_info_multi/
-session.json
-
-# Arquivos gerados dinamicamente
-qrcode.html
-
-# Arquivo de variáveis de ambiente de desenvolvimento
-.env

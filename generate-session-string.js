@@ -1,53 +1,42 @@
-// =================================================================
-// ARQUIVO: generate-session-string.js
-// DESCRIÇÃO: Lê a pasta de autenticação do Baileys e gera
-//            uma string JSON para ser usada como variável de ambiente.
-// =================================================================
+import makeWASocket, { useMultiFileAuthState, fetchLatestBaileysVersion, BufferJSON } from '@whiskeysockets/baileys';
+import qrcode from 'qrcode-terminal';
 
-import { promises as fs } from 'fs';
-import path from 'path';
-import { BufferJSON } from '@whiskeysockets/baileys';
+async function main() {
+    const { state, saveCreds } = await useMultiFileAuthState('auth_temp');
+    const { version } = await fetchLatestBaileysVersion();
 
-const AUTH_DIR = 'auth_info_multi';
+    const sock = makeWASocket({
+        version,
+        auth: state,
+        printQRInTerminal: false
+    });
 
-/**
- * Lê os arquivos de sessão da pasta de autenticação e os compila em
- * uma única string JSON para ser usada como variável de ambiente.
- */
-async function generateSessionString() {
-  try {
-    console.log(`Lendo arquivos de sessão da pasta "${AUTH_DIR}"...`);
+    sock.ev.on('connection.update', (update) => {
+        const { qr, connection } = update;
+        if (qr) {
+            console.clear();
+            console.log("==================================================");
+            console.log("========== ESCANEIE O QR CODE ABAIXO ===========");
+            console.log("==================================================\n");
+            qrcode.generate(qr, { small: false });
+        }
+        if (connection === 'open') {
+            console.log("\n🎉 Conectado! Agora vamos gerar a SESSION_DATA...");
+        }
+    });
 
-    const sessionData = {
-      creds: null,
-      keys: {},
-    };
+    sock.ev.on('creds.update', saveCreds);
 
-    // Lê o creds.json principal
-    const credsContent = await fs.readFile(path.join(AUTH_DIR, 'creds.json'), 'utf-8');
-    sessionData.creds = JSON.parse(credsContent);
-
-    // Lê todos os outros arquivos .json da pasta (pre-key, session, etc.)
-    const files = await fs.readdir(AUTH_DIR);
-    for (const file of files) {
-      if (file.endsWith('.json') && file !== 'creds.json') {
-        const content = await fs.readFile(path.join(AUTH_DIR, file), 'utf-8');
-        sessionData.keys[file] = JSON.parse(content);
-      }
-    }
-
-    // Converte o objeto completo para uma string JSON, usando o replacer do Baileys
-    const jsonString = JSON.stringify(sessionData, BufferJSON.replacer, 2);
-
-    console.log('\n✅ String de sessão gerada com sucesso! Copie o conteúdo abaixo e cole na sua variável de ambiente (ex: SESSION_DATA no Render):\n');
-    console.log('================================ SESSION STRING ================================\n');
-    console.log(jsonString);
-    console.log('\n================================================================================\n');
-
-  } catch (error) {
-    console.error('❌ Erro ao gerar a string de sessão:', error);
-    console.error(`\nCertifique-se de que a pasta "${AUTH_DIR}" existe e contém os arquivos de sessão. Você precisa rodar o bot localmente e escanear o QR Code primeiro.`);
-  }
+    sock.ev.on('connection.update', async (update) => {
+        const { connection } = update;
+        if (connection === 'open') {
+            const fs = await import('fs');
+            const sessionData = JSON.stringify(state, BufferJSON.replacer, 2);
+            fs.writeFileSync('SESSION_DATA.json', sessionData);
+            console.log("\n✅ SESSION_DATA gerada e salva em SESSION_DATA.json\n");
+            process.exit(0);
+        }
+    });
 }
 
-generateSessionString();
+main();

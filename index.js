@@ -12,9 +12,11 @@ import makeWASocket, {
   fetchLatestBaileysVersion,
   BufferJSON,
 } from '@whiskeysockets/baileys';
-
 import qrcode from 'qrcode-terminal';
 import logger from './logger.js';
+import { loadKnowledgeBase, getResponse } from './knowledgeBase.js';
+import { config } from './config.js';
+import { sendSessionInvalidNotification } from './notifications.js';
 
 // ===========================
 // FUNÇÃO: Mostrar QR no Terminal (bem destacado)
@@ -30,10 +32,15 @@ function printBigQR(qr) {
   console.log("===========================================================\n\n");
 }
 
+let reconnectAttempts = 0;
+
 // ===========================
 // FUNÇÃO PRINCIPAL DE CONEXÃO
 // ===========================
 async function connectToWhatsApp() {
+  // Carrega a base de conhecimento antes de iniciar a conexão
+  await loadKnowledgeBase();
+
   let state, saveCreds;
 
   if (process.env.SESSION_DATA) {
@@ -61,6 +68,8 @@ async function connectToWhatsApp() {
     printQRInTerminal: false,
     auth: state,
     browser: ["DudaBot", "Chrome", "1.0"],
+    // Reforço: Ignora jids de grupo para evitar erros de descriptografia de sessão dupla.
+    shouldIgnoreJid: jid => jid.endsWith('@g.us'),
   });
 
   // ===========================
@@ -74,6 +83,7 @@ async function connectToWhatsApp() {
     if (connection === "open") {
       console.clear();
       logger.info("🎉 BOT CONECTADO AO WHATSAPP COM SUCESSO!");
+      reconnectAttempts = 0; // Reseta o contador de tentativas ao conectar com sucesso
     }
 
     if (connection === "close") {
@@ -82,11 +92,18 @@ async function connectToWhatsApp() {
 
       if (statusCode === DisconnectReason.loggedOut) {
         logger.fatal("Sessão expirada. Será necessário gerar novo QR ou nova SESSION_DATA.");
+        sendSessionInvalidNotification(); // Envia notificação para o Discord
         return;
       }
 
-      logger.warn("Reconectando automaticamente...");
-      connectToWhatsApp();
+      if (reconnectAttempts < config.MAX_RECONNECT_ATTEMPTS) {
+        reconnectAttempts++;
+        logger.warn(`Tentando reconectar... (Tentativa ${reconnectAttempts} de ${config.MAX_RECONNECT_ATTEMPTS})`);
+        setTimeout(connectToWhatsApp, 5000); // Espera 5 segundos antes de tentar novamente
+      } else {
+        logger.fatal(`Falha ao reconectar após ${config.MAX_RECONNECT_ATTEMPTS} tentativas. O bot será desligado.`);
+        process.exit(1); // Desliga o processo se não conseguir reconectar
+      }
     }
   });
 
@@ -102,12 +119,6 @@ async function connectToWhatsApp() {
 
       const from = msg.key.remoteJid;
 
-      // 🚫 BLOQUEIO ABSOLUTO DE GRUPOS
-      if (from.endsWith("@g.us")) {
-        logger.warn(`Mensagem ignorada (grupo detectado): ${from}`);
-        return;
-      }
-
       // ====================
       // LÓGICA DE RESPOSTA AUTOMÁTICA
       // ====================
@@ -119,38 +130,14 @@ async function connectToWhatsApp() {
 
       logger.info(`Mensagem recebida de ${from}: ${text}`);
 
-      const user = text.trim().toLowerCase();
-
-      if (user === "oi" || user === "olá" || user.includes("bom dia") || user.includes("boa tarde") || user.includes("boa noite")) {
-        await sock.sendMessage(from, { text: "Olá! Eu sou a Duda 🤖. Como posso ajudar você hoje?" });
-        return;
-      }
-
-      if (user.includes("mensalidade")) {
-        await sock.sendMessage(from, {
-          text: "💳 *Informações sobre mensalidade*\n\n• Pagamento via boleto ou cartão\n• Descontos para pagamento antecipado\n• 2ª via direto no portal do aluno\n\nQuer que eu gere o link para você?",
-        });
-        return;
-      }
-
-      if (user.includes("matrícula") || user.includes("matricula")) {
-        await sock.sendMessage(from, {
-          text: "📝 *Informações sobre matrícula*\n\nTemos vagas abertas! Posso te enviar:\n1️⃣ Cursos disponíveis\n2️⃣ Documentação necessária\n3️⃣ Formas de ingresso\n\nO que deseja?",
-        });
-        return;
-      }
-
-      if (user.includes("ead") || user.includes("curso")) {
-        await sock.sendMessage(from, {
-          text: "🎓 *Cursos EAD Uninter*\n\nTemos graduação, pós e cursos livres.\nQuer ver lista completa ou falar com um atendente?",
-        });
-        return;
-      }
-
-      // Resposta padrão se não entender
-      await sock.sendMessage(from, {
-        text: "🤖 Não entendi exatamente… mas posso ajudar com:\n\n• Matrícula\n• Mensalidade\n• Cursos\n• Polo Caratinga\n\nDigite uma palavra-chave (ex: *matrícula*).",
-      });
+      // Extrai o nome do usuário (se disponível)
+      const userName = msg.pushName || "pessoa";
+      
+      // Centraliza toda a lógica de resposta no knowledgeBase.js
+      const replyText = await getResponse(from, text, userName);
+      
+      // Envia a resposta obtida
+      await sock.sendMessage(from, { text: replyText });
 
     } catch (e) {
       logger.error("Erro no handler de mensagens", e);

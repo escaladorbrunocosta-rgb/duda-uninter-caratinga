@@ -49,15 +49,27 @@ async function connectToWhatsApp() {
     let sessionDataString = process.env.SESSION_DATA;
     logger.info({ session_raw: sessionDataString }, "SESSION_DATA raw:");
 
-    // Tenta extrair apenas o conteúdo JSON da string, ignorando logs ou texto extra.
+    // Reforço: Lógica aprimorada para extrair o primeiro objeto JSON válido da string.
+    // Isso torna o bot mais resiliente a dados de sessão copiados com logs extras.
     const jsonStartIndex = sessionDataString.indexOf('{');
-    const jsonEndIndex = sessionDataString.lastIndexOf('}');
+    let braceCount = 0;
+    let jsonEndIndex = -1;
 
-    if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonEndIndex > jsonStartIndex) {
-      sessionDataString = sessionDataString.substring(jsonStartIndex, jsonEndIndex + 1);
-    } else {
+    if (jsonStartIndex !== -1) {
+      for (let i = jsonStartIndex; i < sessionDataString.length; i++) {
+        if (sessionDataString[i] === '{') braceCount++;
+        if (sessionDataString[i] === '}') braceCount--;
+        if (braceCount === 0) {
+          jsonEndIndex = i;
+          break;
+        }
+      }
+      if (jsonEndIndex !== -1) {
+        sessionDataString = sessionDataString.substring(jsonStartIndex, jsonEndIndex + 1);
+      } else {
         logger.fatal("Nenhum objeto JSON válido ('{...}') encontrado na SESSION_DATA.");
         process.exit(1);
+      }
     }
 
     try {

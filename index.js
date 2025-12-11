@@ -45,15 +45,23 @@ async function connectToWhatsApp() {
 
   if (process.env.SESSION_DATA) {
     logger.info("Carregando sessão da variável de ambiente...");
-    const sessionData = JSON.parse(process.env.SESSION_DATA, BufferJSON.reviver);
-    saveCreds = async () => {};
-    state = {
-      creds: sessionData.creds,
-      keys: {
-        get: (type, ids) => sessionData.keys[type]?.get(ids),
-        set: (data) => Object.assign(sessionData.keys, data)
+    // Limpa a string de caracteres inválidos (quebras de linha, etc.)
+    const sessionDataString = process.env.SESSION_DATA.replace(/(\r\n|\n|\r)/gm, "").trim();
+    
+    logger.info({ session_raw: sessionDataString }, "SESSION_DATA raw (após limpeza):");
+
+    try {
+      const sessionData = JSON.parse(sessionDataString, BufferJSON.reviver);
+      logger.info({ session_keys: Object.keys(sessionData) }, "SESSION_DATA parsed com sucesso.");
+      saveCreds = async () => {}; // Não salva credenciais quando usa variável de ambiente
+      state = {
+        creds: sessionData.creds,
+        keys: sessionData.keys,
+      };
+    } catch (e) {
+      logger.fatal({ error: e.message }, "❌ ERRO FATAL: Falha ao fazer o parse do JSON da SESSION_DATA. A string pode estar corrompida ou mal formatada. Verifique a variável no Render.");
+      process.exit(1); // Encerra o processo se a sessão for inválida
       }
-    };
   } else {
     logger.info("Usando autenticação local (auth_info_multi)...");
     ({ state, saveCreds } = await useMultiFileAuthState("auth_info_multi"));

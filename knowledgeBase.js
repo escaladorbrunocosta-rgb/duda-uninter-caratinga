@@ -5,7 +5,7 @@
  */
 import { promises as fs } from 'fs';
 import path from 'path';
-import { getWeather } from './services.js'; // Importa a nova habilidade
+import { getWeather, getGeminiResponse } from './services.js';
 
 // Carrega a base de conhecimento do arquivo JSON.
 // Usamos uma função assíncrona para carregar o JSON no início.
@@ -82,6 +82,13 @@ export async function getResponse(chatId, messageText, userName) { // A função
         const city = normalizedText.substring(7).trim();
         if (!city) return 'Por favor, informe uma cidade. Exemplo: `!clima São Paulo`';
         return await getWeather(city); // Retorna a promessa do serviço
+    }
+
+    // --- Lógica de Comando para IA Generativa (Gemini) ---
+    if (normalizedText.startsWith('!gemini')) {
+        const prompt = normalizedText.substring(8).trim();
+        if (!prompt) return 'Por favor, faça uma pergunta. Exemplo: `!gemini Qual a capital da Mongólia?`';
+        return await getGeminiResponse(prompt);
     }
 
     // Inicializa o estado do usuário com o menu principal e o contador de falhas

@@ -1,8 +1,10 @@
 import axios from 'axios';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Você precisará de uma chave de API de um serviço de meteorologia, como o OpenWeatherMap.
 // É uma boa prática armazená-la em variáveis de ambiente.
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY || 'SUA_CHAVE_DE_API_AQUI';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 /**
  * Busca a previsão do tempo para uma cidade específica.
@@ -20,5 +22,29 @@ export async function getWeather(city) {
         return `Tempo em ${city}: ${weather[0].description}, com temperatura de ${main.temp}°C.`;
     } catch (error) {
         return `Não consegui encontrar a previsão do tempo para "${city}". Verifique o nome da cidade e tente novamente.`;
+    }
+}
+
+/**
+ * Envia uma pergunta para a API do Google Gemini e retorna a resposta.
+ * @param {string} prompt - A pergunta para a IA.
+ * @returns {Promise<string>} A resposta da IA.
+ */
+export async function getGeminiResponse(prompt) {
+    if (!GEMINI_API_KEY) {
+        return '🤖 O serviço de IA não está configurado. O administrador precisa definir a variável de ambiente `GEMINI_API_KEY`.';
+    }
+
+    try {
+        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+        return text;
+    } catch (error) {
+        console.error("❌ Erro ao chamar a API do Gemini:", error);
+        return "🤖 Desculpe, não consegui processar sua pergunta com a IA no momento. Tente novamente mais tarde.";
     }
 }

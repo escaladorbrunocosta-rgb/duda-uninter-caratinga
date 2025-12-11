@@ -19,6 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
+    "@google/generative-ai": "^0.16.0",
     "@whiskeysockets/baileys": "^6.7.21",
     "dotenv": "^17.2.3",
     "pino": "^9.14.0",

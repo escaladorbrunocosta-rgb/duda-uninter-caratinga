@@ -1,14 +1,24 @@
-# Arquivo gerado para ignorar arquivos e pastas desnecessários ou sensíveis.
-
-# Dependências
+# Dependências do Node.js
 /node_modules
 
-# Arquivos de sessão do Baileys (contêm credenciais)
+# Arquivos de autenticação local (MUITO SENSÍVEL)
+# Contém as credenciais da sessão do WhatsApp. NUNCA envie para o GitHub.
 /auth_info_multi/
 
-# Arquivos de ambiente (contêm segredos)
+# Arquivo de variáveis de ambiente (SENSÍVEL)
+# Contém chaves de API e outras credenciais.
 .env
 
+# Arquivo de sessão para deploy (MUITO SENSÍVEL)
+# Contém a sessão completa para ser usada em plataformas como o Render.
+session_for_render.txt
+
 # Logs
+logs.txt
 *.log
 npm-debug.log*
+nohup.out
+
+# Arquivos gerados pelo sistema operacional
+.DS_Store
+Thumbs.db

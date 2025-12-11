@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node index.js | pino-pretty",
     "dev": "node start-dev.js | pino-pretty",
+    "session": "node generate-session.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npm cache clean --force"
   },

@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index.js | pino-pretty",
     "dev": "node start-dev.js | pino-pretty",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npm cache clean --force"
@@ -21,6 +21,7 @@
     "@hapi/boom": "^10.0.1",
     "@google/generative-ai": "^0.16.0",
     "@whiskeysockets/baileys": "^6.7.21",
+    "express": "^4.19.2",
     "dotenv": "^17.2.3",
     "pino": "^9.14.0",
     "qrcode": "^1.5.3",

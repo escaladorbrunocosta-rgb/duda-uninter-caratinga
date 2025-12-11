@@ -45,21 +45,31 @@ async function connectToWhatsApp() {
 
   if (process.env.SESSION_DATA) {
     logger.info("Carregando sessão da variável de ambiente...");
-    // Limpa a string de caracteres inválidos (quebras de linha, etc.)
-    const sessionDataString = process.env.SESSION_DATA.replace(/(\r\n|\n|\r)/gm, "").trim();
     
-    logger.info({ session_raw: sessionDataString }, "SESSION_DATA raw (após limpeza):");
+    let sessionDataString = process.env.SESSION_DATA;
+    logger.info({ session_raw: sessionDataString }, "SESSION_DATA raw:");
+
+    // Tenta extrair apenas o conteúdo JSON da string, ignorando logs ou texto extra.
+    const jsonStartIndex = sessionDataString.indexOf('{');
+    const jsonEndIndex = sessionDataString.lastIndexOf('}');
+
+    if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonEndIndex > jsonStartIndex) {
+      sessionDataString = sessionDataString.substring(jsonStartIndex, jsonEndIndex + 1);
+    } else {
+        logger.fatal("Nenhum objeto JSON válido ('{...}') encontrado na SESSION_DATA.");
+        process.exit(1);
+    }
 
     try {
       const sessionData = JSON.parse(sessionDataString, BufferJSON.reviver);
-      logger.info({ session_keys: Object.keys(sessionData) }, "SESSION_DATA parsed com sucesso.");
+      logger.info({ session_keys: Object.keys(sessionData) }, "SESSION_DATA parsed:");
       saveCreds = async () => {}; // Não salva credenciais quando usa variável de ambiente
       state = {
         creds: sessionData.creds,
         keys: sessionData.keys,
       };
     } catch (e) {
-      logger.fatal({ error: e.message }, "❌ ERRO FATAL: Falha ao fazer o parse do JSON da SESSION_DATA. A string pode estar corrompida ou mal formatada. Verifique a variável no Render.");
+      logger.fatal({ error: e.message, cleaned_json: sessionDataString }, "❌ ERRO FATAL: Falha ao fazer o parse do JSON da SESSION_DATA. A string pode estar corrompida ou mal formatada. Verifique a variável no Render.");
       process.exit(1); // Encerra o processo se a sessão for inválida
       }
   } else {

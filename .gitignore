@@ -1,36 +1,14 @@
-# Dependências do Node.js
-/node_modules
+# Arquivos e pastas gerados pelo Node.js
+node_modules/
+npm-debug.log
 
-# Arquivos de autenticação local (MUITO SENSÍVEL)
-# A pasta auth_info_multi/ não será mais usada, mas a regra é mantida por segurança.
-# A pasta session_data/ é INTENCIONALMENTE NÃO IGNORADA para ser commitada.
-/auth_info_multi/
+# Arquivos de sessão do Baileys (MUITO IMPORTANTE)
+# Contém credenciais de acesso ao WhatsApp!
+auth/
 
-# Arquivo de variáveis de ambiente (SENSÍVEL)
-# Contém chaves de API e outras credenciais.
-.env
+# Arquivos de log
+logs-base/
+logs-inteligente/
 
-# Arquivo de sessão para deploy (MUITO SENSÍVEL)
-# Contém a sessão completa para ser usada em plataformas como o Render.
-session_for_render.txt
-
-# Logs
-logs.txt
-*.log
-error_log.txt
-npm-debug.log*
-nohup.out
-
-# Arquivos gerados pelo sistema operacional
-.DS_Store
-Thumbs.db
-
-# Arquivo de estado do usuário
-userState.jsonstado do usuário
-userState.jsonstado do usuário
-userState.jsonstado do usuário
-userState.jsonstado do usuário
-userState.jsonstado do usuário
-userState.jsonstado do usuário
-userState.jsonstado do usuário
-userState.json
+# Arquivo de estado da conversa
+userStates.json

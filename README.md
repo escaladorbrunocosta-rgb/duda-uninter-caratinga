@@ -1,54 +1,67 @@
-# Duda - Assistente Virtual para WhatsApp
+# DUDA-BOT - Assistente Virtual para WhatsApp
 
-Este é o repositório do Duda, um bot para WhatsApp desenvolvido com Node.js e a biblioteca Baileys. Ele é projetado para fornecer respostas automáticas, navegar por menus e se integrar com serviços de IA como o Google Gemini.
+Este projeto implementa um chatbot para WhatsApp robusto e modular, utilizando a biblioteca `@whiskeysockets/baileys`. Ele é dividido em duas camadas independentes: `bot-base` e `bot-inteligente`.
 
-## Funcionalidades
+## Estrutura do Projeto
 
-*   Respostas automáticas baseadas em uma base de conhecimento (`knowledgeBase.json`).
-*   Sistema de menu navegável.
-*   Lógica de fallback progressivo para quando o bot não entende a pergunta.
-*   Integração com o Google Gemini para respostas generativas (comando `!gemini`).
-*   Notificações de status para o Discord.
-*   Geração de sessão para deploy em plataformas como o Render.
+```
+/
+├── auth/                   # Pasta de sessão (gerada automaticamente, NÃO ENVIAR PARA O GIT)
+├── bot-base/               # Camada responsável apenas pela conexão e sessão
+│   ├── index.js
+│   └── package.json
+├── bot-inteligente/        # Camada com a lógica de atendimento e IA
+│   ├── index.js
+│   ├── messageHandler.js
+│   ├── knowledgeBase.js
+│   └── connection.js       # Módulo de conexão compartilhado
+├── logs-base/              # Logs do bot-base
+├── logs-inteligente/       # Logs do bot-inteligente
+├── userStates.json         # Arquivo com o estado das conversas
+└── .gitignore              # Arquivo para ignorar pastas sensíveis no Git
+```
+
+### Camadas
+
+#### 🤖 `bot-base`
+- **Responsabilidade**: Conectar-se ao WhatsApp, gerar o QR Code, salvar a sessão na pasta `/auth` e manter a conexão estável.
+- **Características**: Não possui nenhuma lógica de resposta. É o "motor" da conexão.
+
+#### 🧠 `bot-inteligente`
+- **Responsabilidade**: Carregar a sessão criada pelo `bot-base` e gerenciar toda a interação com o usuário.
+- **Características**: Contém a base de conhecimento, o fluxo de menus, processamento de linguagem natural (NLP) simples e a lógica de respostas.
+
+## Pré-requisitos
+
+- Node.js (versão 20.x ou superior)
 
 ## Instalação
 
-1.  Clone este repositório:
-    ```bash
-    git clone <URL_DO_SEU_REPOSITORIO>
-    cd duda-uninter-caratinga
-    ```
+1. Clone o repositório:
+   ```bash
+   git clone <url-do-seu-repositorio>
+   cd duda-uninter-caratinga
+   ```
 
-2.  Instale as dependências:
-    ```bash
-    npm install
-    ```
-
-3.  Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis:
-    ```env
-    # Chave da API do Google Gemini para o comando !gemini
-    GEMINI_API_KEY=SUA_CHAVE_AQUI
-
-    # (Opcional) Webhook do Discord para receber notificações de erro
-    DISCORD_WEBHOOK_URL=SEU_WEBHOOK_AQUI
-    ```
+2. Instale as dependências para ambos os bots. Este comando entrará em cada pasta e executará `npm install`.
+   ```bash
+   (cd bot-base && npm install) && (cd bot-inteligente && npm install)
+   ```
 
 ## Como Executar
 
-### Ambiente de Desenvolvimento
+A execução é feita em dois passos:
 
-Para rodar o bot localmente e gerar o QR Code para autenticação:
-
+### Passo 1: Gerar a Sessão com o `bot-base`
+Execute o bot base para escanear o QR Code.
 ```bash
-npm run dev
+node bot-base/index.js
 ```
+Escaneie o QR Code com seu celular. Após ver a mensagem de "conectado com sucesso", você pode parar o processo (`Ctrl+C`). A sessão estará salva na pasta `/auth`.
 
-### Gerar Sessão para Deploy
-
-Após escanear o QR Code e conectar o bot localmente, pare o processo (`Ctrl+C`) e execute o seguinte comando para gerar a string de sessão para o deploy:
-
+### Passo 2: Iniciar o Atendimento com o `bot-inteligente`
+Com a sessão já criada, inicie o bot que responde aos usuários.
 ```bash
-npm run session
+node bot-inteligente/index.js
 ```
-
-Isso criará um arquivo `session_for_render.txt`. Copie o conteúdo e cole na variável de ambiente `SESSION_DATA` da sua plataforma de hospedagem (ex: Render).
+O bot agora está online e pronto para atender, usando a sessão persistida.

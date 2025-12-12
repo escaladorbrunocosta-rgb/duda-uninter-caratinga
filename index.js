@@ -1,178 +1,91 @@
-// =================================================================
-// ARQUIVO: index.js
-// DESCRIÇÃO: Ponto de entrada do Bot WhatsApp com Baileys.
-// Gerencia a conexão, eventos e o servidor web para keep-alive.
-// =================================================================
+/**
+ * =================================================================
+ * ARQUIVO: bot-inteligente/index.js
+ * DESCRIÇÃO: BOT_INTELIGENTE - Ponto de entrada e orquestração do atendimento.
+ * RESPONSABILIDADE: Usar a sessão existente para conectar,
+ * receber mensagens e delegar o processamento para o messageHandler.
+ * =================================================================
+ */
 
-import dotenv from 'dotenv';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import express from 'express';
-import makeWASocket, {
-  useMultiFileAuthState,
-  DisconnectReason,
-  fetchLatestBaileysVersion,
-} from '@whiskeysockets/baileys';
-import qrcode from 'qrcode-terminal';
-import { Boom } from '@hapi/boom';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import pino from 'pino';
+import fs from 'fs';
+import { initializeWhatsAppClient } from './connection.js';
+import { getResponse } from './messageHandler.js';
 
-import logger from './logger.js';
-import { loadKnowledgeBase, getResponse } from './knowledgeBase.js';
-// A funcionalidade de sincronização com o Git foi desativada para simplificar o deploy.
-// Para reativar, descomente a linha abaixo e as chamadas para as funções.
-// import { initializeGit, autoGitPush } from './utils/git.js';
-import { ensureDirExists, deleteDir } from './utils/file.js';
-// ===========================
-// CONFIGURAÇÃO DO SERVIDOR EXPRESS
-// ===========================
-dotenv.config();
-const app = express();
-const port = process.env.PORT || 3000;
-const SESSION_DIR = path.join(process.cwd(), 'session_data');
+// --- Configuração de Caminhos e Logger ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const execAsync = promisify(exec);
+// O diretório da sessão é o mesmo do bot-base, na raiz do projeto.
+const SESSION_DIR = path.join(__dirname, '..', 'auth'); // Caminho compartilhado
+const LOGS_DIR = path.join(__dirname, 'logs-inteligente'); // Corrigido para pasta local
 
-// ===========================
-// FUNÇÃO: Mostrar QR no Terminal
-// ===========================
-function printBigQR(qr) {
-  console.clear();
-  console.log("\n\n===========================================================");
-  console.log("==============    ESCANEIE O QR CODE ABAIXO    ============");
-  console.log("======   Abra o WhatsApp > Aparelhos Conectados > Conectar  ======");
-  console.log("===========================================================");
-  // Usamos qrcode-terminal para garantir a exibição em qualquer ambiente.
-  qrcode.generate(qr, { small: true });
-  console.log("====================    AGUARDANDO...    ==================\n\n");
-}
+// Garante que o diretório de logs exista
+if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR, { recursive: true });
 
-// ===========================
-// FUNÇÃO PRINCIPAL DE CONEXÃO
-// ===========================
+const logger = pino({
+    level: 'info',
+}, pino.destination(path.join(LOGS_DIR, 'bot-inteligente.log')));
+
+/**
+ * Função principal que inicializa e gerencia a conexão do bot.
+ */
 async function startBot() {
-  logger.info("Iniciando o bot...");
+  logger.info("Iniciando o BOT-INTELIGENTE...");
 
-  // Garante que o diretório da sessão exista antes de usar
-  await ensureDirExists(SESSION_DIR);
-  logger.info(`[AUTH] Diretório de sessão verificado em: ${SESSION_DIR}`);
+  // Verifica se a pasta de sessão existe. Se não, instrui o usuário.
+  if (!fs.existsSync(SESSION_DIR) || fs.readdirSync(SESSION_DIR).length === 0) {
+    console.error("🟥 ERRO: A pasta de sessão 'auth' está vazia ou não existe.");
+    console.error("👉 Por favor, execute o 'bot-base' primeiro para gerar a sessão com o QR Code.");
+    logger.error("[AUTH] Falha ao iniciar: diretório de sessão não encontrado ou vazio.");
+    process.exit(1); // Encerra o processo com código de erro
+  }
 
-  // Carrega o estado de autenticação da pasta
-  const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
-  logger.info("[AUTH] Estado de autenticação carregado da pasta local.");
-
-  const { version, isLatest } = await fetchLatestBaileysVersion();
-  logger.info(`Baileys versão: ${version.join('.')} (mais recente: ${isLatest})`);
-
-  const sock = makeWASocket({
-    version,
-    logger,
-    printQRInTerminal: false, // Desativamos o padrão para usar nossa função customizada
-    auth: state, // Carrega a sessão
-    browser: ["DudaBot", "Chrome", "1.0"],
-    shouldIgnoreJid: jid => jid.endsWith('@g.us'),
-  });
-
-  // ===========================
-  // SALVAR CREDENCIAIS E SINCRONIZAR COM GIT
-  // O evento 'creds.update' é o gatilho para salvar o estado de autenticação.
-  // ===========================
-  sock.ev.on('creds.update', saveCreds); // Salva localmente
-  // A sincronização com o Git a cada atualização de credencial foi desativada.
-  // Para reativar, descomente a linha abaixo.
-  // sock.ev.on('creds.update', autoGitPush); // Envia para o GitHub
-
-  // ===========================
-  // MONITORAR EVENTOS DE CONEXÃO
-  // ===========================
-  sock.ev.on("connection.update", async (update) => {
-    const { connection, lastDisconnect, qr } = update;
-
-    if (qr) printBigQR(qr);
-
-    if (connection === "open") { // Conexão bem-sucedida
+  const onConnectionUpdate = (update, restart) => {
+    const { connection, lastDisconnect } = update;
+    if (connection === "open") {
       console.clear();
-      logger.info("🎉 BOT CONECTADO COM SUCESSO AO WHATSAPP!");
-      // A sincronização com o Git ao conectar foi desativada.
-      // logger.info("[GIT] Iniciando sincronização da sessão com o GitHub...");
-      // await autoGitPush(); // Salva a sessão no GitHub assim que conectar
+      logger.info("🎉 BOT-INTELIGENTE conectado e pronto para atender!");
+      console.log("🎉 BOT-INTELIGENTE conectado e pronto para atender!");
     }
-
-    if (connection === "close") { // Conexão fechada
-      const reason = lastDisconnect?.error?.output?.statusCode;
-      logger.error(`Conexão fechada. Razão: ${DisconnectReason[reason] || 'Desconhecido'}. Código: ${reason}`);
-
-      // Lógica para lidar com sessão corrompida (Logged Out)
-      if (reason === DisconnectReason.loggedOut) {
-        logger.warn("[AUTH] Sessão corrompida ou desconectada remotamente. Apagando dados locais para gerar novo QR Code.");
-        await deleteDir(SESSION_DIR);
-        logger.info("[AUTH] Pasta da sessão local apagada. Reiniciando o bot...");
-        // O commit da remoção será feito na próxima conexão bem-sucedida
-        startBot();
+    if (connection === "close") {
+      if (lastDisconnect?.error?.output?.statusCode === 401) { // 401 = Logged Out
+        logger.fatal("[AUTH] Sessão inválida. O bot-base precisa ser executado para gerar uma nova sessão.");
+        console.error("🟥 ERRO: Sessão do WhatsApp desconectada. Execute o 'bot-base' novamente.");
+        process.exit(1);
       } else {
         logger.info("Tentando reconectar em 10 segundos...");
-        setTimeout(startBot, 10000);
+        setTimeout(restart, 10000);
       }
     }
-  });
+  };
 
-  // ====================
-  // RECEBIMENTO DE MENSAGENS
-  // ====================
-  sock.ev.on("messages.upsert", async ({ messages }) => {
-    try {
-      const msg = messages[0];
-      if (!msg?.message) return;
+  const onMessagesUpsert = async ({ messages }) => {
+    const msg = messages[0];
+    if (!msg?.message || msg.key.fromMe) return;
 
-      const from = msg.key.remoteJid;
+    const from = msg.key.remoteJid;
+    const text = msg.message?.conversation || msg.message.extendedTextMessage?.text || "";
+    const userName = msg.pushName || "aluno(a)";
+    if (!text) return;
+    
+    logger.info(`[MSG] Mensagem de ${userName} (${from}): "${text}"`);
 
-      // ====================
-      // LÓGICA DE RESPOSTA AUTOMÁTICA
-      // ====================
-      const text = msg.message?.conversation 
-        || msg.message.extendedTextMessage?.text 
-        || "";
+    const replyText = await getResponse(from, text, userName);
+    await sock.sendMessage(from, { text: replyText });
+    logger.info(`[REPLY] Resposta para ${from}: "${replyText.substring(0, 80)}..."`);
+  };
 
-      if (!text) return;
-
-      logger.info(`Mensagem recebida de ${from}: ${text}`);
-
-      // Extrai o nome do usuário (se disponível)
-      const userName = msg.pushName || "você";
-      
-      // Centraliza toda a lógica de resposta no knowledgeBase.js
-      const replyText = await getResponse(from, text, userName);
-      
-      // Envia a resposta obtida
-      await sock.sendMessage(from, { text: replyText });
-      logger.info(`Resposta enviada para ${from}: ${replyText.substring(0, 50)}...`);
-    } catch (e) {
-      logger.error("Erro no handler de mensagens", e);
-    }
+  const sock = await initializeWhatsAppClient({
+    sessionDir: SESSION_DIR,
+    logger,
+    onConnectionUpdate,
+    onMessagesUpsert,
   });
 }
 
-// ===========================
-// ROTA KEEP-ALIVE PARA O RENDER
-// ===========================
-app.get('/', (req, res) => {
-  // logger.info('Rota GET / foi acessada (Keep-Alive).'); // Opcional: pode poluir os logs.
-  res.send('🤖 Duda Uninter Bot está no ar e saudável!');
-});
-
-// ===========================
-// INICIALIZAÇÃO DA APLICAÇÃO
-// ===========================
-app.listen(port, async () => {
-  logger.info(`🚀 Servidor Express rodando na porta ${port}.`);
-
-  try {
-    await loadKnowledgeBase(); // 1. Carrega a base de conhecimento
-    // A inicialização do Git foi desativada.
-    // await initializeGit();     // 2. Sincroniza o repositório Git para obter a sessão mais recente
-    await startBot();          // 2. Inicia o bot do WhatsApp
-  } catch (error) {
-    logger.fatal("Falha crítica durante a inicialização do bot.", error);
-    process.exit(1); // Encerra o processo se a inicialização falhar
-  }
+startBot().catch(err => {
+    logger.fatal({ err }, "Falha crítica ao iniciar o BOT-INTELIGENTE.");
 });

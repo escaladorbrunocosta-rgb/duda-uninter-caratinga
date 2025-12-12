@@ -17,7 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.5",
-    "pino": "^9.14.0",
-    "natural": "^7.0.0"
+    "natural": "^7.0.0",
+    "pino": "^9.14.0"
   }
 }

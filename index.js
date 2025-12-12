@@ -1,49 +1,54 @@
 // =================================================================
 // ARQUIVO: index.js
-// DESCRIÇÃO: Bot WhatsApp Baileys com persistência de sessão via Git para deploy no Render.
+// DESCRIÇÃO: Ponto de entrada do Bot WhatsApp com Baileys.
+// Gerencia a conexão, eventos e o servidor web para keep-alive.
 // =================================================================
 
 import dotenv from 'dotenv';
-dotenv.config();
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import express from 'express';
-import path from 'path';
-
 import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
 } from '@whiskeysockets/baileys';
+import qrcode from 'qrcode-terminal';
+import { Boom } from '@hapi/boom';
+import path from 'path';
+
 import logger from './logger.js';
 import { loadKnowledgeBase, getResponse } from './knowledgeBase.js';
 import { initializeGit, autoGitPush } from './utils/git.js';
 import { ensureDirExists, deleteDir } from './utils/file.js';
-
 // ===========================
 // CONFIGURAÇÃO DO SERVIDOR EXPRESS
 // ===========================
+dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 const SESSION_DIR = path.join(process.cwd(), 'session_data');
 
+const execAsync = promisify(exec);
+
 // ===========================
-// FUNÇÃO: Mostrar QR no Terminal (bem destacado)
+// FUNÇÃO: Mostrar QR no Terminal
 // ===========================
 function printBigQR(qr) {
   console.clear();
   console.log("\n\n===========================================================");
   console.log("==============    ESCANEIE O QR CODE ABAIXO    ============");
   console.log("======   Abra o WhatsApp > Aparelhos Conectados > Conectar  ======");
-  console.log("===========================================================\n");
-  // qrcode-terminal não é mais necessário, Baileys imprime o QR nativamente.
-  console.log("\n===========================================================");
-  console.log("====================    AGUARDANDO...    ==================");
-  console.log("===========================================================\n\n");
+  console.log("===========================================================");
+  // Usamos qrcode-terminal para garantir a exibição em qualquer ambiente.
+  qrcode.generate(qr, { small: true });
+  console.log("====================    AGUARDANDO...    ==================\n\n");
 }
 
 // ===========================
 // FUNÇÃO PRINCIPAL DE CONEXÃO
 // ===========================
-export async function startBot() { // Exporta a função para ser usada por start.js
+async function startBot() {
   logger.info("Iniciando o bot...");
 
   // Garante que o diretório da sessão exista antes de usar
@@ -60,7 +65,7 @@ export async function startBot() { // Exporta a função para ser usada por star
   const sock = makeWASocket({
     version,
     logger,
-    printQRInTerminal: true,
+    printQRInTerminal: false, // Desativamos o padrão para usar nossa função customizada
     auth: state, // Carrega a sessão
     browser: ["DudaBot", "Chrome", "1.0"],
     shouldIgnoreJid: jid => jid.endsWith('@g.us'),
@@ -68,8 +73,10 @@ export async function startBot() { // Exporta a função para ser usada por star
 
   // ===========================
   // SALVAR CREDENCIAIS E SINCRONIZAR COM GIT
+  // O evento 'creds.update' é o gatilho para salvar o estado de autenticação.
   // ===========================
-  sock.ev.on('creds.update', saveCreds);
+  sock.ev.on('creds.update', saveCreds); // Salva localmente
+  sock.ev.on('creds.update', autoGitPush); // Envia para o GitHub
 
   // ===========================
   // MONITORAR EVENTOS DE CONEXÃO
@@ -104,13 +111,6 @@ export async function startBot() { // Exporta a função para ser usada por star
     }
   });
 
-  // Hook para salvar a sessão no Git sempre que as credenciais forem atualizadas
-  // Isso garante que a sessão esteja sempre sincronizada.
-  sock.ev.on('creds.update', async () => {
-      logger.info("[AUTH] Credenciais atualizadas. Tentando salvar no GitHub...");
-      await autoGitPush();
-  });
-
   // ====================
   // RECEBIMENTO DE MENSAGENS
   // ====================
@@ -124,7 +124,7 @@ export async function startBot() { // Exporta a função para ser usada por star
       // ====================
       // LÓGICA DE RESPOSTA AUTOMÁTICA
       // ====================
-      const text = msg.message.conversation 
+      const text = msg.message?.conversation 
         || msg.message.extendedTextMessage?.text 
         || "";
 
@@ -133,14 +133,14 @@ export async function startBot() { // Exporta a função para ser usada por star
       logger.info(`Mensagem recebida de ${from}: ${text}`);
 
       // Extrai o nome do usuário (se disponível)
-      const userName = msg.pushName || "pessoa";
+      const userName = msg.pushName || "você";
       
       // Centraliza toda a lógica de resposta no knowledgeBase.js
       const replyText = await getResponse(from, text, userName);
       
       // Envia a resposta obtida
       await sock.sendMessage(from, { text: replyText });
-
+      logger.info(`Resposta enviada para ${from}: ${replyText.substring(0, 50)}...`);
     } catch (e) {
       logger.error("Erro no handler de mensagens", e);
     }
@@ -151,7 +151,7 @@ export async function startBot() { // Exporta a função para ser usada por star
 // ROTA KEEP-ALIVE PARA O RENDER
 // ===========================
 app.get('/', (req, res) => {
-  logger.info('Rota GET / foi acessada (Keep-Alive).');
+  // logger.info('Rota GET / foi acessada (Keep-Alive).'); // Opcional: pode poluir os logs.
   res.send('🤖 Duda Uninter Bot está no ar e saudável!');
 });
 
@@ -161,10 +161,12 @@ app.get('/', (req, res) => {
 app.listen(port, async () => {
   logger.info(`🚀 Servidor Express rodando na porta ${port}.`);
 
-  // 1. Carrega a base de conhecimento
-  await loadKnowledgeBase();
-  // 2. Sincroniza o repositório Git para obter a sessão mais recente
-  await initializeGit();
-  // 3. Inicia o bot do WhatsApp
-  startBot();
+  try {
+    await loadKnowledgeBase(); // 1. Carrega a base de conhecimento
+    await initializeGit();     // 2. Sincroniza o repositório Git para obter a sessão mais recente
+    await startBot();          // 3. Inicia o bot do WhatsApp
+  } catch (error) {
+    logger.fatal("Falha crítica durante a inicialização do bot.", error);
+    process.exit(1); // Encerra o processo se a inicialização falhar
+  }
 });

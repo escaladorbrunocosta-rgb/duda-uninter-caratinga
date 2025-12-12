@@ -1,19 +1,26 @@
-// =================================================================
-// ARQUIVO: utils/file.js
-// DESCRIÇÃO: Funções utilitárias para manipulação de arquivos e diretórios.
-// =================================================================
-
 import { promises as fs } from 'fs';
 import path from 'path';
+import logger from '../logger.js';
 
 /**
- * Garante que um diretório exista. Se não existir, cria-o.
- * @param {string} dirPath - O caminho do diretório.
+ * Garante que um diretório exista. Se não existir, ele o cria.
+ * @param {string} dirPath - O caminho do diretório a ser verificado/criado.
  */
-export const ensureDirExists = (dirPath) => fs.mkdir(dirPath, { recursive: true });
+export async function ensureDirExists(dirPath) {
+  try {
+    await fs.access(dirPath);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      logger.info(`[FS] Diretório ${dirPath} não encontrado. Criando...`);
+      await fs.mkdir(dirPath, { recursive: true });
+    } else {
+      throw error;
+    }
+  }
+}
 
 /**
- * Remove um diretório e todo o seu conteúdo de forma recursiva.
- * @param {string} dirPath - O caminho do diretório a ser removido.
+ * Deleta um diretório recursivamente.
+ * @param {string} dirPath - O caminho do diretório a ser deletado.
  */
-export const deleteDir = (dirPath) => fs.rm(dirPath, { recursive: true, force: true });
+export const deleteDir = async (dirPath) => fs.rm(dirPath, { recursive: true, force: true });

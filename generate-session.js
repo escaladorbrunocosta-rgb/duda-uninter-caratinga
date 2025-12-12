@@ -1,69 +1,71 @@
-// =================================================================
-// ARQUIVO: generate-session.js
-// DESCRIÇÃO: Script ÚNICO para gerar e empacotar a string de sessão para o Render.
-// USO:
-// 1. Delete a pasta 'auth_info_multi' se ela existir.
-// 2. Execute o bot localmente com `npm run dev`.
-// 3. Escaneie o QR Code e espere a mensagem "BOT CONECTADO".
-// 4. Pare o bot (Ctrl+C).
-// 5. Execute `npm run session`.
-// 6. Copie o bloco de texto gerado e cole nas variáveis de ambiente no Render.
-// =================================================================
- 
 import { promises as fs } from 'fs';
 import path from 'path';
-import { BufferJSON } from '@whiskeysockets/baileys';
+import makeWASocket, { useMultiFileAuthState } from '@whiskeysockets/baileys';
+import pino from 'pino';
+import { Boom } from '@hapi/boom';
 
 const AUTH_DIR = 'auth_info_multi';
+const OUTPUT_FILE = 'session_for_render.txt';
 
-async function generateSessionString() {
-  const outputFilePath = path.resolve('session_for_render.txt'); // Novo arquivo de saída
-  try {
-    console.log('▶️  Lendo arquivos de sessão da pasta:', AUTH_DIR);
-    const files = await fs.readdir(AUTH_DIR);
-    const credsFile = files.find(file => file === 'creds.json');
+async function generateSession() {
+    console.log('Iniciando a geração da sessão...');
 
-    if (!credsFile) {
-      throw new Error('Arquivo "creds.json" não encontrado na pasta "auth_info_multi". Certifique-se de que o bot foi iniciado e o QR Code escaneado com sucesso antes de executar este script.');
+    // Limpa o diretório de autenticação anterior para garantir uma nova sessão
+    if (await fs.stat(AUTH_DIR).catch(() => false)) {
+        await fs.rm(AUTH_DIR, { recursive: true, force: true });
+        console.log('Diretório de autenticação anterior removido.');
     }
 
-    const creds = JSON.parse(await fs.readFile(path.join(AUTH_DIR, credsFile), 'utf-8'), BufferJSON.reviver);
+    const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
 
-    const keys = {};
-    for (const file of files) {
-      if (file !== 'creds.json') {
-        const filePath = path.join(AUTH_DIR, file);
-        const data = JSON.parse(await fs.readFile(filePath, 'utf-8'), BufferJSON.reviver);
-        
-        // O nome do arquivo é a chave (ex: 'pre-key-1'), e o conteúdo é o valor
-        const key = file.replace('.json', '');
-        keys[key] = data;
-      }
-    }
+    const sock = makeWASocket({
+        logger: pino({ level: 'silent' }),
+        auth: state,
+        printQRInTerminal: true,
+    });
 
-    const sessionData = { creds, keys };
-    // Gera a string JSON sem espaços ou quebras de linha (minificada) para evitar erros de cópia.
-    const sessionString = JSON.stringify(sessionData, BufferJSON.replacer);
+    sock.ev.on('connection.update', async (update) => {
+        const { connection, qr } = update;
 
-    // Salva a string no arquivo .env
-    const envContentForRender = `SESSION_DATA=${sessionString}`;
-    await fs.writeFile(outputFilePath, envContentForRender);
+        if (qr) {
+            console.log('Escaneie o QR Code com seu WhatsApp. Ele irá desaparecer assim que for escaneado.');
+        }
 
-    console.log('\n✅ Sessão gerada e empacotada com sucesso!');
-    console.log(`   A sessão foi salva no arquivo: ${outputFilePath}`);
-    console.log('\n🚀 PRÓXIMO PASSO:');
-    console.log('   1. Abra o arquivo "session_for_render.txt" que foi criado na pasta do projeto.');
-    console.log('   2. Copie TODO o conteúdo desse arquivo.');
-    console.log('   3. Cole o conteúdo na seção "Environment" do seu serviço no Render (use a opção "Bulk Edit").');
+        if (connection === 'open') {
+            console.log('✅ Conexão estabelecida com sucesso!');
+            console.log('Aguarde, estamos compactando os dados da sessão...');
 
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      console.error('❌ Erro: O diretório "%s" não foi encontrado.', AUTH_DIR);
-      console.error('   Certifique-se de iniciar o bot (`npm run dev`) e escanear o QR Code primeiro.');
-    } else {
-      console.error('❌ Erro ao gerar a string de sessão:', error.message);
-    }
-  }
+            // Compacta os dados da sessão em uma única string JSON
+            const sessionData = JSON.stringify(state.creds);
+            await fs.writeFile(OUTPUT_FILE, sessionData);
+
+            console.log(`\n========================= SESSÃO GERADA =========================`);
+            console.log(`✅ Os dados da sessão foram salvos e compactados no arquivo: ${OUTPUT_FILE}`);
+            console.log(`\nINSTRUÇÕES PARA O RENDER:`);
+            console.log(`1. Copie TODO o conteúdo do arquivo '${OUTPUT_FILE}'.`);
+            console.log(`2. No seu serviço do Render, vá para "Environment".`);
+            console.log(`3. Crie uma nova variável de ambiente com a chave 'SESSION_DATA'.`);
+            console.log(`4. Cole o conteúdo copiado no campo de valor.`);
+            console.log(`=================================================================\n`);
+
+            await sock.end(undefined);
+            process.exit(0);
+        }
+
+        if (connection === 'close') {
+            const { lastDisconnect } = update;
+            const shouldReconnect = (lastDisconnect?.error instanceof Boom)?.output?.statusCode !== 401; // 401 = Logout
+            if (shouldReconnect) {
+                console.log('Conexão fechada. Tentando reconectar...');
+                generateSession();
+            } else {
+                console.log('Conexão fechada permanentemente. Verifique suas credenciais.');
+                process.exit(1);
+            }
+        }
+    });
+
+    sock.ev.on('creds.update', saveCreds);
 }
 
-generateSessionString();
+generateSession().catch(err => console.error('Ocorreu um erro:', err));

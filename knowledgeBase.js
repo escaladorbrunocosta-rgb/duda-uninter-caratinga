@@ -16,9 +16,32 @@ export async function loadKnowledgeBase() {
     knowledge = JSON.parse(fileContent);
 }
 
-// Objeto para rastrear o estado da conversa de cada usuário.
-// Em um bot real, isso seria armazenado em um banco de dados para persistência.
-const userState = new Map();
+// --- LÓGICA DE PERSISTÊNCIA DE ESTADO ---
+// Caminho para o nosso "banco de dados" de estado do usuário em arquivo JSON.
+const userStatePath = path.join(process.cwd(), 'userState.json');
+
+/**
+ * Lê o estado do usuário do arquivo JSON.
+ * @returns {Promise<Map<string, object>>} Um Map com o estado de todos os usuários.
+ */
+async function readUserState() {
+    try {
+        const data = await fs.readFile(userStatePath, 'utf-8');
+        return new Map(Object.entries(JSON.parse(data)));
+    } catch (error) {
+        // Se o arquivo não existir ou estiver vazio, retorna um Map vazio.
+        return new Map();
+    }
+}
+
+/**
+ * Salva o estado atual de todos os usuários no arquivo JSON.
+ * @param {Map<string, object>} userState - O Map contendo o estado dos usuários.
+ */
+async function saveUserState(userState) {
+    const data = JSON.stringify(Object.fromEntries(userState), null, 2);
+    await fs.writeFile(userStatePath, data, 'utf-8');
+}
 
 /**
  * Retorna uma saudação apropriada baseada na hora do dia.
@@ -91,12 +114,16 @@ export async function getResponse(chatId, messageText, userName) { // A função
         return await getGeminiResponse(prompt);
     }
 
+    // Carrega o estado de todos os usuários do arquivo
+    const userState = await readUserState();
+
     // Inicializa o estado do usuário com o menu principal e o contador de falhas
     const state = userState.get(chatId) || { menu: 'main', fallbackCount: 0, topic: null };
 
     // Resetar para o menu principal com saudações ou comando de menu
     if (knowledge.greetings.includes(normalizedText) || normalizedText === knowledge.menu_trigger) {
         userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta o contador
+        await saveUserState(userState); // Salva o estado
         const greeting = getGreeting();
         const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `${greeting}, ${userName}!`);
         return formatMenu({ ...knowledge.menu_tree.main, text: welcomeMessage });
@@ -105,6 +132,7 @@ export async function getResponse(chatId, messageText, userName) { // A função
     // Lógica de transferência para humano (Handover)
     if (knowledge.human_handover.keywords.some(kw => normalizedText.includes(kw))) {
         userState.set(chatId, { menu: 'main', fallbackCount: 0, topic: null }); // Reseta o estado
+        await saveUserState(userState); // Salva o estado
         return knowledge.human_handover.message;
     }
 
@@ -122,6 +150,7 @@ export async function getResponse(chatId, messageText, userName) { // A função
                 // Se for uma resposta final, reseta o estado para o menu principal
                 userState.set(chatId, { menu: 'main', fallbackCount: 0, topic: null }); // Reseta o contador e o tópico
             }
+            await saveUserState(userState); // Salva o estado
             return formatMenu(nextNode);
         }
     }
@@ -157,12 +186,14 @@ export async function getResponse(chatId, messageText, userName) { // A função
             fallbackCount: 0, // Reseta o contador de falhas
             topic: bestMatch.keywords // Armazena as palavras-chave da resposta como o novo tópico
         });
+        await saveUserState(userState); // Salva o estado
         return chooseResponse(bestMatch.answer);
     }
 
     // Se for a primeira interação e não entendeu, mostra o menu principal
     if (!userState.has(chatId)) {
         userState.set(chatId, { menu: 'main', fallbackCount: 0 });
+        await saveUserState(userState); // Salva o estado
         const welcomeMessage = knowledge.menu_tree.main.text.replace('Olá!', `${getGreeting()}, ${userName}!`);
         return formatMenu({ ...knowledge.menu_tree.main, text: welcomeMessage });
     }
@@ -170,7 +201,6 @@ export async function getResponse(chatId, messageText, userName) { // A função
     // --- LÓGICA DE FALLBACK PROGRESSIVO ---
     // Incrementa o contador de falhas do usuário
     state.fallbackCount++;
-    userState.set(chatId, state);
 
     // Calcula qual mensagem de fallback usar. Se o contador passar do tamanho da lista, usa a última.
     const fallbackIndex = Math.min(state.fallbackCount - 1, knowledge.fallback.length - 1);
@@ -178,6 +208,7 @@ export async function getResponse(chatId, messageText, userName) { // A função
     // Se chegamos na última mensagem de fallback, aciona a transferência para humano.
     if (state.fallbackCount >= knowledge.fallback.length) {
         userState.set(chatId, { menu: 'main', fallbackCount: 0, topic: null }); // Reseta o estado
+        await saveUserState(userState); // Salva o estado
         return chooseResponse(knowledge.fallback[knowledge.fallback.length - 1]) + "\n\n" + knowledge.human_handover.message;
     }
 
@@ -185,8 +216,10 @@ export async function getResponse(chatId, messageText, userName) { // A função
 
     if (state.fallbackCount === 2) { // Na segunda falha, oferece o menu
         fallbackResponse += "\n\n" + formatMenu(knowledge.menu_tree.main).replace(/Olá!/, 'Talvez o menu principal possa ajudar:');
-        userState.set(chatId, { menu: 'main', fallbackCount: 0 }); // Reseta para evitar loop
+        state.menu = 'main'; // Volta ao menu principal para a próxima navegação
     }
 
+    userState.set(chatId, state);
+    await saveUserState(userState); // Salva o estado
     return fallbackResponse;
 }

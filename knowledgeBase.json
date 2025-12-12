@@ -246,6 +246,10 @@
       "keywords": ["transferência externa"],
       "answer": "Se você estuda em outra instituição e quer vir para a Uninter, pode solicitar a transferência externa aqui: https://www.uninter.com/transferencia-externa/"
     }
+    ,{
+      "keywords": ["curso de", "graduação em", "sobre o curso", "veterinária", "nutrição", "jornalismo", "biomedicina", "farmácia", "administração"],
+      "answer": "Para informações detalhadas sobre cursos, como grade curricular, duração e valores, o ideal é falar diretamente com nosso time comercial. Eles têm todas as informações atualizadas para você!\n\nPor favor, entre em contato pelo WhatsApp: *(33) 3322-4001*."
+    }
   ],
   "fallback": [
     "Desculpe, não entendi sua solicitação. Tente usar outras palavras ou digite *menu* para ver as opções.",

@@ -1,22 +1,29 @@
 // =================================================================
 // ARQUIVO: index.js
-// DESCRIÇÃO: Bot WhatsApp Baileys - QR destacado, bloqueio de grupos, respostas automáticas
+// DESCRIÇÃO: Bot WhatsApp Baileys integrado com Express para deploy no Render.
 // =================================================================
 
 import dotenv from 'dotenv';
 dotenv.config();
+import express from 'express';
 
 import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
-  BufferJSON,
 } from '@whiskeysockets/baileys';
 import qrcode from 'qrcode-terminal';
-import logger from './logger.js';
-import { loadKnowledgeBase, getResponse } from './knowledgeBase.js';
-import { config } from './config.js';
-import { sendSessionInvalidNotification } from './notifications.js';
+import logger from './logger.js'; // Assumindo que logger.js existe e está configurado
+import { loadKnowledgeBase, getResponse } from './knowledgeBase.js'; // Assumindo que knowledgeBase.js existe
+// Não precisamos de config.js ou notifications.js para o modo efêmero
+// import { config } from './config.js'; // Removido: Não usado para reconexão efêmera
+// import { sendSessionInvalidNotification } from './notifications.js'; // Removido: Não usado para sessão efêmera
+
+// ===========================
+// CONFIGURAÇÃO DO SERVIDOR EXPRESS
+// ===========================
+const app = express();
+const port = process.env.PORT || 3000;
 
 // ===========================
 // FUNÇÃO: Mostrar QR no Terminal (bem destacado)
@@ -32,62 +39,16 @@ function printBigQR(qr) {
   console.log("===========================================================\n\n");
 }
 
-let reconnectAttempts = 0;
-
 // ===========================
 // FUNÇÃO PRINCIPAL DE CONEXÃO
 // ===========================
-async function connectToWhatsApp() {
+export async function startBot() { // Exporta a função para ser usada por start.js
   // Carrega a base de conhecimento antes de iniciar a conexão
   await loadKnowledgeBase();
 
-  let state, saveCreds;
-
-  if (process.env.SESSION_DATA) {
-    logger.info("Carregando sessão da variável de ambiente...");
-    
-    let sessionDataString = process.env.SESSION_DATA;
-    logger.info({ session_raw: sessionDataString }, "SESSION_DATA raw:");
-
-    // Reforço: Lógica aprimorada para extrair o primeiro objeto JSON válido da string.
-    // Isso torna o bot mais resiliente a dados de sessão copiados com logs extras.
-    const jsonStartIndex = sessionDataString.indexOf('{');
-    let braceCount = 0;
-    let jsonEndIndex = -1;
-
-    if (jsonStartIndex !== -1) {
-      for (let i = jsonStartIndex; i < sessionDataString.length; i++) {
-        if (sessionDataString[i] === '{') braceCount++;
-        if (sessionDataString[i] === '}') braceCount--;
-        if (braceCount === 0) {
-          jsonEndIndex = i;
-          break;
-        }
-      }
-      if (jsonEndIndex !== -1) {
-        sessionDataString = sessionDataString.substring(jsonStartIndex, jsonEndIndex + 1);
-      } else {
-        logger.fatal("Nenhum objeto JSON válido ('{...}') encontrado na SESSION_DATA.");
-        process.exit(1);
-      }
-    }
-
-    try {
-      const sessionData = JSON.parse(sessionDataString, BufferJSON.reviver);
-      logger.info({ session_keys: Object.keys(sessionData) }, "SESSION_DATA parsed:");
-      saveCreds = async () => {}; // Não salva credenciais quando usa variável de ambiente
-      state = {
-        creds: sessionData.creds,
-        keys: sessionData.keys,
-      };
-    } catch (e) {
-      logger.fatal({ error: e.message, cleaned_json: sessionDataString }, "❌ ERRO FATAL: Falha ao fazer o parse do JSON da SESSION_DATA. A string pode estar corrompida ou mal formatada. Verifique a variável no Render.");
-      process.exit(1); // Encerra o processo se a sessão for inválida
-      }
-  } else {
-    logger.info("Usando autenticação local (auth_info_multi)...");
-    ({ state, saveCreds } = await useMultiFileAuthState("auth_info_multi"));
-  }
+  // Em ambiente efêmero, não persistimos a sessão.
+  // O Baileys gerará um novo QR Code a cada inicialização.
+  logger.info("Iniciando autenticação... Gerando novo QR Code a cada inicialização.");
 
   const { version, isLatest } = await fetchLatestBaileysVersion();
   logger.info(`Baileys versão: ${version.join('.')} (mais recente: ${isLatest})`);
@@ -95,8 +56,8 @@ async function connectToWhatsApp() {
   const sock = makeWASocket({
     version,
     logger,
-    printQRInTerminal: false,
-    auth: state,
+    printQRInTerminal: true, // IMPRIME O QR CODE NO TERMINAL
+    // Não passamos 'auth' para forçar um novo QR Code a cada inicialização
     browser: ["DudaBot", "Chrome", "1.0"],
     // Reforço: Ignora jids de grupo para evitar erros de descriptografia de sessão dupla.
     shouldIgnoreJid: jid => jid.endsWith('@g.us'),
@@ -110,34 +71,24 @@ async function connectToWhatsApp() {
 
     if (qr) printBigQR(qr);
 
-    if (connection === "open") {
+    if (connection === "open") { // Conexão bem-sucedida
       console.clear();
       logger.info("🎉 BOT CONECTADO AO WHATSAPP COM SUCESSO!");
-      reconnectAttempts = 0; // Reseta o contador de tentativas ao conectar com sucesso
     }
 
-    if (connection === "close") {
+    if (connection === "close") { // Conexão fechada
       const statusCode = lastDisconnect?.error?.output?.statusCode;
-      logger.error(`Conexão fechada. Código: ${statusCode}`);
+      logger.error(`Conexão fechada devido a: ${lastDisconnect?.error?.message || 'Erro desconhecido'}. Código: ${statusCode}`);
 
-      if (statusCode === DisconnectReason.loggedOut) {
-        logger.fatal("Sessão expirada. Será necessário gerar novo QR ou nova SESSION_DATA.");
-        sendSessionInvalidNotification(); // Envia notificação para o Discord
-        return;
-      }
-
-      if (reconnectAttempts < config.MAX_RECONNECT_ATTEMPTS) {
-        reconnectAttempts++;
-        logger.warn(`Tentando reconectar... (Tentativa ${reconnectAttempts} de ${config.MAX_RECONNECT_ATTEMPTS})`);
-        setTimeout(connectToWhatsApp, 5000); // Espera 5 segundos antes de tentar novamente
-      } else {
-        logger.fatal(`Falha ao reconectar após ${config.MAX_RECONNECT_ATTEMPTS} tentativas. O bot será desligado.`);
-        process.exit(1); // Desliga o processo se não conseguir reconectar
-      }
+      // Em um ambiente efêmero, qualquer desconexão (exceto talvez um erro irrecuperável que exija intervenção)
+      // deve levar a uma nova tentativa de conexão, que gerará um novo QR.
+      logger.warn("Conexão fechada. Tentando iniciar uma nova sessão (novo QR Code).");
+      // Pequeno delay para evitar loop muito rápido em caso de falha imediata
+      setTimeout(startBot, 5000);
     }
   });
 
-  sock.ev.on("creds.update", saveCreds);
+  // Não há 'creds.update' para salvar, pois a sessão não é persistente.
 
   // ====================
   // RECEBIMENTO DE MENSAGENS
@@ -176,6 +127,19 @@ async function connectToWhatsApp() {
 }
 
 // ===========================
+// ROTA KEEP-ALIVE PARA O RENDER
+// ===========================
+app.get('/', (req, res) => {
+  logger.info('Rota GET / foi acessada (Keep-Alive).');
+  res.send('🤖 Duda Uninter Bot está no ar e saudável!');
+});
+
+// ===========================
 // INICIAR BOT
 // ===========================
-connectToWhatsApp();
+app.listen(port, () => {
+  logger.info(`🚀 Servidor Express rodando na porta ${port}.`);
+  logger.info('Iniciando conexão com o WhatsApp...');
+  // Inicia o bot do WhatsApp APÓS o servidor web estar no ar.
+  startBot();
+});

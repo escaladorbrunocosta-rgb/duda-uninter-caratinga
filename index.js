@@ -19,7 +19,9 @@ import path from 'path';
 
 import logger from './logger.js';
 import { loadKnowledgeBase, getResponse } from './knowledgeBase.js';
-import { initializeGit, autoGitPush } from './utils/git.js';
+// A funcionalidade de sincronização com o Git foi desativada para simplificar o deploy.
+// Para reativar, descomente a linha abaixo e as chamadas para as funções.
+// import { initializeGit, autoGitPush } from './utils/git.js';
 import { ensureDirExists, deleteDir } from './utils/file.js';
 // ===========================
 // CONFIGURAÇÃO DO SERVIDOR EXPRESS
@@ -76,7 +78,9 @@ async function startBot() {
   // O evento 'creds.update' é o gatilho para salvar o estado de autenticação.
   // ===========================
   sock.ev.on('creds.update', saveCreds); // Salva localmente
-  sock.ev.on('creds.update', autoGitPush); // Envia para o GitHub
+  // A sincronização com o Git a cada atualização de credencial foi desativada.
+  // Para reativar, descomente a linha abaixo.
+  // sock.ev.on('creds.update', autoGitPush); // Envia para o GitHub
 
   // ===========================
   // MONITORAR EVENTOS DE CONEXÃO
@@ -89,8 +93,9 @@ async function startBot() {
     if (connection === "open") { // Conexão bem-sucedida
       console.clear();
       logger.info("🎉 BOT CONECTADO COM SUCESSO AO WHATSAPP!");
-      logger.info("[GIT] Iniciando sincronização da sessão com o GitHub...");
-      await autoGitPush(); // Salva a sessão no GitHub assim que conectar
+      // A sincronização com o Git ao conectar foi desativada.
+      // logger.info("[GIT] Iniciando sincronização da sessão com o GitHub...");
+      // await autoGitPush(); // Salva a sessão no GitHub assim que conectar
     }
 
     if (connection === "close") { // Conexão fechada
@@ -163,8 +168,9 @@ app.listen(port, async () => {
 
   try {
     await loadKnowledgeBase(); // 1. Carrega a base de conhecimento
-    await initializeGit();     // 2. Sincroniza o repositório Git para obter a sessão mais recente
-    await startBot();          // 3. Inicia o bot do WhatsApp
+    // A inicialização do Git foi desativada.
+    // await initializeGit();     // 2. Sincroniza o repositório Git para obter a sessão mais recente
+    await startBot();          // 2. Inicia o bot do WhatsApp
   } catch (error) {
     logger.fatal("Falha crítica durante a inicialização do bot.", error);
     process.exit(1); // Encerra o processo se a inicialização falhar

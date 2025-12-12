@@ -2,7 +2,8 @@
 /node_modules
 
 # Arquivos de autenticação local (MUITO SENSÍVEL)
-# Contém as credenciais da sessão do WhatsApp. NUNCA envie para o GitHub.
+# A pasta auth_info_multi/ não será mais usada, mas a regra é mantida por segurança.
+# A pasta session_data/ é INTENCIONALMENTE NÃO IGNORADA para ser commitada.
 /auth_info_multi/
 
 # Arquivo de variáveis de ambiente (SENSÍVEL)
@@ -16,9 +17,20 @@ session_for_render.txt
 # Logs
 logs.txt
 *.log
+error_log.txt
 npm-debug.log*
 nohup.out
 
 # Arquivos gerados pelo sistema operacional
 .DS_Store
 Thumbs.db
+
+# Arquivo de estado do usuário
+userState.jsonstado do usuário
+userState.jsonstado do usuário
+userState.jsonstado do usuário
+userState.jsonstado do usuário
+userState.jsonstado do usuário
+userState.jsonstado do usuário
+userState.jsonstado do usuário
+userState.json

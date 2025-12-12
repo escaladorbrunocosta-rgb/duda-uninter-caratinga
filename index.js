@@ -1,29 +1,29 @@
 // =================================================================
 // ARQUIVO: index.js
-// DESCRIÇÃO: Bot WhatsApp Baileys integrado com Express para deploy no Render.
+// DESCRIÇÃO: Bot WhatsApp Baileys com persistência de sessão via Git para deploy no Render.
 // =================================================================
 
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
+import path from 'path';
 
 import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
 } from '@whiskeysockets/baileys';
-import qrcode from 'qrcode-terminal';
-import logger from './logger.js'; // Assumindo que logger.js existe e está configurado
-import { loadKnowledgeBase, getResponse } from './knowledgeBase.js'; // Assumindo que knowledgeBase.js existe
-// Não precisamos de config.js ou notifications.js para o modo efêmero
-// import { config } from './config.js'; // Removido: Não usado para reconexão efêmera
-// import { sendSessionInvalidNotification } from './notifications.js'; // Removido: Não usado para sessão efêmera
+import logger from './logger.js';
+import { loadKnowledgeBase, getResponse } from './knowledgeBase.js';
+import { initializeGit, autoGitPush } from './utils/git.js';
+import { ensureDirExists, deleteDir } from './utils/file.js';
 
 // ===========================
 // CONFIGURAÇÃO DO SERVIDOR EXPRESS
 // ===========================
 const app = express();
 const port = process.env.PORT || 3000;
+const SESSION_DIR = path.join(process.cwd(), 'session_data');
 
 // ===========================
 // FUNÇÃO: Mostrar QR no Terminal (bem destacado)
@@ -32,8 +32,9 @@ function printBigQR(qr) {
   console.clear();
   console.log("\n\n===========================================================");
   console.log("==============    ESCANEIE O QR CODE ABAIXO    ============");
+  console.log("======   Abra o WhatsApp > Aparelhos Conectados > Conectar  ======");
   console.log("===========================================================\n");
-  qrcode.generate(qr, { small: false });
+  // qrcode-terminal não é mais necessário, Baileys imprime o QR nativamente.
   console.log("\n===========================================================");
   console.log("====================    AGUARDANDO...    ==================");
   console.log("===========================================================\n\n");
@@ -43,12 +44,15 @@ function printBigQR(qr) {
 // FUNÇÃO PRINCIPAL DE CONEXÃO
 // ===========================
 export async function startBot() { // Exporta a função para ser usada por start.js
-  // Carrega a base de conhecimento antes de iniciar a conexão
-  await loadKnowledgeBase();
+  logger.info("Iniciando o bot...");
 
-  // Em ambiente efêmero, não persistimos a sessão.
-  // O Baileys gerará um novo QR Code a cada inicialização.
-  logger.info("Iniciando autenticação... Gerando novo QR Code a cada inicialização.");
+  // Garante que o diretório da sessão exista antes de usar
+  await ensureDirExists(SESSION_DIR);
+  logger.info(`[AUTH] Diretório de sessão verificado em: ${SESSION_DIR}`);
+
+  // Carrega o estado de autenticação da pasta
+  const { state, saveCreds } = await useMultiFileAuthState(SESSION_DIR);
+  logger.info("[AUTH] Estado de autenticação carregado da pasta local.");
 
   const { version, isLatest } = await fetchLatestBaileysVersion();
   logger.info(`Baileys versão: ${version.join('.')} (mais recente: ${isLatest})`);
@@ -56,12 +60,16 @@ export async function startBot() { // Exporta a função para ser usada por star
   const sock = makeWASocket({
     version,
     logger,
-    printQRInTerminal: true, // IMPRIME O QR CODE NO TERMINAL
-    // Não passamos 'auth' para forçar um novo QR Code a cada inicialização
+    printQRInTerminal: true,
+    auth: state, // Carrega a sessão
     browser: ["DudaBot", "Chrome", "1.0"],
-    // Reforço: Ignora jids de grupo para evitar erros de descriptografia de sessão dupla.
     shouldIgnoreJid: jid => jid.endsWith('@g.us'),
   });
+
+  // ===========================
+  // SALVAR CREDENCIAIS E SINCRONIZAR COM GIT
+  // ===========================
+  sock.ev.on('creds.update', saveCreds);
 
   // ===========================
   // MONITORAR EVENTOS DE CONEXÃO
@@ -73,22 +81,35 @@ export async function startBot() { // Exporta a função para ser usada por star
 
     if (connection === "open") { // Conexão bem-sucedida
       console.clear();
-      logger.info("🎉 BOT CONECTADO AO WHATSAPP COM SUCESSO!");
+      logger.info("🎉 BOT CONECTADO COM SUCESSO AO WHATSAPP!");
+      logger.info("[GIT] Iniciando sincronização da sessão com o GitHub...");
+      await autoGitPush(); // Salva a sessão no GitHub assim que conectar
     }
 
     if (connection === "close") { // Conexão fechada
-      const statusCode = lastDisconnect?.error?.output?.statusCode;
-      logger.error(`Conexão fechada devido a: ${lastDisconnect?.error?.message || 'Erro desconhecido'}. Código: ${statusCode}`);
+      const reason = lastDisconnect?.error?.output?.statusCode;
+      logger.error(`Conexão fechada. Razão: ${DisconnectReason[reason] || 'Desconhecido'}. Código: ${reason}`);
 
-      // Em um ambiente efêmero, qualquer desconexão (exceto talvez um erro irrecuperável que exija intervenção)
-      // deve levar a uma nova tentativa de conexão, que gerará um novo QR.
-      logger.warn("Conexão fechada. Tentando iniciar uma nova sessão (novo QR Code).");
-      // Pequeno delay para evitar loop muito rápido em caso de falha imediata
-      setTimeout(startBot, 5000);
+      // Lógica para lidar com sessão corrompida (Logged Out)
+      if (reason === DisconnectReason.loggedOut) {
+        logger.warn("[AUTH] Sessão corrompida ou desconectada remotamente. Apagando dados locais para gerar novo QR Code.");
+        await deleteDir(SESSION_DIR);
+        logger.info("[AUTH] Pasta da sessão local apagada. Reiniciando o bot...");
+        // O commit da remoção será feito na próxima conexão bem-sucedida
+        startBot();
+      } else {
+        logger.info("Tentando reconectar em 10 segundos...");
+        setTimeout(startBot, 10000);
+      }
     }
   });
 
-  // Não há 'creds.update' para salvar, pois a sessão não é persistente.
+  // Hook para salvar a sessão no Git sempre que as credenciais forem atualizadas
+  // Isso garante que a sessão esteja sempre sincronizada.
+  sock.ev.on('creds.update', async () => {
+      logger.info("[AUTH] Credenciais atualizadas. Tentando salvar no GitHub...");
+      await autoGitPush();
+  });
 
   // ====================
   // RECEBIMENTO DE MENSAGENS
@@ -135,11 +156,15 @@ app.get('/', (req, res) => {
 });
 
 // ===========================
-// INICIAR BOT
+// INICIALIZAÇÃO DA APLICAÇÃO
 // ===========================
-app.listen(port, () => {
+app.listen(port, async () => {
   logger.info(`🚀 Servidor Express rodando na porta ${port}.`);
-  logger.info('Iniciando conexão com o WhatsApp...');
-  // Inicia o bot do WhatsApp APÓS o servidor web estar no ar.
+
+  // 1. Carrega a base de conhecimento
+  await loadKnowledgeBase();
+  // 2. Sincroniza o repositório Git para obter a sessão mais recente
+  await initializeGit();
+  // 3. Inicia o bot do WhatsApp
   startBot();
 });

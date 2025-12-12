@@ -74,7 +74,7 @@ export async function startBot() { // Exporta a função para ser usada por star
   // ===========================
   // MONITORAR EVENTOS DE CONEXÃO
   // ===========================
-  sock.ev.on("connection.update", (update) => {
+  sock.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect, qr } = update;
 
     if (qr) printBigQR(qr);

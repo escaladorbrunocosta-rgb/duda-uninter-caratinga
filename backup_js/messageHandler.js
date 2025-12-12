@@ -8,8 +8,7 @@
  */
 
 import { knowledgeBase } from './knowledgeBase.js';
-import natural from 'natural';
-const { JaroWinklerDistance } = natural;
+import { JaroWinklerDistance } from 'natural';
 import fs from 'fs';
 import path from 'path';
 
@@ -23,7 +22,6 @@ let userStates = new Map();
 function loadUserStates() {
     try {
         if (fs.existsSync(STATES_FILE)) {
-            console.log('Carregando estados de usuários do arquivo...');
             const data = fs.readFileSync(STATES_FILE, 'utf-8');
             userStates = new Map(JSON.parse(data));
         }
@@ -32,9 +30,6 @@ function loadUserStates() {
         userStates = new Map();
     }
 }
-
-// Carrega os estados uma vez na inicialização
-loadUserStates();
 
 /**
  * Retorna uma saudação apropriada baseada na hora do dia.
@@ -77,6 +72,9 @@ function formatMenu(menuNode) {
  * @returns {Promise<string>} A resposta do bot.
  */
 export async function getResponse(chatId, messageText, userName) {
+    // Garante que os estados estejam carregados
+    loadUserStates();
+
     const normalizedText = messageText.toLowerCase().trim();
 
     // --- Lógica de Reset e Menu Principal ---
@@ -85,14 +83,14 @@ export async function getResponse(chatId, messageText, userName) {
 
     if (isGreeting || normalizedText === knowledgeBase.menu_trigger || normalizedText === '9') {
         const greeting = getGreeting();
-        const welcomeMessage = knowledgeBase.menu_tree.main.text.replace('Olá, {userName}', userName);
+        const welcomeMessage = knowledgeBase.menu_tree.main.text.replace('{userName}', userName);
         const fullMessage = `${greeting}, ${welcomeMessage}`;
         
         // Atualiza o estado para o menu principal
         userStates.set(chatId, { menu: 'main' });
         saveUserStates();
-
-        return formatMenu({ ...knowledgeBase.menu_tree.main, text: fullMessage });
+        
+        return formatMenu({ ...knowledgeBase.menu_tree.main, text: fullMessage.replace('Olá, Bom dia, ', '') });
     }
 
     // --- Lógica de Navegação no Menu ---
@@ -117,12 +115,12 @@ export async function getResponse(chatId, messageText, userName) {
 
     // --- Lógica de Fallback ---
     // Se nenhuma lógica anterior funcionou, usa uma mensagem de fallback.
-    const fallbackIndex = (currentState.fallbackCount || 0) % knowledgeBase.fallback.length;
-    const fallbackMessage = knowledgeBase.fallback[fallbackIndex];
+    // Poderíamos adicionar um contador para respostas de fallback progressivas.
+    const fallbackCount = (currentState.fallbackCount || 0) % knowledgeBase.fallback.length;
+    const fallbackMessage = knowledgeBase.fallback[fallbackCount];
     
     // Atualiza o contador de fallback no estado do usuário
-    currentState.fallbackCount = fallbackIndex + 1;
-    userStates.set(chatId, currentState);
+    userStates.set(chatId, { ...currentState, fallbackCount: fallbackCount + 1 });
     saveUserStates();
 
     return fallbackMessage;

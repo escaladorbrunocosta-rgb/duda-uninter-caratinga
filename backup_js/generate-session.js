@@ -2,8 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import makeWASocket, { useMultiFileAuthState } from '@whiskeysockets/baileys';
 import pino from 'pino';
-import pkg from '@hapi/boom';
-const { Boom } = pkg;
+import { Boom } from '@hapi/boom';
 
 const AUTH_DIR = 'auth_info_multi';
 const OUTPUT_FILE = 'session_for_render.txt';
@@ -11,9 +10,11 @@ const OUTPUT_FILE = 'session_for_render.txt';
 async function generateSession() {
     console.log('Iniciando a geração da sessão...');
 
-    // Limpa o diretório de autenticação anterior para garantir uma nova sessão.
-    await fs.rm(AUTH_DIR, { recursive: true, force: true });
-    console.log('Diretório de autenticação anterior removido.');
+    // Limpa o diretório de autenticação anterior para garantir uma nova sessão
+    if (await fs.stat(AUTH_DIR).catch(() => false)) {
+        await fs.rm(AUTH_DIR, { recursive: true, force: true });
+        console.log('Diretório de autenticação anterior removido.');
+    }
 
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
 
@@ -56,7 +57,7 @@ async function generateSession() {
             const shouldReconnect = (lastDisconnect?.error instanceof Boom)?.output?.statusCode !== 401; // 401 = Logout
             if (shouldReconnect) {
                 console.log('Conexão fechada. Tentando reconectar...');
-                await generateSession();
+                generateSession();
             } else {
                 console.log('Conexão fechada permanentemente. Verifique suas credenciais.');
                 process.exit(1);

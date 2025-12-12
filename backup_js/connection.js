@@ -12,8 +12,8 @@ import makeWASocket, {
   DisconnectReason,
   fetchLatestBaileysVersion,
 } from '@whiskeysockets/baileys';
-import pkg from '@hapi/boom';
-const { Boom } = pkg;
+import { Boom } from '@hapi/boom';
+import path from 'path';
 import fs from 'fs';
 
 /**
@@ -65,13 +65,7 @@ export async function initializeWhatsAppClient({
       }
     }
     // Delega o tratamento mais específico para o chamador
-    onConnectionUpdate(update, () => initializeWhatsAppClient({
-      sessionDir,
-      logger,
-      onConnectionUpdate,
-      onMessagesUpsert,
-      printQRInTerminal,
-    }));
+    onConnectionUpdate(update, () => initializeWhatsAppClient(arguments[0]));
   });
 
   if (onMessagesUpsert) {

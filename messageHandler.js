@@ -77,53 +77,44 @@ function formatMenu(menuNode) {
  * @returns {Promise<string>} A resposta do bot.
  */
 export async function getResponse(chatId, messageText, userName) {
+    let responseMessage;
+    let stateChanged = false;
     const normalizedText = messageText.toLowerCase().trim();
+    const currentState = userStates.get(chatId) || { menu: 'main' };
 
     // --- Lógica de Reset e Menu Principal ---
-    // Verifica se a mensagem é uma saudação ou um pedido de menu
     const isGreeting = knowledgeBase.greetings.some(greeting => JaroWinklerDistance(normalizedText, greeting) > 0.85);
 
     if (isGreeting || normalizedText === knowledgeBase.menu_trigger || normalizedText === '9') {
         const greeting = getGreeting();
         const welcomeMessage = knowledgeBase.menu_tree.main.text.replace('Olá, {userName}', userName);
         const fullMessage = `${greeting}, ${welcomeMessage}`;
-        
-        // Atualiza o estado para o menu principal
+
         userStates.set(chatId, { menu: 'main' });
-        saveUserStates();
-
-        return formatMenu({ ...knowledgeBase.menu_tree.main, text: fullMessage });
-    }
-
-    // --- Lógica de Navegação no Menu ---
-    const currentState = userStates.get(chatId) || { menu: 'main' };
-    const currentNode = knowledgeBase.menu_tree[currentState.menu];
-
-    // Verifica se a entrada corresponde a uma opção do menu atual
-    if (currentNode && currentNode.options && knowledgeBase.menu_tree[normalizedText]) {
+        stateChanged = true;
+        responseMessage = formatMenu({ ...knowledgeBase.menu_tree.main, text: fullMessage });
+    } else if (knowledgeBase.menu_tree[currentState.menu]?.options && knowledgeBase.menu_tree[normalizedText]) {
+        // --- Lógica de Navegação no Menu ---
         const nextNode = knowledgeBase.menu_tree[normalizedText];
-        
-        // Se o próximo nó for um menu, atualiza o estado
         if (nextNode.options) {
             userStates.set(chatId, { menu: normalizedText });
-            saveUserStates();
         } else {
-            // Se for uma resposta final, reseta o estado para o menu principal
             userStates.set(chatId, { menu: 'main' });
-            saveUserStates();
         }
-        return formatMenu(nextNode);
+        stateChanged = true;
+        responseMessage = formatMenu(nextNode);
+    } else {
+        // --- Lógica de Fallback ---
+        const fallbackIndex = (currentState.fallbackCount || 0) % knowledgeBase.fallback.length;
+        responseMessage = knowledgeBase.fallback[fallbackIndex];
+        currentState.fallbackCount = fallbackIndex + 1;
+        userStates.set(chatId, currentState);
+        stateChanged = true;
     }
 
-    // --- Lógica de Fallback ---
-    // Se nenhuma lógica anterior funcionou, usa uma mensagem de fallback.
-    const fallbackIndex = (currentState.fallbackCount || 0) % knowledgeBase.fallback.length;
-    const fallbackMessage = knowledgeBase.fallback[fallbackIndex];
-    
-    // Atualiza o contador de fallback no estado do usuário
-    currentState.fallbackCount = fallbackIndex + 1;
-    userStates.set(chatId, currentState);
-    saveUserStates();
+    if (stateChanged) {
+        saveUserStates();
+    }
 
-    return fallbackMessage;
+    return responseMessage;
 }
